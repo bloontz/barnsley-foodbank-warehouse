@@ -13,14 +13,16 @@
   --green:#078b40;
   --dark:#143d28;
   --bg:#f3f6f4;
-  --card:#fff;
+  --card:#ffffff;
   --muted:#68766e;
   --line:#dce5df;
   --danger:#b42318;
   --amber:#9a6700;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -29,9 +31,22 @@ body{
   color:#16201a;
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
 
 .login{
   min-height:100vh;
@@ -56,8 +71,14 @@ button{cursor:pointer}
   margin-bottom:15px;
 }
 
-.login-card h1{font-size:23px;margin:4px 0}
-.login-card p{color:var(--muted)}
+.login-card h1{
+  font-size:23px;
+  margin:4px 0;
+}
+
+.login-card p{
+  color:var(--muted);
+}
 
 label{
   display:block;
@@ -66,7 +87,9 @@ label{
   margin:12px 0 6px;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
   width:100%;
   border:1px solid #cdd8d1;
   border-radius:8px;
@@ -86,10 +109,24 @@ textarea{
   font-weight:700;
 }
 
-.primary{background:var(--green);color:#fff}
-.secondary{background:#e9efeb;color:#173c29}
-.danger{background:#fce8e6;color:var(--danger)}
-.full{grid-column:1/-1}
+.primary{
+  background:var(--green);
+  color:#fff;
+}
+
+.secondary{
+  background:#e9efeb;
+  color:#173c29;
+}
+
+.danger{
+  background:#fce8e6;
+  color:var(--danger);
+}
+
+.full{
+  grid-column:1/-1;
+}
 
 .error{
   background:#fff0ef;
@@ -108,6 +145,22 @@ textarea{
   margin:12px 0;
   font-size:13px;
 }
+
+.item-info{
+  margin-top:8px;
+  padding:9px 11px;
+  background:#f0f7f2;
+  border:1px solid #d5e6da;
+  border-radius:8px;
+  color:#31523d;
+  font-size:13px;
+}
+
+.item-info b{
+  color:#173c29;
+}
+
+/* APP */
 
 .app{
   min-height:100vh;
@@ -134,7 +187,9 @@ textarea{
   color:#cfe5d6;
 }
 
-.nav{margin-top:28px}
+.nav{
+  margin-top:28px;
+}
 
 .nav button{
   display:block;
@@ -161,7 +216,9 @@ textarea{
   color:#cfe5d6;
 }
 
-.userbox button{margin-top:8px}
+.userbox button{
+  margin-top:8px;
+}
 
 main{
   padding:25px;
@@ -181,6 +238,8 @@ main{
   font-size:26px;
 }
 
+/* DASHBOARD */
+
 .grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -194,13 +253,17 @@ main{
   padding:18px;
 }
 
-.stat b{font-size:27px}
+.stat b{
+  font-size:27px;
+}
 
 .stat small{
   display:block;
   color:var(--muted);
   margin-bottom:7px;
 }
+
+/* PANELS */
 
 .panel{
   background:#fff;
@@ -222,7 +285,9 @@ main{
   margin-bottom:14px;
 }
 
-.tablewrap{overflow:auto}
+.tablewrap{
+  overflow:auto;
+}
 
 table{
   width:100%;
@@ -230,7 +295,8 @@ table{
   min-width:700px;
 }
 
-th,td{
+th,
+td{
   text-align:left;
   padding:10px;
   border-bottom:1px solid var(--line);
@@ -286,34 +352,51 @@ form.formgrid{
   padding:25px;
 }
 
-.item-help{
-  color:var(--muted);
-  font-size:12px;
-  margin-top:5px;
-}
+/* MOBILE */
 
 @media(max-width:850px){
-  .app{grid-template-columns:1fr}
-  .side{position:static}
+
+  .app{
+    grid-template-columns:1fr;
+  }
+
+  .side{
+    position:static;
+  }
+
   .userbox{
     position:static;
     width:auto;
     margin-top:20px;
   }
-  .grid{grid-template-columns:repeat(2,1fr)}
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
 }
 
 @media(max-width:550px){
-  main{padding:14px}
-  .grid{grid-template-columns:1fr}
-  .formgrid{grid-template-columns:1fr!important}
+
+  main{
+    padding:14px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .formgrid{
+    grid-template-columns:1fr!important;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- =========================================================
+     LOGIN
+========================================================= -->
 
 <div id="login" class="login">
 
@@ -367,7 +450,9 @@ form.formgrid{
 </div>
 
 
-<!-- APPLICATION -->
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
 
 <div id="app" class="app hidden">
 
@@ -386,16 +471,40 @@ form.formgrid{
 
     </div>
 
+
     <div class="nav">
 
-      <button data-page="dashboard">Dashboard</button>
-      <button data-page="stock">Current Stock</button>
-      <button data-page="in">Stock In</button>
-      <button data-page="out">Stock Out</button>
-      <button data-page="items">Items</button>
-      <button data-page="organisations">Donors & Recipients</button>
-      <button data-page="deliveries">Delivery Notes</button>
-      <button data-page="history">Audit / Movements</button>
+      <button data-page="dashboard">
+        Dashboard
+      </button>
+
+      <button data-page="stock">
+        Current Stock
+      </button>
+
+      <button data-page="in">
+        Stock In
+      </button>
+
+      <button data-page="out">
+        Stock Out
+      </button>
+
+      <button data-page="items">
+        Items
+      </button>
+
+      <button data-page="organisations">
+        Donors & Recipients
+      </button>
+
+      <button data-page="deliveries">
+        Delivery Notes
+      </button>
+
+      <button data-page="history">
+        Audit / Movements
+      </button>
 
       <button
         data-page="users"
@@ -406,11 +515,15 @@ form.formgrid{
 
     </div>
 
+
     <div class="userbox">
 
       <b id="userName"></b>
+
       <br>
+
       <span id="userRole"></span>
+
       <br>
 
       <button
@@ -429,14 +542,18 @@ form.formgrid{
 
     <div class="top">
 
-      <h1 id="pageTitle">Dashboard</h1>
+      <h1 id="pageTitle">
+        Dashboard
+      </h1>
 
       <span id="status"></span>
 
     </div>
 
 
-    <!-- DASHBOARD -->
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
 
     <section
       id="page-dashboard"
@@ -467,9 +584,12 @@ form.formgrid{
 
       </div>
 
+
       <div class="panel">
 
-        <h2>Recent stock movements</h2>
+        <h2>
+          Recent stock movements
+        </h2>
 
         <div
           id="recentMoves"
@@ -481,7 +601,9 @@ form.formgrid{
     </section>
 
 
-    <!-- CURRENT STOCK -->
+    <!-- =====================================================
+         CURRENT STOCK
+    ====================================================== -->
 
     <section
       id="page-stock"
@@ -490,7 +612,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Current Stock</h2>
+        <h2>
+          Current Stock
+        </h2>
 
         <div class="toolbar">
 
@@ -511,7 +635,9 @@ form.formgrid{
     </section>
 
 
-    <!-- STOCK IN -->
+    <!-- =====================================================
+         STOCK IN
+    ====================================================== -->
 
     <section
       id="page-in"
@@ -520,7 +646,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Record Stock In</h2>
+        <h2>
+          Record Stock In
+        </h2>
 
         <form
           id="inForm"
@@ -530,23 +658,29 @@ form.formgrid{
           <div>
 
             <label for="inItem">
-              Item description
+              Item
             </label>
-
-            <!-- CHANGED FROM SELECT TO TEXT INPUT -->
 
             <input
               id="inItem"
               type="text"
-              placeholder="Type what the item is..."
+              list="itemList"
+              placeholder="Type or select item description"
               autocomplete="off"
               required
             >
 
-            <div class="item-help">
-              Type the description of the item, for example:
-              Tinned Tomatoes, Pasta, Cereal, Tea, etc.
-            </div>
+            <datalist id="itemList"></datalist>
+
+            <input
+              id="inItemId"
+              type="hidden"
+            >
+
+            <div
+              id="inItemInfo"
+              class="item-info hidden"
+            ></div>
 
           </div>
 
@@ -643,7 +777,9 @@ form.formgrid{
     </section>
 
 
-    <!-- STOCK OUT -->
+    <!-- =====================================================
+         STOCK OUT
+    ====================================================== -->
 
     <section
       id="page-out"
@@ -652,7 +788,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Record Stock Out</h2>
+        <h2>
+          Record Stock Out
+        </h2>
 
         <form
           id="outForm"
@@ -662,22 +800,13 @@ form.formgrid{
           <div>
 
             <label for="outItem">
-              Item description
+              Item
             </label>
 
-            <!-- ALSO CHANGED TO TEXT INPUT -->
-
-            <input
+            <select
               id="outItem"
-              type="text"
-              placeholder="Type the item description..."
-              autocomplete="off"
               required
-            >
-
-            <div class="item-help">
-              Type the item you are taking out of stock.
-            </div>
+            ></select>
 
           </div>
 
@@ -760,7 +889,9 @@ form.formgrid{
     </section>
 
 
-    <!-- ITEMS -->
+    <!-- =====================================================
+         ITEMS
+    ====================================================== -->
 
     <section
       id="page-items"
@@ -769,7 +900,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Items</h2>
+        <h2>
+          Items
+        </h2>
 
         <div class="toolbar">
 
@@ -794,7 +927,9 @@ form.formgrid{
     </section>
 
 
-    <!-- ORGANISATIONS -->
+    <!-- =====================================================
+         ORGANISATIONS
+    ====================================================== -->
 
     <section
       id="page-organisations"
@@ -803,7 +938,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Donors & Recipients</h2>
+        <h2>
+          Donors & Recipients
+        </h2>
 
         <div class="toolbar">
 
@@ -828,7 +965,9 @@ form.formgrid{
     </section>
 
 
-    <!-- DELIVERY NOTES -->
+    <!-- =====================================================
+         DELIVERY NOTES
+    ====================================================== -->
 
     <section
       id="page-deliveries"
@@ -837,7 +976,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Delivery Notes</h2>
+        <h2>
+          Delivery Notes
+        </h2>
 
         <div class="toolbar">
 
@@ -862,7 +1003,9 @@ form.formgrid{
     </section>
 
 
-    <!-- HISTORY -->
+    <!-- =====================================================
+         HISTORY
+    ====================================================== -->
 
     <section
       id="page-history"
@@ -871,7 +1014,9 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Audit / Movements</h2>
+        <h2>
+          Audit / Movements
+        </h2>
 
         <div
           id="historyTable"
@@ -883,7 +1028,9 @@ form.formgrid{
     </section>
 
 
-    <!-- USERS -->
+    <!-- =====================================================
+         USERS
+    ====================================================== -->
 
     <section
       id="page-users"
@@ -892,12 +1039,16 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Users</h2>
+        <h2>
+          Users
+        </h2>
 
         <p style="color:#68766e">
+
           Create staff accounts in Supabase Authentication,
           then add/update their profile here.
           Only administrators can manage profiles.
+
         </p>
 
         <div
@@ -914,7 +1065,12 @@ form.formgrid{
 </div>
 
 
+<!-- =========================================================
+     CONFIG
+========================================================= -->
+
 <script src="config.js"></script>
+
 
 <script>
 
@@ -937,7 +1093,7 @@ const sb = createClient(
 
 
 /* =========================================================
-   STATE
+   APPLICATION STATE
 ========================================================= */
 
 let currentUser = null;
@@ -956,8 +1112,10 @@ let deliveries = [];
 
 const $ = id => document.getElementById(id);
 
-const esc = value =>
-  String(value ?? '').replace(
+
+const esc = value => {
+
+  return String(value ?? '').replace(
     /[&<>"']/g,
     char => ({
       '&':'&amp;',
@@ -968,8 +1126,14 @@ const esc = value =>
     }[char])
   );
 
-const money = value =>
-  Number(value || 0).toLocaleString();
+};
+
+
+const money = value => {
+
+  return Number(value || 0).toLocaleString();
+
+};
 
 
 function notify(message,good=true){
@@ -1020,6 +1184,100 @@ function canManage(){
 
 
 /* =========================================================
+   FIND ITEM FROM DESCRIPTION
+========================================================= */
+
+function findItemFromText(value){
+
+  const text =
+    String(value || '')
+      .trim()
+      .toLowerCase();
+
+  if(!text){
+    return null;
+  }
+
+  return items.find(
+    item => {
+
+      const name =
+        String(item.name || '')
+          .trim()
+          .toLowerCase();
+
+      const sku =
+        String(item.sku || '')
+          .trim()
+          .toLowerCase();
+
+      const barcode =
+        String(item.barcode || '')
+          .trim()
+          .toLowerCase();
+
+      const full =
+        (
+          String(item.sku || '') +
+          ' — ' +
+          String(item.name || '')
+        )
+          .trim()
+          .toLowerCase();
+
+      return (
+        text === name ||
+        text === sku ||
+        text === barcode ||
+        text === full
+      );
+
+    }
+  ) || null;
+
+}
+
+
+function showItemInfo(){
+
+  const value =
+    $('inItem').value.trim();
+
+  const item =
+    findItemFromText(value);
+
+  if(!item){
+
+    $('inItemId').value = '';
+
+    $('inItemInfo').classList.add('hidden');
+
+    return;
+
+  }
+
+  $('inItemId').value =
+    item.id;
+
+  $('inItemInfo').innerHTML =
+    '<b>Weight:</b> ' +
+    esc(
+      Number(item.weight_kg || 0).toFixed(2)
+    ) +
+    ' kg &nbsp; | &nbsp; ' +
+    '<b>Stored in:</b> ' +
+    esc(
+      item.storage_type || 'Not specified'
+    );
+
+  $('inItemInfo').classList.remove(
+    'hidden'
+  );
+
+}
+
+
+/* =========================================================
    LOGIN
 ========================================================= */
 
@@ -1065,7 +1323,7 @@ async function login(event){
 
 
 /* =========================================================
-   USER
+   LOGIN / USER LOADING
 ========================================================= */
 
 async function loadUser(user){
@@ -1080,6 +1338,7 @@ async function loadUser(user){
     .select('*')
     .eq('id',user.id)
     .single();
+
 
   if(
     error ||
@@ -1100,22 +1359,29 @@ async function loadUser(user){
 
   }
 
+
   currentProfile = data;
 
+
   $('login').classList.add('hidden');
+
   $('app').classList.remove('hidden');
+
 
   $('userName').textContent =
     data.full_name || user.email || 'User';
+
 
   $('userRole').textContent =
     String(data.role || '')
       .replaceAll('_',' ');
 
+
   $('usersNav').classList.toggle(
     'hidden',
     role() !== 'ADMIN'
   );
+
 
   await refresh();
 
@@ -1127,13 +1393,14 @@ async function loadUser(user){
 function showLogin(){
 
   $('app').classList.add('hidden');
+
   $('login').classList.remove('hidden');
 
 }
 
 
 /* =========================================================
-   REFRESH
+   REFRESH DATABASE DATA
 ========================================================= */
 
 async function refresh(){
@@ -1147,6 +1414,7 @@ async function refresh(){
         .eq('active',true)
         .order('name');
 
+
     const orgsResult =
       await sb
         .from('organisations')
@@ -1154,11 +1422,13 @@ async function refresh(){
         .eq('active',true)
         .order('name');
 
+
     const stockResult =
       await sb
         .from('current_stock')
         .select('*')
         .order('name');
+
 
     const movesResult =
       await sb
@@ -1172,6 +1442,7 @@ async function refresh(){
         )
         .limit(100);
 
+
     const deliveriesResult =
       await sb
         .from('delivery_notes')
@@ -1184,39 +1455,62 @@ async function refresh(){
         )
         .limit(100);
 
+
     const profilesResult =
       await sb
         .from('profiles')
         .select('*')
         .order('full_name');
 
+
     if(itemsResult.error)
       throw itemsResult.error;
+
 
     if(orgsResult.error)
       throw orgsResult.error;
 
+
     if(stockResult.error)
       throw stockResult.error;
+
 
     if(movesResult.error)
       throw movesResult.error;
 
+
     if(deliveriesResult.error)
       throw deliveriesResult.error;
+
 
     if(profilesResult.error)
       throw profilesResult.error;
 
-    items = itemsResult.data || [];
-    orgs = orgsResult.data || [];
-    stock = stockResult.data || [];
-    moves = movesResult.data || [];
-    deliveries = deliveriesResult.data || [];
+
+    items =
+      itemsResult.data || [];
+
+
+    orgs =
+      orgsResult.data || [];
+
+
+    stock =
+      stockResult.data || [];
+
+
+    moves =
+      movesResult.data || [];
+
+
+    deliveries =
+      deliveriesResult.data || [];
+
 
     renderAll(
       profilesResult.data || []
     );
+
 
   }catch(error){
 
@@ -1237,6 +1531,20 @@ async function refresh(){
 
 
 /* =========================================================
+   GET ITEM DETAILS FOR STOCK ROW
+========================================================= */
+
+function itemForStock(row){
+
+  return items.find(
+    item =>
+      item.id === row.item_id
+  ) || null;
+
+}
+
+
+/* =========================================================
    RENDER
 ========================================================= */
 
@@ -1244,6 +1552,7 @@ function renderAll(profiles=[]){
 
   $('statItems').textContent =
     items.length;
+
 
   $('statUnits').textContent =
     money(
@@ -1257,6 +1566,7 @@ function renderAll(profiles=[]){
       )
     );
 
+
   $('statLow').textContent =
     stock.filter(
       row =>
@@ -1268,9 +1578,12 @@ function renderAll(profiles=[]){
         )
     ).length;
 
+
   $('statMoves').textContent =
     moves.length;
 
+
+  /* RECENT MOVEMENTS */
 
   $('recentMoves').innerHTML =
     table(
@@ -1299,7 +1612,9 @@ function renderAll(profiles=[]){
             move.items?.name || '-'
           ),
 
-          money(move.quantity),
+          money(
+            move.quantity
+          ),
 
           esc(
             move.user_id === currentUser?.id
@@ -1311,29 +1626,12 @@ function renderAll(profiles=[]){
     );
 
 
-  $('stockTable').innerHTML =
-    table(
-      [
-        'SKU',
-        'Item',
-        'Category',
-        'Location',
-        'Qty',
-        'Reorder'
-      ],
+  /* CURRENT STOCK */
 
-      stock.map(row => [
+  renderStockTable(stock);
 
-        esc(row.sku),
-        esc(row.name),
-        esc(row.category),
-        esc(row.location || '—'),
-        money(row.current_quantity),
-        money(row.reorder_level)
 
-      ])
-    );
-
+  /* ITEMS */
 
   $('itemsTable').innerHTML =
     table(
@@ -1342,6 +1640,8 @@ function renderAll(profiles=[]){
         'Barcode',
         'Item',
         'Category',
+        'Weight',
+        'Stored In',
         'Location',
         'Reorder'
       ],
@@ -1349,15 +1649,37 @@ function renderAll(profiles=[]){
       items.map(row => [
 
         esc(row.sku),
-        esc(row.barcode || '—'),
+
+        esc(
+          row.barcode || '—'
+        ),
+
         esc(row.name),
+
         esc(row.category),
-        esc(row.location || '—'),
-        money(row.reorder_level)
+
+        Number(
+          row.weight_kg || 0
+        ).toFixed(2) +
+        ' kg',
+
+        esc(
+          row.storage_type || '—'
+        ),
+
+        esc(
+          row.location || '—'
+        ),
+
+        money(
+          row.reorder_level
+        )
 
       ])
     );
 
+
+  /* ORGANISATIONS */
 
   $('orgsTable').innerHTML =
     table(
@@ -1372,14 +1694,26 @@ function renderAll(profiles=[]){
       orgs.map(row => [
 
         esc(row.name),
+
         esc(row.type),
-        esc(row.contact_name || '—'),
-        esc(row.phone || '—'),
-        esc(row.postcode || '—')
+
+        esc(
+          row.contact_name || '—'
+        ),
+
+        esc(
+          row.phone || '—'
+        ),
+
+        esc(
+          row.postcode || '—'
+        )
 
       ])
     );
 
+
+  /* HISTORY */
 
   $('historyTable').innerHTML =
     table(
@@ -1407,15 +1741,23 @@ function renderAll(profiles=[]){
           move.items?.name || '-'
         ),
 
-        money(move.quantity),
+        money(
+          move.quantity
+        ),
 
-        esc(move.reference || '—'),
+        esc(
+          move.reference || '—'
+        ),
 
-        esc(move.batch_ref || '—')
+        esc(
+          move.batch_ref || '—'
+        )
 
       ])
     );
 
+
+  /* DELIVERY NOTES */
 
   $('deliveriesTable').innerHTML =
     table(
@@ -1429,9 +1771,13 @@ function renderAll(profiles=[]){
 
       deliveries.map(delivery => [
 
-        esc(delivery.delivery_number),
+        esc(
+          delivery.delivery_number
+        ),
 
-        esc(delivery.delivery_date),
+        esc(
+          delivery.delivery_date
+        ),
 
         esc(
           delivery.organisations?.name ||
@@ -1452,6 +1798,28 @@ function renderAll(profiles=[]){
     );
 
 
+  /* USERS */
+
+  const userRows =
+    profiles.map(profile => [
+
+      esc(
+        profile.full_name || '—'
+      ),
+
+      esc(
+        profile.role || '—'
+      ),
+
+      profile.active
+        ? 'Active'
+        : 'Inactive',
+
+      esc(profile.id)
+
+    ]);
+
+
   $('usersTable').innerHTML =
     table(
       [
@@ -1460,15 +1828,7 @@ function renderAll(profiles=[]){
         'Status',
         'User ID'
       ],
-
-      profiles.map(profile => [
-
-        esc(profile.full_name || '—'),
-        esc(profile.role || '—'),
-        profile.active ? 'Active' : 'Inactive',
-        esc(profile.id)
-
-      ])
+      userRows
     );
 
 
@@ -1478,7 +1838,88 @@ function renderAll(profiles=[]){
 
 
 /* =========================================================
-   TABLE
+   CURRENT STOCK TABLE
+========================================================= */
+
+function renderStockTable(rows){
+
+  $('stockTable').innerHTML =
+    table(
+      [
+        'SKU',
+        'Item',
+        'Category',
+        'Weight',
+        'Stored In',
+        'Location',
+        'Qty',
+        'Reorder'
+      ],
+
+      rows.map(row => {
+
+        const item =
+          itemForStock(row);
+
+        return [
+
+          esc(
+            row.sku ||
+            item?.sku ||
+            '—'
+          ),
+
+          esc(
+            row.name ||
+            item?.name ||
+            '—'
+          ),
+
+          esc(
+            row.category ||
+            item?.category ||
+            '—'
+          ),
+
+          Number(
+            item?.weight_kg ||
+            row.weight_kg ||
+            0
+          ).toFixed(2) +
+          ' kg',
+
+          esc(
+            item?.storage_type ||
+            row.storage_type ||
+            '—'
+          ),
+
+          esc(
+            row.location ||
+            item?.location ||
+            '—'
+          ),
+
+          money(
+            row.current_quantity
+          ),
+
+          money(
+            row.reorder_level ||
+            item?.reorder_level ||
+            0
+          )
+
+        ];
+
+      })
+    );
+
+}
+
+
+/* =========================================================
+   TABLE HELPERS
 ========================================================= */
 
 function badge(text,green){
@@ -1506,10 +1947,14 @@ function table(headers,rows){
 
   }
 
+
   return (
     '<table>' +
+
       '<thead>' +
+
         '<tr>' +
+
           headers
             .map(
               header =>
@@ -1518,7 +1963,9 @@ function table(headers,rows){
                 '</th>'
             )
             .join('') +
+
         '</tr>' +
+
       '</thead>' +
 
       '<tbody>' +
@@ -1540,6 +1987,7 @@ function table(headers,rows){
           .join('') +
 
       '</tbody>' +
+
     '</table>'
   );
 
@@ -1547,10 +1995,54 @@ function table(headers,rows){
 
 
 /* =========================================================
-   ORGANISATION SELECTS
+   SELECT BOXES
 ========================================================= */
 
 function fillSelects(){
+
+  /* TYPEABLE ITEM LIST */
+
+  $('itemList').innerHTML =
+    items
+      .map(
+        item =>
+          '<option value="' +
+          esc(
+            item.sku +
+            ' — ' +
+            item.name
+          ) +
+          '"></option>'
+      )
+      .join('');
+
+
+  /* STOCK OUT */
+
+  const itemOptions =
+    '<option value="">Select…</option>' +
+
+    items
+      .map(
+        item =>
+          '<option value="' +
+          esc(item.id) +
+          '">' +
+          esc(
+            item.sku +
+            ' — ' +
+            item.name
+          ) +
+          '</option>'
+      )
+      .join('');
+
+
+  $('outItem').innerHTML =
+    itemOptions;
+
+
+  /* DONORS */
 
   const donorOptions =
     '<option value="">None / not recorded</option>' +
@@ -1576,6 +2068,8 @@ function fillSelects(){
       )
       .join('');
 
+
+  /* RECIPIENTS */
 
   const recipientOptions =
     '<option value="">None / not recorded</option>' +
@@ -1611,123 +2105,6 @@ function fillSelects(){
 
 
 /* =========================================================
-   FIND OR CREATE ITEM
-========================================================= */
-
-async function findOrCreateItem(description){
-
-  const name =
-    description.trim();
-
-  if(!name){
-    throw new Error(
-      'Please enter an item description.'
-    );
-  }
-
-
-  /*
-     First look for an existing item by name.
-  */
-
-  const existing =
-    items.find(
-      item =>
-        String(item.name || '')
-          .trim()
-          .toLowerCase() ===
-        name.toLowerCase()
-    );
-
-
-  if(existing){
-
-    return existing.id;
-
-  }
-
-
-  /*
-     Also allow SKU to be typed.
-  */
-
-  const bySku =
-    items.find(
-      item =>
-        String(item.sku || '')
-          .trim()
-          .toLowerCase() ===
-        name.toLowerCase()
-    );
-
-
-  if(bySku){
-
-    return bySku.id;
-
-  }
-
-
-  /*
-     New item.
-     Generate a simple SKU automatically.
-  */
-
-  const sku =
-    'ITEM-' +
-    Date.now().toString().slice(-8);
-
-
-  const newItem = {
-
-    sku:sku,
-
-    name:name,
-
-    category:'General',
-
-    unit:'units',
-
-    location:null,
-
-    reorder_level:0,
-
-    active:true
-
-  };
-
-
-  const {
-    data,
-    error
-  } =
-    await sb
-      .from('items')
-      .insert(newItem)
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(
-      'Create item error:',
-      error
-    );
-
-    throw error;
-
-  }
-
-
-  items.push(data);
-
-  return data.id;
-
-}
-
-
-/* =========================================================
    STOCK MOVEMENTS
 ========================================================= */
 
@@ -1745,12 +2122,42 @@ async function addMove(type,form){
   }
 
 
-  const itemDescription =
-    $(
-      type === 'IN'
-        ? 'inItem'
-        : 'outItem'
-    ).value.trim();
+  let itemId;
+
+
+  /* STOCK IN USES TYPEABLE ITEM */
+
+  if(type === 'IN'){
+
+    const typed =
+      $('inItem').value.trim();
+
+    const foundItem =
+      findItemFromText(typed);
+
+    if(!foundItem){
+
+      notify(
+        'Please select an existing item from the suggestions.',
+        false
+      );
+
+      return;
+
+    }
+
+    itemId =
+      foundItem.id;
+
+    $('inItemId').value =
+      foundItem.id;
+
+  }else{
+
+    itemId =
+      $('outItem').value;
+
+  }
 
 
   const qty =
@@ -1795,10 +2202,10 @@ async function addMove(type,form){
     ).value.trim() || null;
 
 
-  if(!itemDescription || qty < 1){
+  if(!itemId || qty < 1){
 
     notify(
-      'Please enter an item description and quantity.',
+      'Please select an item and enter a quantity.',
       false
     );
 
@@ -1807,57 +2214,28 @@ async function addMove(type,form){
   }
 
 
-  let itemId;
-
-
-  try{
-
-    /*
-       Find existing item or create a new one.
-    */
-
-    itemId =
-      await findOrCreateItem(
-        itemDescription
-      );
-
-  }catch(error){
-
-    notify(
-      error.message ||
-      'Unable to create or find item.',
-      false
-    );
-
-    return;
-
-  }
-
-
-  /*
-     Refresh stock before checking Stock Out.
-  */
+  /* CHECK AVAILABLE STOCK BEFORE OUT */
 
   if(type === 'OUT'){
 
     const stockRow =
       stock.find(
         row =>
-          row.item_id === itemId
+          row.item_id === itemId ||
+          row.id === itemId
       );
 
 
     if(
-      !stockRow ||
+      stockRow &&
+      qty >
       Number(
         stockRow.current_quantity || 0
-      ) < qty
+      )
     ){
 
       notify(
-        'Not enough stock available for "' +
-        itemDescription +
-        '".',
+        'Not enough stock available.',
         false
       );
 
@@ -1909,9 +2287,7 @@ async function addMove(type,form){
   }
 
 
-  /*
-     Audit log.
-  */
+  /* AUDIT LOG */
 
   const auditResult =
     await sb
@@ -1926,7 +2302,6 @@ async function addMove(type,form){
 
         details:{
           item_id:itemId,
-          item_description:itemDescription,
           quantity:qty,
           reference:reference
         }
@@ -1945,6 +2320,13 @@ async function addMove(type,form){
 
 
   form.reset();
+
+  $('inItemId').value = '';
+
+  $('inItemInfo').classList.add(
+    'hidden'
+  );
+
 
   await refresh();
 
@@ -1974,7 +2356,6 @@ function showPage(name){
   const page =
     $('page-' + name);
 
-
   if(page){
 
     page.classList.remove('hidden');
@@ -1996,13 +2377,24 @@ function showPage(name){
   const titles = {
 
     dashboard:'Dashboard',
+
     stock:'Current Stock',
+
     in:'Stock In',
+
     out:'Stock Out',
+
     items:'Items',
-    organisations:'Donors & Recipients',
-    deliveries:'Delivery Notes',
-    history:'Audit / Movements',
+
+    organisations:
+      'Donors & Recipients',
+
+    deliveries:
+      'Delivery Notes',
+
+    history:
+      'Audit / Movements',
+
     users:'Users'
 
   };
@@ -2041,44 +2433,148 @@ function openItemEditor(){
     >
 
       <div>
+
         <label>SKU</label>
-        <input name="sku" required>
+
+        <input
+          name="sku"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Barcode</label>
-        <input name="barcode">
+
+        <input
+          name="barcode"
+        >
+
       </div>
 
-      <div>
-        <label>Name</label>
-        <input name="name" required>
-      </div>
 
       <div>
+
+        <label>Name / Description</label>
+
+        <input
+          name="name"
+          placeholder="e.g. Tinned tomatoes 400g"
+          required
+        >
+
+      </div>
+
+
+      <div>
+
         <label>Category</label>
-        <input name="category" required>
+
+        <input
+          name="category"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Unit</label>
-        <input name="unit" value="units">
+
+        <input
+          name="unit"
+          value="units"
+        >
+
       </div>
 
+
       <div>
+
+        <label>Weight per item (kg)</label>
+
+        <input
+          name="weight_kg"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="e.g. 0.50"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label>Stored in</label>
+
+        <select name="storage_type">
+
+          <option value="">
+            Select...
+          </option>
+
+          <option value="Box">
+            Box
+          </option>
+
+          <option value="Tray">
+            Tray
+          </option>
+
+          <option value="Pallet">
+            Pallet
+          </option>
+
+          <option value="Pallet Cage">
+            Pallet Cage
+          </option>
+
+          <option value="Bag">
+            Bag
+          </option>
+
+          <option value="Crate">
+            Crate
+          </option>
+
+          <option value="Other">
+            Other
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div>
+
         <label>Location</label>
-        <input name="location">
+
+        <input
+          name="location"
+          placeholder="e.g. A1"
+        >
+
       </div>
 
+
       <div>
+
         <label>Reorder level</label>
+
         <input
           name="reorder_level"
           type="number"
           min="0"
           value="0"
         >
+
       </div>
+
 
       <div class="actions">
 
@@ -2109,20 +2605,34 @@ function openItemEditor(){
 
       event.preventDefault();
 
+
       const formData =
         new FormData(
           event.target
         );
+
 
       const object =
         Object.fromEntries(
           formData
         );
 
+
       object.reorder_level =
         Number(
           object.reorder_level || 0
         );
+
+
+      object.weight_kg =
+        Number(
+          object.weight_kg || 0
+        );
+
+
+      object.storage_type =
+        object.storage_type ||
+        null;
 
 
       const { error } =
@@ -2143,7 +2653,8 @@ function openItemEditor(){
       }
 
 
-      $('itemEditor').innerHTML = '';
+      $('itemEditor').innerHTML =
+        '';
 
       await refresh();
 
@@ -2183,51 +2694,110 @@ function openOrgEditor(){
     >
 
       <div>
+
         <label>Name</label>
-        <input name="name" required>
+
+        <input
+          name="name"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Type</label>
 
         <select name="type">
-          <option value="DONOR">DONOR</option>
-          <option value="RECIPIENT">RECIPIENT</option>
-          <option value="PARTNER">PARTNER</option>
-          <option value="SUPPLIER">SUPPLIER</option>
+
+          <option value="DONOR">
+            DONOR
+          </option>
+
+          <option value="RECIPIENT">
+            RECIPIENT
+          </option>
+
+          <option value="PARTNER">
+            PARTNER
+          </option>
+
+          <option value="SUPPLIER">
+            SUPPLIER
+          </option>
+
         </select>
 
       </div>
 
+
       <div>
+
         <label>Contact</label>
-        <input name="contact_name">
+
+        <input
+          name="contact_name"
+        >
+
       </div>
 
+
       <div>
+
         <label>Phone</label>
-        <input name="phone">
+
+        <input
+          name="phone"
+        >
+
       </div>
 
+
       <div>
+
         <label>Email</label>
-        <input name="email" type="email">
+
+        <input
+          name="email"
+          type="email"
+        >
+
       </div>
+
 
       <div>
+
         <label>Postcode</label>
-        <input name="postcode">
+
+        <input
+          name="postcode"
+        >
+
       </div>
 
+
       <div class="full">
+
         <label>Address</label>
-        <input name="address">
+
+        <input
+          name="address"
+        >
+
       </div>
 
+
       <div class="full">
+
         <label>Notes</label>
-        <textarea name="notes"></textarea>
+
+        <textarea
+          name="notes"
+        ></textarea>
+
       </div>
+
 
       <div class="full actions">
 
@@ -2258,9 +2828,12 @@ function openOrgEditor(){
 
       event.preventDefault();
 
+
       const object =
         Object.fromEntries(
-          new FormData(event.target)
+          new FormData(
+            event.target
+          )
         );
 
 
@@ -2282,7 +2855,8 @@ function openOrgEditor(){
       }
 
 
-      $('orgEditor').innerHTML = '';
+      $('orgEditor').innerHTML =
+        '';
 
       await refresh();
 
@@ -2296,7 +2870,7 @@ function openOrgEditor(){
 
 
 /* =========================================================
-   DELIVERY EDITOR
+   DELIVERY NOTE EDITOR
 ========================================================= */
 
 function openDeliveryEditor(){
@@ -2360,7 +2934,9 @@ function openDeliveryEditor(){
 
       <div>
 
-        <label>Delivery Note No.</label>
+        <label>
+          Delivery Note No.
+        </label>
 
         <input
           name="delivery_number"
@@ -2369,6 +2945,7 @@ function openDeliveryEditor(){
         >
 
       </div>
+
 
       <div>
 
@@ -2383,11 +2960,14 @@ function openDeliveryEditor(){
 
       </div>
 
+
       <div>
 
         <label>Recipient</label>
 
-        <select name="recipient_id">
+        <select
+          name="recipient_id"
+        >
 
           <option value="">
             Select recipient
@@ -2399,40 +2979,70 @@ function openDeliveryEditor(){
 
       </div>
 
+
       <div>
 
         <label>Method</label>
 
-        <select name="delivery_method">
+        <select
+          name="delivery_method"
+        >
 
-          <option value="Van">Van</option>
-          <option value="Collection">Collection</option>
-          <option value="Other">Other</option>
+          <option value="Van">
+            Van
+          </option>
+
+          <option value="Collection">
+            Collection
+          </option>
+
+          <option value="Other">
+            Other
+          </option>
 
         </select>
 
       </div>
 
-      <div>
-
-        <label>Driver / Collected By</label>
-        <input name="driver_name">
-
-      </div>
 
       <div>
 
-        <label>Reference</label>
-        <input name="reference">
+        <label>
+          Driver / Collected By
+        </label>
+
+        <input
+          name="driver_name"
+        >
 
       </div>
+
+
+      <div>
+
+        <label>
+          Reference
+        </label>
+
+        <input
+          name="reference"
+        >
+
+      </div>
+
 
       <div class="full">
 
-        <label>Notes</label>
-        <textarea name="notes"></textarea>
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          name="notes"
+        ></textarea>
 
       </div>
+
 
       <div class="full actions">
 
@@ -2463,13 +3073,19 @@ function openDeliveryEditor(){
 
       event.preventDefault();
 
+
       const object =
         Object.fromEntries(
-          new FormData(event.target)
+          new FormData(
+            event.target
+          )
         );
 
+
       object.recipient_id =
-        object.recipient_id || null;
+        object.recipient_id ||
+        null;
+
 
       object.created_by =
         currentUser.id;
@@ -2493,7 +3109,8 @@ function openDeliveryEditor(){
       }
 
 
-      $('deliveryEditor').innerHTML = '';
+      $('deliveryEditor').innerHTML =
+        '';
 
       await refresh();
 
@@ -2507,7 +3124,7 @@ function openDeliveryEditor(){
 
 
 /* =========================================================
-   PRINT DELIVERY
+   PRINT DELIVERY NOTE
 ========================================================= */
 
 function printDelivery(id){
@@ -2531,7 +3148,8 @@ function printDelivery(id){
 
 
   const recipient =
-    delivery.organisations?.name || '';
+    delivery.organisations?.name ||
+    '';
 
 
   const printWindow =
@@ -2561,7 +3179,9 @@ function printDelivery(id){
 
 <head>
 
-<title>${esc(delivery.delivery_number)}</title>
+<title>
+${esc(delivery.delivery_number)}
+</title>
 
 <style>
 
@@ -2620,7 +3240,11 @@ footer{
 }
 
 @media print{
-  body{margin:12mm}
+
+  body{
+    margin:12mm;
+  }
+
 }
 
 </style>
@@ -2639,7 +3263,9 @@ footer{
 
   <div class="addr">
 
-    <b>Barnsley Foodbank Partnership</b>
+    <b>
+      Barnsley Foodbank Partnership
+    </b>
 
     <br>
 
@@ -2657,7 +3283,11 @@ footer{
 
 </div>
 
-<h1>DELIVERY NOTE</h1>
+
+<h1>
+DELIVERY NOTE
+</h1>
+
 
 <div class="box">
 
@@ -2691,6 +3321,7 @@ footer{
 
 </div>
 
+
 <div class="box">
 
   <b>Notes</b>
@@ -2701,24 +3332,37 @@ footer{
 
 </div>
 
+
 <div class="sign">
 
   <div>
+
     Received by:
+
     <div class="line"></div>
+
   </div>
 
+
   <div>
+
     Signature:
+
     <div class="line"></div>
+
   </div>
 
+
   <div>
+
     Date:
+
     <div class="line"></div>
+
   </div>
 
 </div>
+
 
 <footer>
 
@@ -2732,6 +3376,7 @@ footer{
   </b>
 
 </footer>
+
 
 <script>
 
@@ -2750,7 +3395,9 @@ window.onload = function(){
 
   printWindow.document.open();
 
-  printWindow.document.write(html);
+  printWindow.document.write(
+    html
+  );
 
   printWindow.document.close();
 
@@ -2833,6 +3480,22 @@ $('newDelivery').onclick =
 
 
 /* =========================================================
+   TYPEABLE STOCK-IN ITEM
+========================================================= */
+
+$('inItem').addEventListener(
+  'input',
+  showItemInfo
+);
+
+
+$('inItem').addEventListener(
+  'change',
+  showItemInfo
+);
+
+
+/* =========================================================
    STOCK SEARCH
 ========================================================= */
 
@@ -2847,53 +3510,38 @@ $('stockSearch').oninput =
 
     const filtered =
       stock.filter(
-        row =>
-          [
+        row => {
+
+          const item =
+            itemForStock(row);
+
+          return [
+
             row.sku,
             row.name,
             row.category,
             row.location,
-            row.barcode
+            row.barcode,
+
+            item?.sku,
+            item?.name,
+            item?.category,
+            item?.location,
+            item?.barcode,
+            item?.storage_type
+
           ]
-          .join(' ')
-          .toLowerCase()
-          .includes(query)
+            .join(' ')
+            .toLowerCase()
+            .includes(query);
+
+        }
       );
 
 
-    $('stockTable').innerHTML =
-      table(
-        [
-          'SKU',
-          'Item',
-          'Category',
-          'Location',
-          'Qty',
-          'Reorder'
-        ],
-
-        filtered.map(row => [
-
-          esc(row.sku),
-
-          esc(row.name),
-
-          esc(row.category),
-
-          esc(
-            row.location || '—'
-          ),
-
-          money(
-            row.current_quantity
-          ),
-
-          money(
-            row.reorder_level
-          )
-
-        ])
-      );
+    renderStockTable(
+      filtered
+    );
 
   };
 
