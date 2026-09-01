@@ -210,12 +210,11 @@ async function loadUser(user){
 async function refresh(){
   try {
     const itemsResult = await sb.from('items').select('*').eq('active',true).order('name');
-    const orgsResult = await sb.from('organizations').select('*').eq('active',true).order('name');
-    const stockResult = await sb.from('current_stock').select('*').order('name');
-    const movesResult = await sb.from('stock_movements').select('*,items(name,sku),.order('created_at',{ascending:false}).limit(100);
-    const deliveriesResult = await sb.from('delivery_notes').select('*,organizations(name)').order('created_at',{ascending:false}).limit(100);
-    const profilesResult = await sb.from('profiles').select('*').order('full_name');
-
+const orgsResult = await sb.from('organizations').select('*').eq('active',true).order('name');
+const stockResult = await sb.from('current_stock').select('*').order('name');
+const movesResult = await sb.from('stock_movements').select('*,items(name,sku)').order('created_at',{ascending:false}).limit(100);
+const deliveriesResult = await sb.from('delivery_notes').select('*,organizations(name)').order('created_at',{ascending:false}).limit(100);
+const profilesResult = await sb.from('profiles').select('*').order('full_name');
     if(itemsResult.error) throw itemsResult.error;
     if(orgsResult.error) throw orgsResult.error;
     if(stockResult.error) throw stockResult.error;
