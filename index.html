@@ -237,33 +237,112 @@ async function refresh(){
 }
 
 function renderAll(profiles=[]){
-  $('#statItems').textContent=items.length;
-  $('#statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
- $('#recentMoves').innerHTML=table(['Date','Type','Item','Qty','User'],moves.slice(0,10).map(m=>[
-  new Date(m.created_at).toLocaleString(),
-  badge(m.movement_type,m.movement_type==='IN'),
-  esc(m.items?.name),
-  money(m.quantity),
-  esc(m.user_id===currentUser.id?'You':m.user_id)
-]));
- $('stockTable').innerHTML=table(['SKU','Item','Category','Location','Qty','Reorder'],stock.map(x=>[
-  esc(x.sku),esc(x.name),esc(x.category),esc(x.location||'—'),money(x.current_quantity),money(x.reorder_level)
- ]));
- $('itemsTable').innerHTML=table(['SKU','Barcode','Item','Category','Location','Reorder'],items.map(x=>[
-  esc(x.sku),esc(x.barcode||'—'),esc(x.name),esc(x.category),esc(x.location||'—'),money(x.reorder_level)
- ]));
- $('orgsTable').innerHTML=table(['Name','Type','Contact','Phone','Postcode'],orgs.map(x=>[
-  esc(x.name),esc(x.type),esc(x.contact_name||'—'),esc(x.phone||'—'),esc(x.postcode||'—')
- ]));
- $('historyTable').innerHTML=table(['Date','Type','Item','Qty','Reference','Batch'],moves.map(m=>[
-  new Date(m.created_at).toLocaleString(),badge(m.movement_type,m.movement_type==='IN'),esc(m.items?.name),money(m.quantity),esc(m.reference||'—'),esc(m.batch_ref||'—')
- ]));
- $('deliveriesTable').innerHTML=table(['Number','Date','Recipient','Status','Action'],deliveries.map(d=>[
-  esc(d.delivery_number),esc(d.delivery_date),esc(d.organisations?.name||'—'),badge(d.status,d.status==='COMPLETED'),'<button class="btn secondary" onclick="printDelivery('+JSON.stringify(d.id)+')">Print</button>'
- ]));
- const userRows=profiles.map(p=>[esc(p.full_name),esc(p.role),p.active?'Active':'Inactive',esc(p.id)]);
- $('usersTable').innerHTML=table(['Name','Role','Status','User ID'],userRows);
- fillSelects();
+  $('#statItems').textContent = items.length;
+
+  $('#statLow').textContent = stock.filter(function(x){
+    return Number(x.current_quantity || 0) <= Number(x.reorder_level || 0);
+  }).length;
+
+  $('#statMoves').textContent = moves.length;
+
+  $('#recentMoves').innerHTML = table(
+    ['Date','Type','Item','Qty','User'],
+    moves.slice(0,10).map(function(m){
+      return [
+        new Date(m.created_at).toLocaleString(),
+        badge(m.movement_type, m.movement_type === 'IN'),
+        esc(m.items ? m.items.name : '-'),
+        money(m.quantity),
+        esc(m.user_id === currentUser.id ? 'You' : m.user_id)
+      ];
+    })
+  );
+
+  $('#stockTable').innerHTML = table(
+    ['SKU','Item','Category','Location','Qty','Reorder'],
+    stock.map(function(x){
+      return [
+        esc(x.sku),
+        esc(x.name),
+        esc(x.category),
+        esc(x.location || '-'),
+        money(x.current_quantity),
+        money(x.reorder_level)
+      ];
+    })
+  );
+
+  $('#itemsTable').innerHTML = table(
+    ['SKU','Barcode','Item','Category','Location','Reorder'],
+    items.map(function(x){
+      return [
+        esc(x.sku),
+        esc(x.barcode || '-'),
+        esc(x.name),
+        esc(x.category),
+        esc(x.location || '-'),
+        money(x.reorder_level)
+      ];
+    })
+  );
+
+  $('#orgsTable').innerHTML = table(
+    ['Name','Type','Contact','Phone','Postcode'],
+    orgs.map(function(x){
+      return [
+        esc(x.name),
+        esc(x.type),
+        esc(x.contact_name || '-'),
+        esc(x.phone || '-'),
+        esc(x.postcode || '-')
+      ];
+    })
+  );
+
+  $('#historyTable').innerHTML = table(
+    ['Date','Type','Item','Qty','Reference','Batch'],
+    moves.map(function(m){
+      return [
+        new Date(m.created_at).toLocaleDateString(),
+        badge(m.movement_type, m.movement_type === 'IN'),
+        esc(m.items ? m.items.name : '-'),
+        money(m.quantity),
+        esc(m.reference || '-'),
+        esc(m.batch_ref || '-')
+      ];
+    })
+  );
+
+  $('#deliveriesTable').innerHTML = table(
+    ['Number','Date','Recipient','Status','Action'],
+    deliveries.map(function(d){
+      return [
+        esc(d.delivery_number),
+        esc(d.delivery_date),
+        esc(d.organisations ? d.organisations.name : '-'),
+        badge(d.status, d.status === 'COMPLETED'),
+        '<button class="btn secondary" onclick="printDelivery(\'' +
+          JSON.stringify(d.id) +
+          '\')">Print</button>'
+      ];
+    })
+  );
+
+  const userRows = profiles.map(function(p){
+    return [
+      esc(p.full_name),
+      esc(p.role),
+      p.active ? 'Active' : 'Inactive',
+      esc(p.id)
+    ];
+  });
+
+  $('#usersTable').innerHTML = table(
+    ['Name','Role','Status','User ID'],
+    userRows
+  );
+
+  fillSelects();
 }
 function badge(t,green){return '<span class="badge '+(green?'green':'amber')+'">'+esc(t)+'</span>'}
 function table(headers,rows){
