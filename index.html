@@ -224,11 +224,10 @@ async function refresh(){
     if(profilesResult.error) throw profilesResult.error;
 
     items = itemsResult.data || [];
-    orgs = orgsResult.data || [];
-    stock = stockResult.data || [];
-    moves = movesResult.data || [];
-    deliveries = deliveriesResult.data || [];
-
+    const orgsResult = await sb.from('organizations').select('*').eq('active',true).order('name');
+const stockResult = await sb.from('current_stock').select('*').order('name');
+const movesResult = await sb.from('stock_movements').select('*,items(name,sku)').order('created_at',{ascending:false}).limit(100);
+const deliveriesResult = await sb.from('delivery_notes').select('*').order('created_at',{ascending:false}).limit(100);
     renderAll(profilesResult.data || []);
   } catch(error) {
     notify(error.message || 'Unable to load warehouse data', false);
