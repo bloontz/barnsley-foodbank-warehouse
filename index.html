@@ -33,11 +33,30 @@ form.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px
       <label>Email</label><input id="email" type="email" autocomplete="username" required>
       <label>Password</label><input id="password" type="password" autocomplete="current-password" required>
       <button class="btn primary" style="width:100%;margin-top:16px">Sign in</button>
+      <button type="button" id="forgotPassword" class="btn secondary" style="width:100%;margin-top:10px">Forgot password?</button>
     </form>
   </div>
-</div>
+ </div>
 
-<div id="app" class="app hidden">
+ <div id="reset" class="login hidden">
+  <div class="login-card">
+   <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+   <h1>Set a new password</h1>
+   <p>Choose a new password for your warehouse account.</p>
+   <div id="resetError" class="error hidden"></div>
+   <div id="resetOk" class="ok hidden"></div>
+   <form id="resetForm">
+    <label>New password</label>
+    <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+    <label>Confirm new password</label>
+    <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
+    <button class="btn primary" style="width:100%;margin-top:16px">Set new password</button>
+   </form>
+   <button type="button" id="backToLogin" class="btn secondary" style="width:100%;margin-top:10px">Back to sign in</button>
+  </div>
+ </div>
+
+ <div id="app" class="app hidden">
 <aside class="side">
   <div class="brand"><img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank"><small>Warehouse Management System</small></div>
   <div class="nav">
@@ -110,15 +129,60 @@ function role(){return currentProfile?.role||'READ_ONLY'}
 function canWrite(){return ['ADMIN','MANAGER','OPERATIVE'].includes(role())}
 function canManage(){return ['ADMIN','MANAGER'].includes(role())}
 
+function clearMessage(id){$(id).classList.add('hidden');$(id).textContent=''}
+function showMessage(id,msg){$(id).textContent=msg;$(id).classList.remove('hidden')}
+function recoveryRedirect(){return window.location.origin+window.location.pathname}
+
 async function login(e){
- e.preventDefault(); $('loginError').classList.add('hidden');
- const {error}=await sb.auth.signInWithPassword({email:$('email').value,password:$('password').value});
- if(error){$('loginError').textContent=error.message;$('loginError').classList.remove('hidden')}
+ e.preventDefault(); clearMessage('loginError');
+ const email=$('email').value.trim(), password=$('password').value;
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ if(error) showMessage('loginError',error.message);
 }
+
+async function forgotPassword(){
+ clearMessage('loginError');
+ const email=$('email').value.trim();
+ if(!email){showMessage('loginError','Enter your email address first, then click “Forgot password?”.');return}
+ const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:recoveryRedirect()});
+ if(error) showMessage('loginError',error.message);
+ else showMessage('loginError','If that email is registered, a password reset email has been sent. Check your inbox and spam folder.');
+}
+
+function showReset(){
+ $('login').classList.add('hidden');
+ $('app').classList.add('hidden');
+ $('reset').classList.remove('hidden');
+ clearMessage('resetError'); clearMessage('resetOk');
+}
+
+function showLogin(){
+ $('reset').classList.add('hidden');
+ $('app').classList.add('hidden');
+ $('login').classList.remove('hidden');
+}
+
+async function setNewPassword(e){
+ e.preventDefault(); clearMessage('resetError'); clearMessage('resetOk');
+ const p=$('newPassword').value, c=$('confirmPassword').value;
+ if(p.length<8){showMessage('resetError','Your new password must be at least 8 characters.');return}
+ if(p!==c){showMessage('resetError','The passwords do not match.');return}
+ const {error}=await sb.auth.updateUser({password:p});
+ if(error){showMessage('resetError',error.message);return}
+ $('resetForm').reset();
+ showMessage('resetOk','Password changed successfully. You can now sign in with your new password.');
+ await sb.auth.signOut();
+ setTimeout(()=>showLogin(),1200);
+}
+
 async function boot(){
  const {data:{session}}=await sb.auth.getSession();
- if(session) await loadUser(session.user);
- sb.auth.onAuthStateChange(async(_event,session)=>{ if(session) await loadUser(session.user); else showLogin(); });
+ if(session && !location.hash.includes('type=recovery')) await loadUser(session.user);
+ sb.auth.onAuthStateChange((event,session)=>{
+   if(event==='PASSWORD_RECOVERY'){showReset();return}
+   if(session) setTimeout(()=>loadUser(session.user),0);
+   else showLogin();
+ });
 }
 async function loadUser(user){
  currentUser=user;
@@ -221,9 +285,12 @@ function openDeliveryEditor(){
 }
 async function printDelivery(id){
  const d=deliveries.find(x=>x.id===id);if(!d)return;
- const w=window.open('','_blank');w.document.write(`<html><head><title>${esc(d.delivery_number)}</title><style>body{font-family:Arial;margin:35px;color:#111}.head{display:flex;justify-content:space-between;border-bottom:3px solid #078b40;padding-bottom:16px}.logo{width:250px}.addr{text-align:right;font-size:13px;line-height:1.5}h1{color:#078b40}.box{border:1px solid #aaa;padding:14px;margin:16px 0}.sign{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:35px}.line{border-bottom:1px solid #333;height:35px}footer{text-align:center;margin-top:40px;font-size:11px}@media print{body{margin:12mm}}</style></head><body><div class="head"><img class="logo" src="assets/barnsley-foodbank-logo.png"><div class="addr"><b>Barnsley Foodbank Partnership</b><br>Unit 19, Grange Lane Industrial Estate<br>Carrwood Road, Stairfoot<br>Barnsley, South Yorkshire, S71 5AS</div></div><h1>DELIVERY NOTE</h1><div class="box"><b>Note:</b> ${esc(d.delivery_number)}<br><b>Date:</b> ${esc(d.delivery_date)}<br><b>Recipient:</b> ${esc(d.organisations?.name||'')}<br><b>Method:</b> ${esc(d.delivery_method||'')}<br><b>Driver / Collected By:</b> ${esc(d.driver_name||'')}<br><b>Reference:</b> ${esc(d.reference||'')}</div><div class="box"><b>Notes</b><br><br>${esc(d.notes||'')}</div><div class="sign"><div>Received by:<div class="line"></div></div><div>Signature:<div class="line"></div></div><div>Date:<div class="line"></div></div></div><footer>Thank you for working together to support local people in crisis.<br><br><b>Barnsley Foodbank Partnership — Together with Trussell</b></footer><script>onload=()=>print()<\/script></body></html>`);w.document.close();
+ const w=window.open('','_blank');w.document.write(`<html><head><title>${esc(d.delivery_number)}</title><style>body{font-family:Arial;margin:35px;color:#111}.head{display:flex;justify-content:space-between;border-bottom:3px solid #078b40;padding-bottom:16px}.logo{width:250px}.addr{text-align:right;font-size:13px;line-height:1.5}h1{color:#078b40}.box{border:1px solid #aaa;padding:14px;margin:16px 0}.sign{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:35px}.line{border-bottom:1px solid #333;height:35px}footer{text-align:center;margin-top:40px;font-size:11px}@media print{body{margin:12mm}}</style></head><body><div class="head"><img class="logo" src="barnsley-foodbank-logo.png"><div class="addr"><b>Barnsley Foodbank Partnership</b><br>Unit 19, Grange Lane Industrial Estate<br>Carrwood Road, Stairfoot<br>Barnsley, South Yorkshire, S71 5AS</div></div><h1>DELIVERY NOTE</h1><div class="box"><b>Note:</b> ${esc(d.delivery_number)}<br><b>Date:</b> ${esc(d.delivery_date)}<br><b>Recipient:</b> ${esc(d.organisations?.name||'')}<br><b>Method:</b> ${esc(d.delivery_method||'')}<br><b>Driver / Collected By:</b> ${esc(d.driver_name||'')}<br><b>Reference:</b> ${esc(d.reference||'')}</div><div class="box"><b>Notes</b><br><br>${esc(d.notes||'')}</div><div class="sign"><div>Received by:<div class="line"></div></div><div>Signature:<div class="line"></div></div><div>Date:<div class="line"></div></div></div><footer>Thank you for working together to support local people in crisis.<br><br><b>Barnsley Foodbank Partnership — Together with Trussell</b></footer><script>onload=()=>print()<\/script></body></html>`);w.document.close();
 }
 $('loginForm').addEventListener('submit',login);
+$('forgotPassword').onclick=forgotPassword;
+$('resetForm').addEventListener('submit',setNewPassword);
+$('backToLogin').onclick=async()=>{await sb.auth.signOut();showLogin()};
 $('logout').onclick=()=>sb.auth.signOut();
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
 $('inForm').onsubmit=e=>{e.preventDefault();addMove('IN',e.target)};
