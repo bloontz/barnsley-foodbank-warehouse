@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Barnsley Foodbank Partnership — Warehouse</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,34 +11,49 @@
 <style>
 :root{
   --green:#078b40;
-  --dark:#163124;
+  --dark:#143d28;
   --bg:#f3f6f4;
-  --card:#fff;
-  --muted:#6a766f;
+  --card:#ffffff;
+  --muted:#68766e;
   --line:#dce5df;
   --danger:#b42318;
-  --amber:#9a6700
+  --amber:#9a6700;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   background:var(--bg);
-  color:#16201a
+  color:#16201a;
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
 
 .login{
   min-height:100vh;
   display:grid;
   place-items:center;
   padding:24px;
-  background:linear-gradient(135deg,#edf7f0,#f7faf8)
+  background:linear-gradient(135deg,#edf7f0,#f7faf8);
 }
 
 .login-card{
@@ -46,68 +62,70 @@ button{cursor:pointer}
   border:1px solid var(--line);
   border-radius:18px;
   padding:30px;
-  box-shadow:0 20px 50px #00000012
+  box-shadow:0 20px 50px #00000012;
 }
 
 .login-card img{
   width:260px;
   max-width:100%;
-  margin-bottom:15px
+  margin-bottom:15px;
 }
 
 .login-card h1{
   font-size:23px;
-  margin:4px 0
+  margin:4px 0;
 }
 
 .login-card p{
-  color:var(--muted)
+  color:var(--muted);
 }
 
 label{
   display:block;
   font-size:13px;
   font-weight:700;
-  margin:12px 0 6px
+  margin:12px 0 6px;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
   width:100%;
   border:1px solid #cdd8d1;
   border-radius:8px;
   padding:10px;
-  background:#fff
+  background:#fff;
 }
 
 textarea{
   min-height:100px;
-  resize:vertical
+  resize:vertical;
 }
 
 .btn{
   border:0;
   border-radius:8px;
   padding:10px 14px;
-  font-weight:700
+  font-weight:700;
 }
 
 .primary{
   background:var(--green);
-  color:#fff
+  color:#fff;
 }
 
 .secondary{
   background:#e9efeb;
-  color:#173c29
+  color:#173c29;
 }
 
 .danger{
   background:#fce8e6;
-  color:var(--danger)
+  color:var(--danger);
 }
 
 .full{
-  grid-column:1/-1
+  grid-column:1/-1;
 }
 
 .error{
@@ -116,7 +134,7 @@ textarea{
   padding:10px;
   border-radius:8px;
   margin:12px 0;
-  font-size:13px
+  font-size:13px;
 }
 
 .ok{
@@ -125,36 +143,38 @@ textarea{
   padding:10px;
   border-radius:8px;
   margin:12px 0;
-  font-size:13px
+  font-size:13px;
 }
+
+/* APP */
 
 .app{
   min-height:100vh;
   display:grid;
-  grid-template-columns:240px 1fr
+  grid-template-columns:240px 1fr;
 }
 
 .side{
-  background:#143d28;
+  background:var(--dark);
   color:#fff;
-  padding:20px 14px
+  padding:20px 14px;
 }
 
 .brand img{
   width:180px;
   background:#fff;
   border-radius:5px;
-  padding:5px
+  padding:5px;
 }
 
 .brand small{
   display:block;
   margin-top:8px;
-  color:#cfe5d6
+  color:#cfe5d6;
 }
 
 .nav{
-  margin-top:28px
+  margin-top:28px;
 }
 
 .nav button{
@@ -166,12 +186,12 @@ textarea{
   border:0;
   padding:11px 12px;
   border-radius:8px;
-  margin:3px 0
+  margin:3px 0;
 }
 
 .nav button.active,
 .nav button:hover{
-  background:#ffffff18
+  background:#ffffff18;
 }
 
 .userbox{
@@ -179,16 +199,16 @@ textarea{
   bottom:20px;
   width:210px;
   font-size:12px;
-  color:#cfe5d6
+  color:#cfe5d6;
 }
 
 .userbox button{
-  margin-top:8px
+  margin-top:8px;
 }
 
 main{
   padding:25px;
-  min-width:0
+  min-width:0;
 }
 
 .top{
@@ -196,78 +216,83 @@ main{
   justify-content:space-between;
   gap:15px;
   align-items:center;
-  margin-bottom:22px
+  margin-bottom:22px;
 }
 
 .top h1{
   margin:0;
-  font-size:26px
+  font-size:26px;
 }
+
+/* DASHBOARD */
 
 .grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px
+  gap:14px;
 }
 
 .stat{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:12px;
-  padding:18px
+  padding:18px;
 }
 
 .stat b{
-  font-size:27px
+  font-size:27px;
 }
 
 .stat small{
   display:block;
   color:var(--muted);
-  margin-bottom:7px
+  margin-bottom:7px;
 }
+
+/* PANELS */
 
 .panel{
   background:#fff;
   border:1px solid var(--line);
   border-radius:12px;
   padding:18px;
-  margin-top:16px
+  margin-top:16px;
 }
 
 .panel h2{
   margin:0 0 14px;
-  font-size:18px
+  font-size:18px;
 }
 
 .toolbar{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
-  margin-bottom:14px
+  margin-bottom:14px;
 }
 
 .tablewrap{
-  overflow:auto
+  overflow:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px
+  min-width:700px;
 }
 
-th,td{
+th,
+td{
   text-align:left;
   padding:10px;
   border-bottom:1px solid var(--line);
-  font-size:13px
+  font-size:13px;
 }
 
 th{
   font-size:12px;
   text-transform:uppercase;
-  color:#607067
+  color:#607067;
 }
 
 .badge{
@@ -276,74 +301,78 @@ th{
   border-radius:999px;
   font-size:11px;
   font-weight:700;
-  background:#edf1ee
+  background:#edf1ee;
 }
 
 .badge.green{
   background:#e7f6ec;
-  color:#13723a
+  color:#13723a;
 }
 
 .badge.red{
   background:#fce8e6;
-  color:#a1261c
+  color:#a1261c;
 }
 
 .badge.amber{
   background:#fff4d6;
-  color:#805700
+  color:#805700;
 }
 
 form.formgrid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:2px 14px
+  gap:2px 14px;
 }
 
 .actions{
   display:flex;
   gap:8px;
   justify-content:flex-end;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .empty{
   text-align:center;
   color:var(--muted);
-  padding:25px
+  padding:25px;
 }
 
+/* MOBILE */
+
 @media(max-width:850px){
+
   .app{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .side{
-    position:static
+    position:static;
   }
 
   .userbox{
     position:static;
     width:auto;
-    margin-top:20px
+    margin-top:20px;
   }
 
   .grid{
-    grid-template-columns:repeat(2,1fr)
+    grid-template-columns:repeat(2,1fr);
   }
 }
 
 @media(max-width:550px){
+
   main{
-    padding:14px
+    padding:14px;
   }
 
   .grid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .formgrid{
-    grid-template-columns:1fr!important
+    grid-template-columns:1fr!important;
   }
 }
 </style>
@@ -351,11 +380,18 @@ form.formgrid{
 
 <body>
 
-<!-- LOGIN -->
+<!-- =========================================================
+     LOGIN
+========================================================= -->
+
 <div id="login" class="login">
+
   <div class="login-card">
 
-    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+    <img
+      src="barnsley-foodbank-logo.png"
+      alt="Barnsley Foodbank"
+    >
 
     <h1>Warehouse Management System</h1>
 
@@ -367,7 +403,8 @@ form.formgrid{
 
     <form id="loginForm">
 
-      <label>Email</label>
+      <label for="email">Email</label>
+
       <input
         id="email"
         type="email"
@@ -375,7 +412,8 @@ form.formgrid{
         required
       >
 
-      <label>Password</label>
+      <label for="password">Password</label>
+
       <input
         id="password"
         type="password"
@@ -384,96 +422,41 @@ form.formgrid{
       >
 
       <button
+        type="submit"
         class="btn primary"
         style="width:100%;margin-top:16px"
       >
         Sign in
       </button>
 
-      <button
-        type="button"
-        id="forgotPassword"
-        class="btn secondary"
-        style="width:100%;margin-top:10px"
-      >
-        Forgot password?
-      </button>
-
     </form>
 
   </div>
+
 </div>
 
 
-<!-- PASSWORD RESET -->
-<div id="reset" class="login hidden">
-  <div class="login-card">
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
 
-    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
-
-    <h1>Set a new password</h1>
-
-    <p>
-      Choose a new password for your warehouse account.
-    </p>
-
-    <div id="resetError" class="error hidden"></div>
-    <div id="resetOk" class="ok hidden"></div>
-
-    <form id="resetForm">
-
-      <label>New password</label>
-      <input
-        id="newPassword"
-        type="password"
-        autocomplete="new-password"
-        minlength="8"
-        required
-      >
-
-      <label>Confirm new password</label>
-      <input
-        id="confirmPassword"
-        type="password"
-        autocomplete="new-password"
-        minlength="8"
-        required
-      >
-
-      <button
-        class="btn primary"
-        style="width:100%;margin-top:16px"
-      >
-        Set new password
-      </button>
-
-    </form>
-
-    <button
-      type="button"
-      id="backToLogin"
-      class="btn secondary"
-      style="width:100%;margin-top:10px"
-    >
-      Back to sign in
-    </button>
-
-  </div>
-</div>
-
-
-<!-- APPLICATION -->
 <div id="app" class="app hidden">
 
   <aside class="side">
 
     <div class="brand">
+
       <img
         src="barnsley-foodbank-logo.png"
         alt="Barnsley Foodbank"
       >
-      <small>Warehouse Management System</small>
+
+      <small>
+        Warehouse Management System
+      </small>
+
     </div>
+
 
     <div class="nav">
 
@@ -509,21 +492,33 @@ form.formgrid{
         Audit / Movements
       </button>
 
-      <button data-page="users" id="usersNav">
+      <button
+        data-page="users"
+        id="usersNav"
+      >
         Users
       </button>
 
     </div>
 
+
     <div class="userbox">
+
       <b id="userName"></b>
-      <br>
-      <span id="userRole"></span>
+
       <br>
 
-      <button id="logout" class="btn secondary">
+      <span id="userRole"></span>
+
+      <br>
+
+      <button
+        id="logout"
+        class="btn secondary"
+      >
         Sign out
       </button>
+
     </div>
 
   </aside>
@@ -532,13 +527,24 @@ form.formgrid{
   <main>
 
     <div class="top">
-      <h1 id="pageTitle">Dashboard</h1>
+
+      <h1 id="pageTitle">
+        Dashboard
+      </h1>
+
       <span id="status"></span>
+
     </div>
 
 
-    <!-- DASHBOARD -->
-    <section id="page-dashboard" class="page">
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+
+    <section
+      id="page-dashboard"
+      class="page"
+    >
 
       <div class="grid">
 
@@ -564,88 +570,174 @@ form.formgrid{
 
       </div>
 
+
       <div class="panel">
-        <h2>Recent stock movements</h2>
-        <div id="recentMoves" class="tablewrap"></div>
+
+        <h2>
+          Recent stock movements
+        </h2>
+
+        <div
+          id="recentMoves"
+          class="tablewrap"
+        ></div>
+
       </div>
 
     </section>
 
 
-    <!-- CURRENT STOCK -->
-    <section id="page-stock" class="page hidden">
+    <!-- =====================================================
+         CURRENT STOCK
+    ====================================================== -->
+
+    <section
+      id="page-stock"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Current Stock</h2>
+        <h2>
+          Current Stock
+        </h2>
 
         <div class="toolbar">
+
           <input
             id="stockSearch"
             placeholder="Search item, SKU, barcode or location"
           >
+
         </div>
 
-        <div id="stockTable" class="tablewrap"></div>
+        <div
+          id="stockTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
     </section>
 
 
-    <!-- STOCK IN -->
-    <section id="page-in" class="page hidden">
+    <!-- =====================================================
+         STOCK IN
+    ====================================================== -->
+
+    <section
+      id="page-in"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Record Stock In</h2>
+        <h2>
+          Record Stock In
+        </h2>
 
-        <form id="inForm" class="formgrid">
+        <form
+          id="inForm"
+          class="formgrid"
+        >
 
           <div>
-            <label>Item</label>
-            <select id="inItem" required></select>
+
+            <label for="inItem">
+              Item
+            </label>
+
+            <select
+              id="inItem"
+              required
+            ></select>
+
           </div>
 
+
           <div>
-            <label>Quantity</label>
+
+            <label for="inQty">
+              Quantity
+            </label>
+
             <input
               id="inQty"
               type="number"
               min="1"
               required
             >
+
           </div>
 
+
           <div>
-            <label>Donor</label>
+
+            <label for="inOrg">
+              Donor
+            </label>
+
             <select id="inOrg"></select>
+
           </div>
 
+
           <div>
-            <label>Batch reference</label>
+
+            <label for="inBatch">
+              Batch reference
+            </label>
+
             <input id="inBatch">
+
           </div>
 
-          <div>
-            <label>Best-before</label>
-            <input id="inBB" type="date">
-          </div>
 
           <div>
-            <label>Reference</label>
+
+            <label for="inBB">
+              Best-before
+            </label>
+
+            <input
+              id="inBB"
+              type="date"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label for="inRef">
+              Reference
+            </label>
+
             <input id="inRef">
+
           </div>
+
 
           <div class="full">
-            <label>Notes</label>
+
+            <label for="inNotes">
+              Notes
+            </label>
+
             <textarea id="inNotes"></textarea>
+
           </div>
 
+
           <div class="full actions">
-            <button class="btn primary">
+
+            <button
+              type="submit"
+              class="btn primary"
+            >
               Record stock in
             </button>
+
           </div>
 
         </form>
@@ -655,54 +747,109 @@ form.formgrid{
     </section>
 
 
-    <!-- STOCK OUT -->
-    <section id="page-out" class="page hidden">
+    <!-- =====================================================
+         STOCK OUT
+    ====================================================== -->
+
+    <section
+      id="page-out"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Record Stock Out</h2>
+        <h2>
+          Record Stock Out
+        </h2>
 
-        <form id="outForm" class="formgrid">
+        <form
+          id="outForm"
+          class="formgrid"
+        >
 
           <div>
-            <label>Item</label>
-            <select id="outItem" required></select>
+
+            <label for="outItem">
+              Item
+            </label>
+
+            <select
+              id="outItem"
+              required
+            ></select>
+
           </div>
 
+
           <div>
-            <label>Quantity</label>
+
+            <label for="outQty">
+              Quantity
+            </label>
+
             <input
               id="outQty"
               type="number"
               min="1"
               required
             >
+
           </div>
 
+
           <div>
-            <label>Recipient</label>
+
+            <label for="outOrg">
+              Recipient
+            </label>
+
             <select id="outOrg"></select>
+
           </div>
 
+
           <div>
-            <label>Batch reference</label>
+
+            <label for="outBatch">
+              Batch reference
+            </label>
+
             <input id="outBatch">
+
           </div>
 
+
           <div>
-            <label>Reference</label>
+
+            <label for="outRef">
+              Reference
+            </label>
+
             <input id="outRef">
+
           </div>
+
 
           <div class="full">
-            <label>Notes</label>
+
+            <label for="outNotes">
+              Notes
+            </label>
+
             <textarea id="outNotes"></textarea>
+
           </div>
 
+
           <div class="full actions">
-            <button class="btn primary">
+
+            <button
+              type="submit"
+              class="btn primary"
+            >
               Record stock out
             </button>
+
           </div>
 
         </form>
@@ -712,100 +859,172 @@ form.formgrid{
     </section>
 
 
-    <!-- ITEMS -->
-    <section id="page-items" class="page hidden">
+    <!-- =====================================================
+         ITEMS
+    ====================================================== -->
+
+    <section
+      id="page-items"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Items</h2>
+        <h2>
+          Items
+        </h2>
 
         <div class="toolbar">
-          <button id="newItem" class="btn primary">
+
+          <button
+            id="newItem"
+            class="btn primary"
+          >
             + New Item
           </button>
+
         </div>
 
         <div id="itemEditor"></div>
 
-        <div id="itemsTable" class="tablewrap"></div>
+        <div
+          id="itemsTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
     </section>
 
 
-    <!-- ORGANISATIONS -->
-    <section id="page-organisations" class="page hidden">
+    <!-- =====================================================
+         ORGANISATIONS
+    ====================================================== -->
+
+    <section
+      id="page-organisations"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Donors & Recipients</h2>
+        <h2>
+          Donors & Recipients
+        </h2>
 
         <div class="toolbar">
-          <button id="newOrg" class="btn primary">
+
+          <button
+            id="newOrg"
+            class="btn primary"
+          >
             + New Organisation
           </button>
+
         </div>
 
         <div id="orgEditor"></div>
 
-        <div id="orgsTable" class="tablewrap"></div>
+        <div
+          id="orgsTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
     </section>
 
 
-    <!-- DELIVERY NOTES -->
-    <section id="page-deliveries" class="page hidden">
+    <!-- =====================================================
+         DELIVERY NOTES
+    ====================================================== -->
+
+    <section
+      id="page-deliveries"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Delivery Notes</h2>
+        <h2>
+          Delivery Notes
+        </h2>
 
         <div class="toolbar">
-          <button id="newDelivery" class="btn primary">
+
+          <button
+            id="newDelivery"
+            class="btn primary"
+          >
             + New Delivery Note
           </button>
+
         </div>
 
         <div id="deliveryEditor"></div>
 
-        <div id="deliveriesTable" class="tablewrap"></div>
+        <div
+          id="deliveriesTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
     </section>
 
 
-    <!-- HISTORY -->
-    <section id="page-history" class="page hidden">
+    <!-- =====================================================
+         HISTORY
+    ====================================================== -->
+
+    <section
+      id="page-history"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Audit / Movements</h2>
+        <h2>
+          Audit / Movements
+        </h2>
 
-        <div id="historyTable" class="tablewrap"></div>
+        <div
+          id="historyTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
     </section>
 
 
-    <!-- USERS -->
-    <section id="page-users" class="page hidden">
+    <!-- =====================================================
+         USERS
+    ====================================================== -->
+
+    <section
+      id="page-users"
+      class="page hidden"
+    >
 
       <div class="panel">
 
-        <h2>Users</h2>
+        <h2>
+          Users
+        </h2>
 
         <p style="color:#68766e">
+
           Create staff accounts in Supabase Authentication,
           then add/update their profile here.
           Only administrators can manage profiles.
+
         </p>
 
-        <div id="usersTable" class="tablewrap"></div>
+        <div
+          id="usersTable"
+          class="tablewrap"
+        ></div>
 
       </div>
 
@@ -816,13 +1035,22 @@ form.formgrid{
 </div>
 
 
+<!-- =========================================================
+     CONFIG
+========================================================= -->
+
 <script src="config.js"></script>
+
 
 <script>
 
-const {createClient}=supabase;
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-const sb=createClient(
+const { createClient } = supabase;
+
+const sb = createClient(
   window.SUPABASE_URL,
   window.SUPABASE_PUBLISHABLE_KEY,
   {
@@ -834,330 +1062,159 @@ const sb=createClient(
 );
 
 
-let currentUser=null;
-let currentProfile=null;
+/* =========================================================
+   APPLICATION STATE
+========================================================= */
 
-let items=[];
-let orgs=[];
-let stock=[];
-let moves=[];
-let deliveries=[];
+let currentUser = null;
+let currentProfile = null;
+
+let items = [];
+let orgs = [];
+let stock = [];
+let moves = [];
+let deliveries = [];
 
 
-const $=id=>document.getElementById(id);
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
 
 
-const esc=v=>
-  String(v??'').replace(
+const esc = value => {
+
+  return String(value ?? '').replace(
     /[&<>"']/g,
-    c=>({
+    char => ({
       '&':'&amp;',
       '<':'&lt;',
       '>':'&gt;',
       '"':'&quot;',
       "'":'&#39;'
-    }[c])
+    }[char])
   );
 
-
-const money=n=>
-  Number(n||0).toLocaleString();
+};
 
 
-function notify(msg,good=true){
+const money = value => {
 
-  $('status').innerHTML=
-    '<span class="badge '+
-    (good?'green':'red')+
-    '">'+
-    esc(msg)+
+  return Number(value || 0).toLocaleString();
+
+};
+
+
+function notify(message,good=true){
+
+  $('status').innerHTML =
+    '<span class="badge ' +
+    (good ? 'green' : 'red') +
+    '">' +
+    esc(message) +
     '</span>';
 
-  setTimeout(()=>{
-    $('status').innerHTML=''
-  },3500);
+  setTimeout(
+    () => {
+      $('status').innerHTML = '';
+    },
+    3500
+  );
 
 }
 
 
 function role(){
-  return currentProfile?.role||'READ_ONLY';
+
+  return currentProfile?.role || 'READ_ONLY';
+
 }
 
 
 function canWrite(){
+
   return [
     'ADMIN',
     'MANAGER',
     'OPERATIVE'
   ].includes(role());
+
 }
 
 
 function canManage(){
+
   return [
     'ADMIN',
     'MANAGER'
   ].includes(role());
-}
-
-
-function clearMessage(id){
-
-  $(id).classList.add('hidden');
-  $(id).textContent='';
 
 }
 
 
-function showMessage(id,msg){
+/* =========================================================
+   LOGIN
+========================================================= */
 
-  $(id).textContent=msg;
-  $(id).classList.remove('hidden');
+async function login(event){
 
-}
+  event.preventDefault();
 
+  $('loginError').classList.add('hidden');
 
-function recoveryRedirect(){
+  const email =
+    $('email').value.trim();
 
-  return window.location.origin+
-         window.location.pathname;
+  const password =
+    $('password').value;
 
-}
+  if(!email || !password){
 
+    $('loginError').textContent =
+      'Please enter your email and password.';
 
-/* LOGIN */
-
-async function login(e){
-
-  e.preventDefault();
-
-  clearMessage('loginError');
-
-  const email=$('email').value.trim();
-  const password=$('password').value;
-
-  const {error}=await sb.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if(error){
-    showMessage(
-      'loginError',
-      error.message
-    );
-  }
-
-}
-
-
-/* FORGOT PASSWORD */
-
-async function forgotPassword(){
-
-  clearMessage('loginError');
-
-  const email=$('email').value.trim();
-
-  if(!email){
-
-    showMessage(
-      'loginError',
-      'Enter your email address first, then click “Forgot password?”.'
-    );
+    $('loginError').classList.remove('hidden');
 
     return;
+
   }
 
-  const {error}=
-    await sb.auth.resetPasswordForEmail(
+  const { error } =
+    await sb.auth.signInWithPassword({
       email,
-      {
-        redirectTo:recoveryRedirect()
-      }
-    );
-
-  if(error){
-
-    showMessage(
-      'loginError',
-      error.message
-    );
-
-  }else{
-
-    showMessage(
-      'loginError',
-      'If that email is registered, a password reset email has been sent. Check your inbox and spam folder.'
-    );
-
-  }
-
-}
-
-
-/* PASSWORD RESET */
-
-function showReset(){
-
-  $('login').classList.add('hidden');
-  $('app').classList.add('hidden');
-  $('reset').classList.remove('hidden');
-
-  clearMessage('resetError');
-  clearMessage('resetOk');
-
-}
-
-
-function showLogin(){
-
-  $('reset').classList.add('hidden');
-  $('app').classList.add('hidden');
-  $('login').classList.remove('hidden');
-
-}
-
-
-async function setNewPassword(e){
-
-  e.preventDefault();
-
-  clearMessage('resetError');
-  clearMessage('resetOk');
-
-  const p=$('newPassword').value;
-  const c=$('confirmPassword').value;
-
-  if(p.length<8){
-
-    showMessage(
-      'resetError',
-      'Your new password must be at least 8 characters.'
-    );
-
-    return;
-  }
-
-  if(p!==c){
-
-    showMessage(
-      'resetError',
-      'The passwords do not match.'
-    );
-
-    return;
-  }
-
-  const {error}=
-    await sb.auth.updateUser({
-      password:p
+      password
     });
 
   if(error){
 
-    showMessage(
-      'resetError',
-      error.message
-    );
+    $('loginError').textContent =
+      error.message;
 
-    return;
+    $('loginError').classList.remove('hidden');
+
   }
-
-  $('resetForm').reset();
-
-  showMessage(
-    'resetOk',
-    'Password changed successfully. You can now sign in with your new password.'
-  );
-
-  await sb.auth.signOut();
-
-  setTimeout(
-    ()=>showLogin(),
-    1200
-  );
 
 }
 
 
-let recoveryMode=false;
-
-
-/* START APPLICATION */
-
-async function boot(){
-
-  const isRecovery=
-    location.hash.includes('type=recovery');
-
-  if(isRecovery){
-
-    recoveryMode=true;
-    showReset();
-
-  }
-
-  const {
-    data:{session}
-  }=await sb.auth.getSession();
-
-  if(session && !recoveryMode){
-
-    await loadUser(session.user);
-
-  }
-
-  sb.auth.onAuthStateChange(
-    (event,session)=>{
-
-      if(event==='PASSWORD_RECOVERY'){
-
-        recoveryMode=true;
-        showReset();
-
-        return;
-      }
-
-      if(recoveryMode){
-
-        return;
-      }
-
-      if(session){
-
-        setTimeout(
-          ()=>loadUser(session.user),
-          0
-        );
-
-      }else{
-
-        showLogin();
-
-      }
-
-    }
-  );
-
-}
-
-
-/* LOAD USER */
+/* =========================================================
+   LOGIN / USER LOADING
+========================================================= */
 
 async function loadUser(user){
 
-  currentUser=user;
+  currentUser = user;
 
   const {
     data,
     error
-  }=await sb
+  } = await sb
     .from('profiles')
     .select('*')
     .eq('id',user.id)
     .single();
+
 
   if(
     error ||
@@ -1169,30 +1226,38 @@ async function loadUser(user){
 
     showLogin();
 
-    showMessage(
-      'loginError',
-      'Your account is not active or has no warehouse profile.'
-    );
+    $('loginError').textContent =
+      'Your account is not active or has no warehouse profile.';
+
+    $('loginError').classList.remove('hidden');
 
     return;
+
   }
 
-  currentProfile=data;
+
+  currentProfile = data;
+
 
   $('login').classList.add('hidden');
-  $('reset').classList.add('hidden');
+
   $('app').classList.remove('hidden');
 
-  $('userName').textContent=
-    data.full_name;
 
-  $('userRole').textContent=
-    data.role.replace('_',' ');
+  $('userName').textContent =
+    data.full_name || user.email || 'User';
+
+
+  $('userRole').textContent =
+    String(data.role || '')
+      .replaceAll('_',' ');
+
 
   $('usersNav').classList.toggle(
     'hidden',
-    role()!=='ADMIN'
+    role() !== 'ADMIN'
   );
+
 
   await refresh();
 
@@ -1201,13 +1266,24 @@ async function loadUser(user){
 }
 
 
-/* REFRESH DATA */
+function showLogin(){
+
+  $('app').classList.add('hidden');
+
+  $('login').classList.remove('hidden');
+
+}
+
+
+/* =========================================================
+   REFRESH DATABASE DATA
+========================================================= */
 
 async function refresh(){
 
   try{
 
-    const itemsResult=
+    const itemsResult =
       await sb
         .from('items')
         .select('*')
@@ -1215,26 +1291,26 @@ async function refresh(){
         .order('name');
 
 
-    const orgsResult=
+    const orgsResult =
       await sb
-        .from('organizations')
+        .from('organisations')
         .select('*')
         .eq('active',true)
         .order('name');
 
 
-    const stockResult=
+    const stockResult =
       await sb
         .from('current_stock')
         .select('*')
         .order('name');
 
 
-    const movesResult=
+    const movesResult =
       await sb
         .from('stock_movements')
         .select(
-          '*,items(name,sku),organizations(name)'
+          '*,items(name,sku),organisations(name)'
         )
         .order(
           'created_at',
@@ -1243,11 +1319,11 @@ async function refresh(){
         .limit(100);
 
 
-    const deliveriesResult=
+    const deliveriesResult =
       await sb
         .from('delivery_notes')
         .select(
-          '*,organizations(name)'
+          '*,organisations(name)'
         )
         .order(
           'created_at',
@@ -1256,7 +1332,7 @@ async function refresh(){
         .limit(100);
 
 
-    const profilesResult=
+    const profilesResult =
       await sb
         .from('profiles')
         .select('*')
@@ -1266,35 +1342,58 @@ async function refresh(){
     if(itemsResult.error)
       throw itemsResult.error;
 
+
     if(orgsResult.error)
       throw orgsResult.error;
+
 
     if(stockResult.error)
       throw stockResult.error;
 
+
     if(movesResult.error)
       throw movesResult.error;
 
+
     if(deliveriesResult.error)
       throw deliveriesResult.error;
+
 
     if(profilesResult.error)
       throw profilesResult.error;
 
 
-    items=itemsResult.data||[];
-    orgs=orgsResult.data||[];
-    stock=stockResult.data||[];
-    moves=movesResult.data||[];
-    deliveries=deliveriesResult.data||[];
+    items =
+      itemsResult.data || [];
+
+
+    orgs =
+      orgsResult.data || [];
+
+
+    stock =
+      stockResult.data || [];
+
+
+    moves =
+      movesResult.data || [];
+
+
+    deliveries =
+      deliveriesResult.data || [];
 
 
     renderAll(
-      profilesResult.data||[]
+      profilesResult.data || []
     );
 
 
   }catch(error){
+
+    console.error(
+      'Refresh error:',
+      error
+    );
 
     notify(
       error.message ||
@@ -1302,56 +1401,53 @@ async function refresh(){
       false
     );
 
-    console.error(
-      'Refresh error:',
-      error
-    );
-
   }
 
 }
 
 
-/* RENDER */
+/* =========================================================
+   RENDER
+========================================================= */
 
 function renderAll(profiles=[]){
 
-  $('statItems').textContent=
+  $('statItems').textContent =
     items.length;
 
 
-  $('statUnits').textContent=
+  $('statUnits').textContent =
     money(
       stock.reduce(
-        (s,x)=>
-          s+
+        (sum,row) =>
+          sum +
           Number(
-            x.current_quantity||0
+            row.current_quantity || 0
           ),
         0
       )
     );
 
 
-  $('statLow').textContent=
+  $('statLow').textContent =
     stock.filter(
-      function(x){
-
-        return Number(
-          x.current_quantity||0
-        )<=Number(
-          x.reorder_level||0
-        );
-
-      }
+      row =>
+        Number(
+          row.current_quantity || 0
+        ) <=
+        Number(
+          row.reorder_level || 0
+        )
     ).length;
 
 
-  $('statMoves').textContent=
+  $('statMoves').textContent =
     moves.length;
 
 
-  $('recentMoves').innerHTML=
+  /* RECENT MOVEMENTS */
+
+  $('recentMoves').innerHTML =
     table(
       [
         'Date',
@@ -1363,40 +1459,38 @@ function renderAll(profiles=[]){
 
       moves
         .slice(0,10)
-        .map(function(m){
+        .map(move => [
 
-          return [
+          new Date(
+            move.created_at
+          ).toLocaleString(),
 
-            new Date(
-              m.created_at
-            ).toLocaleString(),
+          badge(
+            move.movement_type,
+            move.movement_type === 'IN'
+          ),
 
-            badge(
-              m.movement_type,
-              m.movement_type==='IN'
-            ),
+          esc(
+            move.items?.name || '-'
+          ),
 
-            esc(
-              m.items
-                ? m.items.name
-                : '-'
-            ),
+          money(
+            move.quantity
+          ),
 
-            money(m.quantity),
+          esc(
+            move.user_id === currentUser?.id
+              ? 'You'
+              : move.user_id || '-'
+          )
 
-            esc(
-              m.user_id===currentUser.id
-                ? 'You'
-                : m.user_id
-            )
-
-          ];
-
-        })
+        ])
     );
 
 
-  $('stockTable').innerHTML=
+  /* CURRENT STOCK */
+
+  $('stockTable').innerHTML =
     table(
       [
         'SKU',
@@ -1407,33 +1501,31 @@ function renderAll(profiles=[]){
         'Reorder'
       ],
 
-      stock.map(function(x){
+      stock.map(row => [
 
-        return [
+        esc(row.sku),
 
-          esc(x.sku),
+        esc(row.name),
 
-          esc(x.name),
+        esc(row.category),
 
-          esc(x.category),
+        esc(row.location || '—'),
 
-          esc(x.location||'-'),
+        money(
+          row.current_quantity
+        ),
 
-          money(
-            x.current_quantity
-          ),
+        money(
+          row.reorder_level
+        )
 
-          money(
-            x.reorder_level
-          )
-
-        ];
-
-      })
+      ])
     );
 
 
-  $('itemsTable').innerHTML=
+  /* ITEMS */
+
+  $('itemsTable').innerHTML =
     table(
       [
         'SKU',
@@ -1444,35 +1536,33 @@ function renderAll(profiles=[]){
         'Reorder'
       ],
 
-      items.map(function(x){
+      items.map(row => [
 
-        return [
+        esc(row.sku),
 
-          esc(x.sku),
+        esc(
+          row.barcode || '—'
+        ),
 
-          esc(
-            x.barcode||'-'
-          ),
+        esc(row.name),
 
-          esc(x.name),
+        esc(row.category),
 
-          esc(x.category),
+        esc(
+          row.location || '—'
+        ),
 
-          esc(
-            x.location||'-'
-          ),
+        money(
+          row.reorder_level
+        )
 
-          money(
-            x.reorder_level
-          )
-
-        ];
-
-      })
+      ])
     );
 
 
-  $('orgsTable').innerHTML=
+  /* ORGANISATIONS */
+
+  $('orgsTable').innerHTML =
     table(
       [
         'Name',
@@ -1482,33 +1572,31 @@ function renderAll(profiles=[]){
         'Postcode'
       ],
 
-      orgs.map(function(x){
+      orgs.map(row => [
 
-        return [
+        esc(row.name),
 
-          esc(x.name),
+        esc(row.type),
 
-          esc(x.type),
+        esc(
+          row.contact_name || '—'
+        ),
 
-          esc(
-            x.contact_name||'-'
-          ),
+        esc(
+          row.phone || '—'
+        ),
 
-          esc(
-            x.phone||'-'
-          ),
+        esc(
+          row.postcode || '—'
+        )
 
-          esc(
-            x.postcode||'-'
-          )
-
-        ];
-
-      })
+      ])
     );
 
 
-  $('historyTable').innerHTML=
+  /* HISTORY */
+
+  $('historyTable').innerHTML =
     table(
       [
         'Date',
@@ -1519,42 +1607,40 @@ function renderAll(profiles=[]){
         'Batch'
       ],
 
-      moves.map(function(m){
+      moves.map(move => [
 
-        return [
+        new Date(
+          move.created_at
+        ).toLocaleString(),
 
-          new Date(
-            m.created_at
-          ).toLocaleDateString(),
+        badge(
+          move.movement_type,
+          move.movement_type === 'IN'
+        ),
 
-          badge(
-            m.movement_type,
-            m.movement_type==='IN'
-          ),
+        esc(
+          move.items?.name || '-'
+        ),
 
-          esc(
-            m.items
-              ? m.items.name
-              : '-'
-          ),
+        money(
+          move.quantity
+        ),
 
-          money(m.quantity),
+        esc(
+          move.reference || '—'
+        ),
 
-          esc(
-            m.reference||'-'
-          ),
+        esc(
+          move.batch_ref || '—'
+        )
 
-          esc(
-            m.batch_ref||'-'
-          )
-
-        ];
-
-      })
+      ])
     );
 
 
-  $('deliveriesTable').innerHTML=
+  /* DELIVERY NOTES */
+
+  $('deliveriesTable').innerHTML =
     table(
       [
         'Number',
@@ -1564,60 +1650,58 @@ function renderAll(profiles=[]){
         'Action'
       ],
 
-      deliveries.map(function(d){
+      deliveries.map(delivery => [
 
-        return [
+        esc(
+          delivery.delivery_number
+        ),
 
-          esc(
-            d.delivery_number
-          ),
+        esc(
+          delivery.delivery_date
+        ),
 
-          esc(
-            d.delivery_date
-          ),
+        esc(
+          delivery.organisations?.name ||
+          '—'
+        ),
 
-          esc(
-            d.organizations
-              ? d.organizations.name
-              : '-'
-          ),
+        badge(
+          delivery.status,
+          delivery.status === 'COMPLETED'
+        ),
 
-          badge(
-            d.status,
-            d.status==='COMPLETED'
-          ),
+        '<button class="btn secondary" ' +
+        'onclick="printDelivery(' +
+        JSON.stringify(delivery.id) +
+        ')">Print</button>'
 
-          '<button class="btn secondary" onclick="printDelivery('+
-          JSON.stringify(d.id)+
-          ')">Print</button>'
-
-        ];
-
-      })
+      ])
     );
 
 
-  const userRows=
-    profiles.map(function(p){
+  /* USERS */
 
-      return [
+  const userRows =
+    profiles.map(profile => [
 
-        esc(p.full_name),
+      esc(
+        profile.full_name || '—'
+      ),
 
-        esc(p.role),
+      esc(
+        profile.role || '—'
+      ),
 
-        p.active
-          ? 'Active'
-          : 'Inactive',
+      profile.active
+        ? 'Active'
+        : 'Inactive',
 
-        esc(p.id)
+      esc(profile.id)
 
-      ];
-
-    });
+    ]);
 
 
-  $('usersTable').innerHTML=
+  $('usersTable').innerHTML =
     table(
       [
         'Name',
@@ -1634,15 +1718,19 @@ function renderAll(profiles=[]){
 }
 
 
-/* HELPERS */
+/* =========================================================
+   TABLE HELPERS
+========================================================= */
 
-function badge(t,green){
+function badge(text,green){
 
-  return '<span class="badge '+
-    (green?'green':'amber')+
-    '">'+
-    esc(t)+
-    '</span>';
+  return (
+    '<span class="badge ' +
+    (green ? 'green' : 'amber') +
+    '">' +
+    esc(text) +
+    '</span>'
+  );
 
 }
 
@@ -1651,116 +1739,154 @@ function table(headers,rows){
 
   if(!rows.length){
 
-    return '<div class="empty">No records found.</div>';
+    return (
+      '<div class="empty">' +
+      'No records found.' +
+      '</div>'
+    );
 
   }
 
+
   return (
-    '<table>'+
-      '<thead>'+
-        '<tr>'+
+    '<table>' +
+
+      '<thead>' +
+
+        '<tr>' +
+
           headers
             .map(
-              h=>'<th>'+h+'</th>'
+              header =>
+                '<th>' +
+                esc(header) +
+                '</th>'
             )
-            .join('')+
-        '</tr>'+
-      '</thead>'+
-      '<tbody>'+
+            .join('') +
+
+        '</tr>' +
+
+      '</thead>' +
+
+      '<tbody>' +
+
         rows
           .map(
-            r=>
-              '<tr>'+
-              r
+            row =>
+              '<tr>' +
+              row
                 .map(
-                  x=>'<td>'+x+'</td>'
+                  cell =>
+                    '<td>' +
+                    cell +
+                    '</td>'
                 )
-                .join('')+
+                .join('') +
               '</tr>'
           )
-          .join('')+
-      '</tbody>'+
+          .join('') +
+
+      '</tbody>' +
+
     '</table>'
   );
 
 }
 
 
-/* SELECT BOXES */
+/* =========================================================
+   SELECT BOXES
+========================================================= */
 
 function fillSelects(){
 
-  const opts=
-    '<option value="">Select…</option>'+
+  const itemOptions =
+    '<option value="">Select…</option>' +
+
     items
       .map(
-        i=>
-          '<option value="'+
-          i.id+
-          '">'+
+        item =>
+          '<option value="' +
+          esc(item.id) +
+          '">' +
           esc(
-            i.sku+
-            ' — '+
-            i.name
-          )+
+            item.sku +
+            ' — ' +
+            item.name
+          ) +
           '</option>'
       )
       .join('');
 
-  $('inItem').innerHTML=opts;
-  $('outItem').innerHTML=opts;
+
+  $('inItem').innerHTML =
+    itemOptions;
+
+  $('outItem').innerHTML =
+    itemOptions;
 
 
-  const donor=
-    '<option value="">None / not recorded</option>'+
+  const donorOptions =
+    '<option value="">None / not recorded</option>' +
+
     orgs
       .filter(
-        o=>
+        organisation =>
           [
             'DONOR',
             'SUPPLIER',
             'PARTNER'
-          ].includes(o.type)
+          ].includes(
+            organisation.type
+          )
       )
       .map(
-        o=>
-          '<option value="'+
-          o.id+
-          '">'+
-          esc(o.name)+
+        organisation =>
+          '<option value="' +
+          esc(organisation.id) +
+          '">' +
+          esc(organisation.name) +
           '</option>'
       )
       .join('');
 
 
-  const rec=
-    '<option value="">None / not recorded</option>'+
+  const recipientOptions =
+    '<option value="">None / not recorded</option>' +
+
     orgs
       .filter(
-        o=>
+        organisation =>
           [
             'RECIPIENT',
             'PARTNER'
-          ].includes(o.type)
+          ].includes(
+            organisation.type
+          )
       )
       .map(
-        o=>
-          '<option value="'+
-          o.id+
-          '">'+
-          esc(o.name)+
+        organisation =>
+          '<option value="' +
+          esc(organisation.id) +
+          '">' +
+          esc(organisation.name) +
           '</option>'
       )
       .join('');
 
 
-  $('inOrg').innerHTML=donor;
-  $('outOrg').innerHTML=rec;
+  $('inOrg').innerHTML =
+    donorOptions;
+
+  $('outOrg').innerHTML =
+    recipientOptions;
 
 }
 
 
-/* STOCK MOVEMENTS */
+/* =========================================================
+   STOCK MOVEMENTS
+========================================================= */
 
 async function addMove(type,form){
 
@@ -1772,60 +1898,61 @@ async function addMove(type,form){
     );
 
     return;
+
   }
 
 
-  const itemId=
+  const itemId =
     $(
-      type==='IN'
+      type === 'IN'
         ? 'inItem'
         : 'outItem'
     ).value;
 
 
-  const qty=
+  const qty =
     Number(
       $(
-        type==='IN'
+        type === 'IN'
           ? 'inQty'
           : 'outQty'
       ).value
     );
 
 
-  const org=
+  const organisationId =
     $(
-      type==='IN'
+      type === 'IN'
         ? 'inOrg'
         : 'outOrg'
-    ).value||null;
+    ).value || null;
 
 
-  const batch=
+  const batch =
     $(
-      type==='IN'
+      type === 'IN'
         ? 'inBatch'
         : 'outBatch'
-    ).value||null;
+    ).value.trim() || null;
 
 
-  const ref=
+  const reference =
     $(
-      type==='IN'
+      type === 'IN'
         ? 'inRef'
         : 'outRef'
-    ).value||null;
+    ).value.trim() || null;
 
 
-  const notes=
+  const notes =
     $(
-      type==='IN'
+      type === 'IN'
         ? 'inNotes'
         : 'outNotes'
-    ).value||null;
+    ).value.trim() || null;
 
 
-  if(!itemId||qty<1){
+  if(!itemId || qty < 1){
 
     notify(
       'Please select an item and enter a quantity.',
@@ -1833,39 +1960,43 @@ async function addMove(type,form){
     );
 
     return;
+
   }
 
 
-  if(type==='OUT'){
+  /* Check available stock before OUT */
 
-    const itemRow=
+  if(type === 'OUT'){
+
+    const stockRow =
       stock.find(
-        x=>
-          x.item_id===itemId ||
-          x.id===itemId
+        row =>
+          row.item_id === itemId ||
+          row.id === itemId
       );
 
 
     if(
-      itemRow &&
-      qty>
+      stockRow &&
+      qty >
       Number(
-        itemRow.current_quantity||0
+        stockRow.current_quantity || 0
       )
     ){
 
       notify(
-        'Not enough stock available',
+        'Not enough stock available.',
         false
       );
 
       return;
+
     }
 
   }
 
 
-  const {error}=
+  const { error } =
     await sb
       .from('stock_movements')
       .insert({
@@ -1878,9 +2009,9 @@ async function addMove(type,form){
 
         user_id:currentUser.id,
 
-        organisation_id:org,
+        organisation_id:organisationId,
 
-        reference:ref,
+        reference:reference,
 
         batch_ref:batch,
 
@@ -1891,32 +2022,51 @@ async function addMove(type,form){
 
   if(error){
 
+    console.error(
+      'Stock movement error:',
+      error
+    );
+
     notify(
       error.message,
       false
     );
 
     return;
+
   }
 
 
-  await sb
-    .from('audit_log')
-    .insert({
+  /* Audit log */
 
-      user_id:currentUser.id,
+  const auditResult =
+    await sb
+      .from('audit_log')
+      .insert({
 
-      action:'STOCK_'+type,
+        user_id:currentUser.id,
 
-      table_name:'stock_movements',
+        action:'STOCK_' + type,
 
-      details:{
-        item_id:itemId,
-        quantity:qty,
-        reference:ref
-      }
+        table_name:'stock_movements',
 
-    });
+        details:{
+          item_id:itemId,
+          quantity:qty,
+          reference:reference
+        }
+
+      });
+
+
+  if(auditResult.error){
+
+    console.warn(
+      'Audit log error:',
+      auditResult.error
+    );
+
+  }
 
 
   form.reset();
@@ -1924,61 +2074,84 @@ async function addMove(type,form){
   await refresh();
 
   notify(
-    'Stock '+
-    type.toLowerCase()+
+    'Stock ' +
+    type.toLowerCase() +
     ' recorded'
   );
 
 }
 
 
-/* NAVIGATION */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function showPage(name){
 
   document
     .querySelectorAll('.page')
     .forEach(
-      x=>
-        x.classList.add('hidden')
+      page =>
+        page.classList.add('hidden')
     );
 
 
-  $('page-'+name)
-    .classList.remove('hidden');
+  const page =
+    $('page-' + name);
+
+  if(page){
+
+    page.classList.remove('hidden');
+
+  }
 
 
   document
     .querySelectorAll('.nav button')
     .forEach(
-      x=>
-        x.classList.toggle(
+      button =>
+        button.classList.toggle(
           'active',
-          x.dataset.page===name
+          button.dataset.page === name
         )
     );
 
 
-  const titles={
+  const titles = {
+
     dashboard:'Dashboard',
+
     stock:'Current Stock',
+
     in:'Stock In',
+
     out:'Stock Out',
+
     items:'Items',
-    organisations:'Donors & Recipients',
-    deliveries:'Delivery Notes',
-    history:'Audit / Movements',
+
+    organisations:
+      'Donors & Recipients',
+
+    deliveries:
+      'Delivery Notes',
+
+    history:
+      'Audit / Movements',
+
     users:'Users'
+
   };
 
 
-  $('pageTitle').textContent=
-    titles[name]||name;
+  $('pageTitle').textContent =
+    titles[name] || name;
 
 }
 
 
-/* ITEM EDITOR */
+/* =========================================================
+   ITEM EDITOR
+========================================================= */
 
 function openItemEditor(){
 
@@ -1990,10 +2163,11 @@ function openItemEditor(){
     );
 
     return;
+
   }
 
 
-  $('itemEditor').innerHTML=`
+  $('itemEditor').innerHTML = `
 
     <form
       id="itemForm"
@@ -2002,44 +2176,88 @@ function openItemEditor(){
     >
 
       <div>
+
         <label>SKU</label>
-        <input name="sku" required>
+
+        <input
+          name="sku"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Barcode</label>
-        <input name="barcode">
+
+        <input
+          name="barcode"
+        >
+
       </div>
 
+
       <div>
+
         <label>Name</label>
-        <input name="name" required>
+
+        <input
+          name="name"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Category</label>
-        <input name="category" required>
+
+        <input
+          name="category"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Unit</label>
-        <input name="unit" value="units">
+
+        <input
+          name="unit"
+          value="units"
+        >
+
       </div>
 
+
       <div>
+
         <label>Location</label>
-        <input name="location">
+
+        <input
+          name="location"
+        >
+
       </div>
 
+
       <div>
+
         <label>Reorder level</label>
+
         <input
           name="reorder_level"
           type="number"
           min="0"
           value="0"
         >
+
       </div>
+
 
       <div class="actions">
 
@@ -2051,37 +2269,48 @@ function openItemEditor(){
           Cancel
         </button>
 
-        <button class="btn primary">
+        <button
+          type="submit"
+          class="btn primary"
+        >
           Save item
         </button>
 
       </div>
 
     </form>
+
   `;
 
 
-  $('itemForm').onsubmit=
-    async e=>{
+  $('itemForm').onsubmit =
+    async event => {
 
-      e.preventDefault();
+      event.preventDefault();
 
-      let f=
-        new FormData(e.target);
 
-      let obj=
-        Object.fromEntries(f);
-
-      obj.reorder_level=
-        Number(
-          obj.reorder_level||0
+      const formData =
+        new FormData(
+          event.target
         );
 
 
-      const {error}=
+      const object =
+        Object.fromEntries(
+          formData
+        );
+
+
+      object.reorder_level =
+        Number(
+          object.reorder_level || 0
+        );
+
+
+      const { error } =
         await sb
           .from('items')
-          .insert(obj);
+          .insert(object);
 
 
       if(error){
@@ -2091,24 +2320,28 @@ function openItemEditor(){
           false
         );
 
-      }else{
-
-        $('itemEditor').innerHTML='';
-
-        await refresh();
-
-        notify(
-          'Item created'
-        );
+        return;
 
       }
+
+
+      $('itemEditor').innerHTML =
+        '';
+
+      await refresh();
+
+      notify(
+        'Item created'
+      );
 
     };
 
 }
 
 
-/* ORGANISATION EDITOR */
+/* =========================================================
+   ORGANISATION EDITOR
+========================================================= */
 
 function openOrgEditor(){
 
@@ -2120,10 +2353,11 @@ function openOrgEditor(){
     );
 
     return;
+
   }
 
 
-  $('orgEditor').innerHTML=`
+  $('orgEditor').innerHTML = `
 
     <form
       id="orgForm"
@@ -2132,53 +2366,110 @@ function openOrgEditor(){
     >
 
       <div>
+
         <label>Name</label>
-        <input name="name" required>
+
+        <input
+          name="name"
+          required
+        >
+
       </div>
 
+
       <div>
+
         <label>Type</label>
 
         <select name="type">
 
-          <option>DONOR</option>
-          <option>RECIPIENT</option>
-          <option>PARTNER</option>
-          <option>SUPPLIER</option>
+          <option value="DONOR">
+            DONOR
+          </option>
+
+          <option value="RECIPIENT">
+            RECIPIENT
+          </option>
+
+          <option value="PARTNER">
+            PARTNER
+          </option>
+
+          <option value="SUPPLIER">
+            SUPPLIER
+          </option>
 
         </select>
 
       </div>
 
+
       <div>
+
         <label>Contact</label>
-        <input name="contact_name">
+
+        <input
+          name="contact_name"
+        >
+
       </div>
 
+
       <div>
+
         <label>Phone</label>
-        <input name="phone">
+
+        <input
+          name="phone"
+        >
+
       </div>
 
+
       <div>
+
         <label>Email</label>
-        <input name="email">
+
+        <input
+          name="email"
+          type="email"
+        >
+
       </div>
+
 
       <div>
+
         <label>Postcode</label>
-        <input name="postcode">
+
+        <input
+          name="postcode"
+        >
+
       </div>
 
+
       <div class="full">
+
         <label>Address</label>
-        <input name="address">
+
+        <input
+          name="address"
+        >
+
       </div>
 
+
       <div class="full">
+
         <label>Notes</label>
-        <textarea name="notes"></textarea>
+
+        <textarea
+          name="notes"
+        ></textarea>
+
       </div>
+
 
       <div class="full actions">
 
@@ -2190,31 +2481,38 @@ function openOrgEditor(){
           Cancel
         </button>
 
-        <button class="btn primary">
+        <button
+          type="submit"
+          class="btn primary"
+        >
           Save organisation
         </button>
 
       </div>
 
     </form>
+
   `;
 
 
-  $('orgForm').onsubmit=
-    async e=>{
+  $('orgForm').onsubmit =
+    async event => {
 
-      e.preventDefault();
+      event.preventDefault();
 
-      let obj=
+
+      const object =
         Object.fromEntries(
-          new FormData(e.target)
+          new FormData(
+            event.target
+          )
         );
 
 
-      const {error}=
+      const { error } =
         await sb
-          .from('organizations')
-          .insert(obj);
+          .from('organisations')
+          .insert(object);
 
 
       if(error){
@@ -2224,24 +2522,28 @@ function openOrgEditor(){
           false
         );
 
-      }else{
-
-        $('orgEditor').innerHTML='';
-
-        await refresh();
-
-        notify(
-          'Organisation created'
-        );
+        return;
 
       }
+
+
+      $('orgEditor').innerHTML =
+        '';
+
+      await refresh();
+
+      notify(
+        'Organisation created'
+      );
 
     };
 
 }
 
 
-/* DELIVERY EDITOR */
+/* =========================================================
+   DELIVERY NOTE EDITOR
+========================================================= */
 
 function openDeliveryEditor(){
 
@@ -2253,25 +2555,48 @@ function openDeliveryEditor(){
     );
 
     return;
+
   }
 
 
-  const today=
+  const today =
     new Date()
       .toISOString()
       .slice(0,10);
 
 
-  const number=
-    'DN-'+
-    today.replaceAll('-','')+
-    '-'+
+  const number =
+    'DN-' +
+    today.replaceAll('-','') +
+    '-' +
     String(
-      deliveries.length+1
+      deliveries.length + 1
     ).padStart(4,'0');
 
 
-  $('deliveryEditor').innerHTML=`
+  const recipientOptions =
+    orgs
+      .filter(
+        organisation =>
+          [
+            'RECIPIENT',
+            'PARTNER'
+          ].includes(
+            organisation.type
+          )
+      )
+      .map(
+        organisation =>
+          '<option value="' +
+          esc(organisation.id) +
+          '">' +
+          esc(organisation.name) +
+          '</option>'
+      )
+      .join('');
+
+
+  $('deliveryEditor').innerHTML = `
 
     <form
       id="deliveryForm"
@@ -2280,82 +2605,116 @@ function openDeliveryEditor(){
     >
 
       <div>
-        <label>Delivery Note No.</label>
+
+        <label>
+          Delivery Note No.
+        </label>
+
         <input
           name="delivery_number"
-          value="${number}"
+          value="${esc(number)}"
           required
         >
+
       </div>
 
+
       <div>
+
         <label>Date</label>
+
         <input
           name="delivery_date"
           type="date"
           value="${today}"
           required
         >
+
       </div>
 
+
       <div>
+
         <label>Recipient</label>
 
-        <select name="recipient_id">
+        <select
+          name="recipient_id"
+        >
 
           <option value="">
-            None / not recorded
+            Select recipient
           </option>
 
-          ${orgs
-            .filter(
-              o=>
-                [
-                  'RECIPIENT',
-                  'PARTNER'
-                ].includes(o.type)
-            )
-            .map(
-              o=>
-                '<option value="'+
-                o.id+
-                '">'+
-                esc(o.name)+
-                '</option>'
-            )
-            .join('')}
+          ${recipientOptions}
 
         </select>
 
       </div>
 
+
       <div>
+
         <label>Method</label>
 
-        <select name="delivery_method">
+        <select
+          name="delivery_method"
+        >
 
-          <option>Van</option>
-          <option>Collection</option>
-          <option>Other</option>
+          <option value="Van">
+            Van
+          </option>
+
+          <option value="Collection">
+            Collection
+          </option>
+
+          <option value="Other">
+            Other
+          </option>
 
         </select>
 
       </div>
 
-      <div>
-        <label>Driver / Collected By</label>
-        <input name="driver_name">
-      </div>
 
       <div>
-        <label>Reference</label>
-        <input name="reference">
+
+        <label>
+          Driver / Collected By
+        </label>
+
+        <input
+          name="driver_name"
+        >
+
       </div>
+
+
+      <div>
+
+        <label>
+          Reference
+        </label>
+
+        <input
+          name="reference"
+        >
+
+      </div>
+
 
       <div class="full">
-        <label>Notes</label>
-        <textarea name="notes"></textarea>
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          name="notes"
+        ></textarea>
+
       </div>
+
 
       <div class="full actions">
 
@@ -2367,39 +2726,47 @@ function openDeliveryEditor(){
           Cancel
         </button>
 
-        <button class="btn primary">
+        <button
+          type="submit"
+          class="btn primary"
+        >
           Create delivery note
         </button>
 
       </div>
 
     </form>
+
   `;
 
 
-  $('deliveryForm').onsubmit=
-    async e=>{
+  $('deliveryForm').onsubmit =
+    async event => {
 
-      e.preventDefault();
+      event.preventDefault();
 
-      let obj=
+
+      const object =
         Object.fromEntries(
-          new FormData(e.target)
+          new FormData(
+            event.target
+          )
         );
 
 
-      obj.recipient_id=
-        obj.recipient_id||null;
+      object.recipient_id =
+        object.recipient_id ||
+        null;
 
 
-      obj.created_by=
+      object.created_by =
         currentUser.id;
 
 
-      const {error}=
+      const { error } =
         await sb
           .from('delivery_notes')
-          .insert(obj);
+          .insert(object);
 
 
       if(error){
@@ -2409,254 +2776,309 @@ function openDeliveryEditor(){
           false
         );
 
-      }else{
-
-        $('deliveryEditor').innerHTML='';
-
-        await refresh();
-
-        notify(
-          'Delivery note created'
-        );
+        return;
 
       }
+
+
+      $('deliveryEditor').innerHTML =
+        '';
+
+      await refresh();
+
+      notify(
+        'Delivery note created'
+      );
 
     };
 
 }
 
 
-/* PRINT DELIVERY NOTE */
+/* =========================================================
+   PRINT DELIVERY NOTE
+========================================================= */
 
-async function printDelivery(id){
+function printDelivery(id){
 
-  const d=
+  const delivery =
     deliveries.find(
-      x=>x.id===id
+      row => row.id === id
     );
 
 
-  if(!d)return;
+  if(!delivery){
+
+    notify(
+      'Delivery note not found.',
+      false
+    );
+
+    return;
+
+  }
 
 
-  const w=
+  const recipient =
+    delivery.organisations?.name ||
+    '';
+
+
+  const printWindow =
     window.open(
       '',
       '_blank'
     );
 
 
-  w.document.write(`
+  if(!printWindow){
 
-    <html>
+    notify(
+      'Please allow pop-ups to print delivery notes.',
+      false
+    );
 
-    <head>
+    return;
 
-      <title>
-        ${esc(d.delivery_number)}
-      </title>
+  }
 
-      <style>
 
-        body{
-          font-family:Arial;
-          margin:35px;
-          color:#111
-        }
+  const html = `
 
-        .head{
-          display:flex;
-          justify-content:space-between;
-          border-bottom:3px solid #078b40;
-          padding-bottom:16px
-        }
+<!doctype html>
 
-        .logo{
-          width:250px
-        }
+<html>
 
-        .addr{
-          text-align:right;
-          font-size:13px;
-          line-height:1.5
-        }
+<head>
 
-        h1{
-          color:#078b40
-        }
+<title>
+${esc(delivery.delivery_number)}
+</title>
 
-        .box{
-          border:1px solid #aaa;
-          padding:14px;
-          margin:16px 0
-        }
+<style>
 
-        .sign{
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:35px;
-          margin-top:35px
-        }
+body{
+  font-family:Arial,sans-serif;
+  margin:35px;
+  color:#111;
+}
 
-        .line{
-          border-bottom:1px solid #333;
-          height:35px
-        }
+.head{
+  display:flex;
+  justify-content:space-between;
+  gap:30px;
+  border-bottom:3px solid #078b40;
+  padding-bottom:16px;
+}
 
-        footer{
-          text-align:center;
-          margin-top:40px;
-          font-size:11px
-        }
+.logo{
+  width:250px;
+  height:auto;
+}
 
-        @media print{
-          body{
-            margin:12mm
-          }
-        }
+.addr{
+  text-align:right;
+  font-size:13px;
+  line-height:1.5;
+}
 
-      </style>
+h1{
+  color:#078b40;
+  margin-top:28px;
+}
 
-    </head>
+.box{
+  border:1px solid #aaa;
+  padding:14px;
+  margin:16px 0;
+}
 
-    <body>
+.sign{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:35px;
+  margin-top:35px;
+}
 
-      <div class="head">
+.line{
+  border-bottom:1px solid #333;
+  height:35px;
+}
 
-        <img
-          class="logo"
-          src="barnsley-foodbank-logo.png"
-        >
+footer{
+  text-align:center;
+  margin-top:40px;
+  font-size:11px;
+}
 
-        <div class="addr">
+@media print{
 
-          <b>
-            Barnsley Foodbank Partnership
-          </b>
+  body{
+    margin:12mm;
+  }
 
-          <br>
-          Unit 19, Grange Lane Industrial Estate
+}
 
-          <br>
-          Carrwood Road, Stairfoot
+</style>
 
-          <br>
-          Barnsley, South Yorkshire, S71 5AS
+</head>
 
-        </div>
+<body>
 
-      </div>
+<div class="head">
 
+  <img
+    class="logo"
+    src="barnsley-foodbank-logo.png"
+    alt="Barnsley Foodbank"
+  >
 
-      <h1>DELIVERY NOTE</h1>
+  <div class="addr">
 
+    <b>
+      Barnsley Foodbank Partnership
+    </b>
 
-      <div class="box">
+    <br>
 
-        <b>Note:</b>
-        ${esc(d.delivery_number)}
+    Unit 19, Grange Lane Industrial Estate
 
-        <br>
+    <br>
 
-        <b>Date:</b>
-        ${esc(d.delivery_date)}
+    Carrwood Road, Stairfoot
 
-        <br>
+    <br>
 
-        <b>Recipient:</b>
-        ${esc(
-          d.organizations
-            ?.name||''
-        )}
+    Barnsley, South Yorkshire, S71 5AS
 
-        <br>
+  </div>
 
-        <b>Method:</b>
-        ${esc(
-          d.delivery_method||''
-        )}
+</div>
 
-        <br>
 
-        <b>Driver / Collected By:</b>
-        ${esc(
-          d.driver_name||''
-        )}
+<h1>
+DELIVERY NOTE
+</h1>
 
-        <br>
 
-        <b>Reference:</b>
-        ${esc(
-          d.reference||''
-        )}
+<div class="box">
 
-      </div>
+  <b>Note:</b>
+  ${esc(delivery.delivery_number)}
 
+  <br>
 
-      <div class="box">
+  <b>Date:</b>
+  ${esc(delivery.delivery_date)}
 
-        <b>Notes</b>
+  <br>
 
-        <br><br>
+  <b>Recipient:</b>
+  ${esc(recipient)}
 
-        ${esc(
-          d.notes||''
-        )}
+  <br>
 
-      </div>
+  <b>Method:</b>
+  ${esc(delivery.delivery_method || '')}
 
+  <br>
 
-      <div class="sign">
+  <b>Driver / Collected By:</b>
+  ${esc(delivery.driver_name || '')}
 
-        <div>
-          Received by:
-          <div class="line"></div>
-        </div>
+  <br>
 
-        <div>
-          Signature:
-          <div class="line"></div>
-        </div>
+  <b>Reference:</b>
+  ${esc(delivery.reference || '')}
 
-        <div>
-          Date:
-          <div class="line"></div>
-        </div>
+</div>
 
-      </div>
 
+<div class="box">
 
-      <footer>
+  <b>Notes</b>
 
-        Thank you for working together
-        to support local people in crisis.
+  <br><br>
 
-        <br><br>
+  ${esc(delivery.notes || '')}
 
-        <b>
-          Barnsley Foodbank Partnership —
-          Together with Trussell
-        </b>
+</div>
 
-      </footer>
 
+<div class="sign">
 
-      <script>
-        onload=()=>print()
-      <\/script>
+  <div>
 
-    </body>
+    Received by:
 
-    </html>
+    <div class="line"></div>
 
-  `);
+  </div>
 
-  w.document.close();
+
+  <div>
+
+    Signature:
+
+    <div class="line"></div>
+
+  </div>
+
+
+  <div>
+
+    Date:
+
+    <div class="line"></div>
+
+  </div>
+
+</div>
+
+
+<footer>
+
+  Thank you for working together to support local people in crisis.
+
+  <br><br>
+
+  <b>
+    Barnsley Foodbank Partnership —
+    Together with Trussell
+  </b>
+
+</footer>
+
+
+<script>
+
+window.onload = function(){
+  window.print();
+};
+
+<\/script>
+
+</body>
+
+</html>
+
+`;
+
+
+  printWindow.document.open();
+
+  printWindow.document.write(
+    html
+  );
+
+  printWindow.document.close();
 
 }
 
 
-/* EVENT HANDLERS */
+/* =========================================================
+   EVENT HANDLERS
+========================================================= */
 
 $('loginForm')
   .addEventListener(
@@ -2665,101 +3087,100 @@ $('loginForm')
   );
 
 
-$('forgotPassword')
-  .onclick=
-    forgotPassword;
+$('logout').onclick =
+  async () => {
 
+    await sb.auth.signOut();
 
-$('resetForm')
-  .addEventListener(
-    'submit',
-    setNewPassword
-  );
-
-
-$('backToLogin')
-  .onclick=
-    async()=>{
-      await sb.auth.signOut();
-      showLogin();
-    };
-
-
-$('logout')
-  .onclick=
-    ()=>sb.auth.signOut();
+  };
 
 
 document
   .querySelectorAll('.nav button')
   .forEach(
-    b=>
-      b.onclick=
-        ()=>showPage(
-          b.dataset.page
-        )
+    button => {
+
+      button.onclick =
+        () => {
+
+          showPage(
+            button.dataset.page
+          );
+
+        };
+
+    }
   );
 
 
-$('inForm').onsubmit=
-  e=>{
-    e.preventDefault();
+$('inForm').onsubmit =
+  event => {
+
+    event.preventDefault();
+
     addMove(
       'IN',
-      e.target
+      event.target
     );
+
   };
 
 
-$('outForm').onsubmit=
-  e=>{
-    e.preventDefault();
+$('outForm').onsubmit =
+  event => {
+
+    event.preventDefault();
+
     addMove(
       'OUT',
-      e.target
+      event.target
     );
+
   };
 
 
-$('newItem')
-  .onclick=
-    openItemEditor;
+$('newItem').onclick =
+  openItemEditor;
 
 
-$('newOrg')
-  .onclick=
-    openOrgEditor;
+$('newOrg').onclick =
+  openOrgEditor;
 
 
-$('newDelivery')
-  .onclick=
-    openDeliveryEditor;
+$('newDelivery').onclick =
+  openDeliveryEditor;
 
 
-$('stockSearch').oninput=
-  e=>{
+/* =========================================================
+   STOCK SEARCH
+========================================================= */
 
-    const q=
-      e.target.value
+$('stockSearch').oninput =
+  event => {
+
+    const query =
+      event.target.value
+        .trim()
         .toLowerCase();
 
 
-    const filtered=
+    const filtered =
       stock.filter(
-        x=>
+        row =>
           [
-            x.sku,
-            x.name,
-            x.category,
-            x.location
+            row.sku,
+            row.name,
+            row.category,
+            row.location,
+            row.barcode
           ]
           .join(' ')
           .toLowerCase()
-          .includes(q)
+          .includes(query)
       );
 
 
-    $('stockTable').innerHTML=
+    $('stockTable').innerHTML =
       table(
         [
           'SKU',
@@ -2770,22 +3191,103 @@ $('stockSearch').oninput=
           'Reorder'
         ],
 
-        filtered.map(
-          x=>[
-            esc(x.sku),
-            esc(x.name),
-            esc(x.category),
-            esc(x.location||'—'),
-            money(x.current_quantity),
-            money(x.reorder_level)
-          ]
-        )
+        filtered.map(row => [
+
+          esc(row.sku),
+
+          esc(row.name),
+
+          esc(row.category),
+
+          esc(
+            row.location || '—'
+          ),
+
+          money(
+            row.current_quantity
+          ),
+
+          money(
+            row.reorder_level
+          )
+
+        ])
       );
 
   };
 
 
-/* START */
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+sb.auth.onAuthStateChange(
+  async (
+    event,
+    session
+  ) => {
+
+    if(session){
+
+      setTimeout(
+        () =>
+          loadUser(
+            session.user
+          ),
+        0
+      );
+
+    }else{
+
+      showLogin();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+async function boot(){
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await sb.auth.getSession();
+
+
+    if(session){
+
+      await loadUser(
+        session.user
+      );
+
+    }else{
+
+      showLogin();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      'Boot error:',
+      error
+    );
+
+    showLogin();
+
+  }
+
+}
+
 
 boot();
 
