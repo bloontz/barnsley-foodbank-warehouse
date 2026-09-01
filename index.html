@@ -234,10 +234,10 @@ async function refresh(){
   } catch(error) {
     notify(error.message || 'Unable to load warehouse data',false);
     console.error('Refresh error:',error);
-  }
-}
- $('statItems').textContent=items.length;
- $('statUnits').textContent=money(stock.reduce((s,x)=>s+Number(x.current_quantity||0),0));
+ 237  }
+238  }
+239  function renderAll(profiles=[]) {
+240    $('statItems').textContent=items.length;
  $('statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
  $('statMoves').textContent=moves.length;
  $('recentMoves').innerHTML=table(['Date','Type','Item','Qty','User'],moves.slice(0,10).map(m=>[
