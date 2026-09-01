@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 :root{
   --green:#078b40;
   --dark:#143d28;
@@ -146,18 +147,10 @@ textarea{
   font-size:13px;
 }
 
-.item-info{
-  margin-top:8px;
-  padding:9px 11px;
-  background:#f0f7f2;
-  border:1px solid #d5e6da;
-  border-radius:8px;
-  color:#31523d;
-  font-size:13px;
-}
-
-.item-info b{
-  color:#173c29;
+.help{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:5px;
 }
 
 /* APP */
@@ -242,7 +235,7 @@ main{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:14px;
 }
 
@@ -292,7 +285,7 @@ main{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px;
+  min-width:900px;
 }
 
 th,
@@ -354,6 +347,14 @@ form.formgrid{
 
 /* MOBILE */
 
+@media(max-width:1000px){
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
 @media(max-width:850px){
 
   .app{
@@ -373,6 +374,7 @@ form.formgrid{
   .grid{
     grid-template-columns:repeat(2,1fr);
   }
+
 }
 
 @media(max-width:550px){
@@ -388,15 +390,15 @@ form.formgrid{
   .formgrid{
     grid-template-columns:1fr!important;
   }
+
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- =========================================================
-     LOGIN
-========================================================= -->
+<!-- LOGIN -->
 
 <div id="login" class="login">
 
@@ -417,7 +419,9 @@ form.formgrid{
 
     <form id="loginForm">
 
-      <label for="email">Email</label>
+      <label for="email">
+        Email
+      </label>
 
       <input
         id="email"
@@ -426,7 +430,9 @@ form.formgrid{
         required
       >
 
-      <label for="password">Password</label>
+      <label for="password">
+        Password
+      </label>
 
       <input
         id="password"
@@ -450,9 +456,7 @@ form.formgrid{
 </div>
 
 
-<!-- =========================================================
-     APPLICATION
-========================================================= -->
+<!-- APPLICATION -->
 
 <div id="app" class="app hidden">
 
@@ -470,7 +474,6 @@ form.formgrid{
       </small>
 
     </div>
-
 
     <div class="nav">
 
@@ -515,7 +518,6 @@ form.formgrid{
 
     </div>
 
-
     <div class="userbox">
 
       <b id="userName"></b>
@@ -551,9 +553,7 @@ form.formgrid{
     </div>
 
 
-    <!-- =====================================================
-         DASHBOARD
-    ====================================================== -->
+    <!-- DASHBOARD -->
 
     <section
       id="page-dashboard"
@@ -570,6 +570,11 @@ form.formgrid{
         <div class="stat">
           <small>Units in stock</small>
           <b id="statUnits">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Total weight</small>
+          <b id="statWeight">0 kg</b>
         </div>
 
         <div class="stat">
@@ -601,9 +606,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         CURRENT STOCK
-    ====================================================== -->
+    <!-- CURRENT STOCK -->
 
     <section
       id="page-stock"
@@ -620,7 +623,7 @@ form.formgrid{
 
           <input
             id="stockSearch"
-            placeholder="Search item, SKU, barcode or location"
+            placeholder="Search item, SKU, barcode, location or storage"
           >
 
         </div>
@@ -635,9 +638,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         STOCK IN
-    ====================================================== -->
+    <!-- STOCK IN -->
 
     <section
       id="page-in"
@@ -658,29 +659,20 @@ form.formgrid{
           <div>
 
             <label for="inItem">
-              Item
+              Item description
             </label>
 
             <input
               id="inItem"
               type="text"
-              list="itemList"
-              placeholder="Type or select item description"
-              autocomplete="off"
+              placeholder="Type what the item is..."
               required
             >
 
-            <datalist id="itemList"></datalist>
-
-            <input
-              id="inItemId"
-              type="hidden"
-            >
-
-            <div
-              id="inItemInfo"
-              class="item-info hidden"
-            ></div>
+            <div class="help">
+              Type the description of the item, for example:
+              Tinned Tomatoes, Pasta, Cereal, Tea, etc.
+            </div>
 
           </div>
 
@@ -695,8 +687,87 @@ form.formgrid{
               id="inQty"
               type="number"
               min="1"
+              value="1"
               required
             >
+
+          </div>
+
+
+          <div>
+
+            <label for="inWeight">
+              Weight per individual item (kg)
+            </label>
+
+            <input
+              id="inWeight"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Example: 0.50"
+            >
+
+            <div class="help">
+              Enter the weight of one individual item/package.
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <label for="inStorage">
+              Stored in
+            </label>
+
+            <select id="inStorage">
+
+              <option value="">
+                Select storage
+              </option>
+
+              <option value="Box">
+                Box
+              </option>
+
+              <option value="Tray">
+                Tray
+              </option>
+
+              <option value="Pallet">
+                Pallet
+              </option>
+
+              <option value="Pallet cage">
+                Pallet cage
+              </option>
+
+              <option value="Crate">
+                Crate
+              </option>
+
+              <option value="Bag">
+                Bag
+              </option>
+
+              <option value="Sack">
+                Sack
+              </option>
+
+              <option value="Container">
+                Container
+              </option>
+
+              <option value="Shelf">
+                Shelf
+              </option>
+
+              <option value="Other">
+                Other
+              </option>
+
+            </select>
 
           </div>
 
@@ -777,9 +848,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         STOCK OUT
-    ====================================================== -->
+    <!-- STOCK OUT -->
 
     <section
       id="page-out"
@@ -800,13 +869,19 @@ form.formgrid{
           <div>
 
             <label for="outItem">
-              Item
+              Item description
             </label>
 
-            <select
+            <input
               id="outItem"
+              type="text"
+              placeholder="Type the item description..."
               required
-            ></select>
+            >
+
+            <div class="help">
+              Type the item description already used in your stock.
+            </div>
 
           </div>
 
@@ -821,8 +896,83 @@ form.formgrid{
               id="outQty"
               type="number"
               min="1"
+              value="1"
               required
             >
+
+          </div>
+
+
+          <div>
+
+            <label for="outWeight">
+              Weight per individual item (kg)
+            </label>
+
+            <input
+              id="outWeight"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Example: 0.50"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label for="outStorage">
+              Stored in
+            </label>
+
+            <select id="outStorage">
+
+              <option value="">
+                Select storage
+              </option>
+
+              <option value="Box">
+                Box
+              </option>
+
+              <option value="Tray">
+                Tray
+              </option>
+
+              <option value="Pallet">
+                Pallet
+              </option>
+
+              <option value="Pallet cage">
+                Pallet cage
+              </option>
+
+              <option value="Crate">
+                Crate
+              </option>
+
+              <option value="Bag">
+                Bag
+              </option>
+
+              <option value="Sack">
+                Sack
+              </option>
+
+              <option value="Container">
+                Container
+              </option>
+
+              <option value="Shelf">
+                Shelf
+              </option>
+
+              <option value="Other">
+                Other
+              </option>
+
+            </select>
 
           </div>
 
@@ -889,9 +1039,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         ITEMS
-    ====================================================== -->
+    <!-- ITEMS -->
 
     <section
       id="page-items"
@@ -927,9 +1075,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         ORGANISATIONS
-    ====================================================== -->
+    <!-- ORGANISATIONS -->
 
     <section
       id="page-organisations"
@@ -965,9 +1111,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         DELIVERY NOTES
-    ====================================================== -->
+    <!-- DELIVERY NOTES -->
 
     <section
       id="page-deliveries"
@@ -1003,9 +1147,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         HISTORY
-    ====================================================== -->
+    <!-- HISTORY -->
 
     <section
       id="page-history"
@@ -1028,9 +1170,7 @@ form.formgrid{
     </section>
 
 
-    <!-- =====================================================
-         USERS
-    ====================================================== -->
+    <!-- USERS -->
 
     <section
       id="page-users"
@@ -1065,10 +1205,6 @@ form.formgrid{
 </div>
 
 
-<!-- =========================================================
-     CONFIG
-========================================================= -->
-
 <script src="config.js"></script>
 
 
@@ -1093,7 +1229,7 @@ const sb = createClient(
 
 
 /* =========================================================
-   APPLICATION STATE
+   STATE
 ========================================================= */
 
 let currentUser = null;
@@ -1110,7 +1246,8 @@ let deliveries = [];
    HELPERS
 ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
 
 
 const esc = value => {
@@ -1129,11 +1266,12 @@ const esc = value => {
 };
 
 
-const money = value => {
+const numberValue = value =>
+  Number(value || 0);
 
-  return Number(value || 0).toLocaleString();
 
-};
+const money = value =>
+  Number(value || 0).toLocaleString();
 
 
 function notify(message,good=true){
@@ -1184,100 +1322,6 @@ function canManage(){
 
 
 /* =========================================================
-   FIND ITEM FROM DESCRIPTION
-========================================================= */
-
-function findItemFromText(value){
-
-  const text =
-    String(value || '')
-      .trim()
-      .toLowerCase();
-
-  if(!text){
-    return null;
-  }
-
-  return items.find(
-    item => {
-
-      const name =
-        String(item.name || '')
-          .trim()
-          .toLowerCase();
-
-      const sku =
-        String(item.sku || '')
-          .trim()
-          .toLowerCase();
-
-      const barcode =
-        String(item.barcode || '')
-          .trim()
-          .toLowerCase();
-
-      const full =
-        (
-          String(item.sku || '') +
-          ' — ' +
-          String(item.name || '')
-        )
-          .trim()
-          .toLowerCase();
-
-      return (
-        text === name ||
-        text === sku ||
-        text === barcode ||
-        text === full
-      );
-
-    }
-  ) || null;
-
-}
-
-
-function showItemInfo(){
-
-  const value =
-    $('inItem').value.trim();
-
-  const item =
-    findItemFromText(value);
-
-  if(!item){
-
-    $('inItemId').value = '';
-
-    $('inItemInfo').classList.add('hidden');
-
-    return;
-
-  }
-
-  $('inItemId').value =
-    item.id;
-
-  $('inItemInfo').innerHTML =
-    '<b>Weight:</b> ' +
-    esc(
-      Number(item.weight_kg || 0).toFixed(2)
-    ) +
-    ' kg &nbsp; | &nbsp; ' +
-    '<b>Stored in:</b> ' +
-    esc(
-      item.storage_type || 'Not specified'
-    );
-
-  $('inItemInfo').classList.remove(
-    'hidden'
-  );
-
-}
-
-
-/* =========================================================
    LOGIN
 ========================================================= */
 
@@ -1323,7 +1367,7 @@ async function login(event){
 
 
 /* =========================================================
-   LOGIN / USER LOADING
+   USER
 ========================================================= */
 
 async function loadUser(user){
@@ -1369,7 +1413,9 @@ async function loadUser(user){
 
 
   $('userName').textContent =
-    data.full_name || user.email || 'User';
+    data.full_name ||
+    user.email ||
+    'User';
 
 
   $('userRole').textContent =
@@ -1400,7 +1446,7 @@ function showLogin(){
 
 
 /* =========================================================
-   REFRESH DATABASE DATA
+   REFRESH
 ========================================================= */
 
 async function refresh(){
@@ -1434,7 +1480,7 @@ async function refresh(){
       await sb
         .from('stock_movements')
         .select(
-          '*,items(name,sku),organisations(name)'
+          '*,items(name,sku,weight_kg,storage_type),organisations(name)'
         )
         .order(
           'created_at',
@@ -1466,22 +1512,17 @@ async function refresh(){
     if(itemsResult.error)
       throw itemsResult.error;
 
-
     if(orgsResult.error)
       throw orgsResult.error;
-
 
     if(stockResult.error)
       throw stockResult.error;
 
-
     if(movesResult.error)
       throw movesResult.error;
 
-
     if(deliveriesResult.error)
       throw deliveriesResult.error;
-
 
     if(profilesResult.error)
       throw profilesResult.error;
@@ -1490,18 +1531,14 @@ async function refresh(){
     items =
       itemsResult.data || [];
 
-
     orgs =
       orgsResult.data || [];
-
 
     stock =
       stockResult.data || [];
 
-
     moves =
       movesResult.data || [];
-
 
     deliveries =
       deliveriesResult.data || [];
@@ -1531,20 +1568,6 @@ async function refresh(){
 
 
 /* =========================================================
-   GET ITEM DETAILS FOR STOCK ROW
-========================================================= */
-
-function itemForStock(row){
-
-  return items.find(
-    item =>
-      item.id === row.item_id
-  ) || null;
-
-}
-
-
-/* =========================================================
    RENDER
 ========================================================= */
 
@@ -1554,27 +1577,50 @@ function renderAll(profiles=[]){
     items.length;
 
 
-  $('statUnits').textContent =
-    money(
-      stock.reduce(
-        (sum,row) =>
-          sum +
-          Number(
-            row.current_quantity || 0
-          ),
-        0
-      )
+  const totalUnits =
+    stock.reduce(
+      (sum,row) =>
+        sum +
+        numberValue(
+          row.current_quantity
+        ),
+      0
     );
+
+
+  const totalWeight =
+    stock.reduce(
+      (sum,row) =>
+        sum +
+        (
+          numberValue(
+            row.current_quantity
+          ) *
+          numberValue(
+            row.weight_kg
+          )
+        ),
+      0
+    );
+
+
+  $('statUnits').textContent =
+    money(totalUnits);
+
+
+  $('statWeight').textContent =
+    totalWeight.toFixed(2) +
+    ' kg';
 
 
   $('statLow').textContent =
     stock.filter(
       row =>
-        Number(
-          row.current_quantity || 0
+        numberValue(
+          row.current_quantity
         ) <=
-        Number(
-          row.reorder_level || 0
+        numberValue(
+          row.reorder_level
         )
     ).length;
 
@@ -1592,43 +1638,74 @@ function renderAll(profiles=[]){
         'Type',
         'Item',
         'Qty',
+        'Weight/item',
+        'Total weight',
+        'Stored in',
         'User'
       ],
 
       moves
         .slice(0,10)
-        .map(move => [
+        .map(move => {
 
-          new Date(
-            move.created_at
-          ).toLocaleString(),
+          const weight =
+            numberValue(
+              move.weight_kg ||
+              move.items?.weight_kg
+            );
 
-          badge(
-            move.movement_type,
-            move.movement_type === 'IN'
-          ),
+          const total =
+            numberValue(
+              move.quantity
+            ) *
+            weight;
 
-          esc(
-            move.items?.name || '-'
-          ),
+          return [
 
-          money(
-            move.quantity
-          ),
+            new Date(
+              move.created_at
+            ).toLocaleString(),
 
-          esc(
-            move.user_id === currentUser?.id
-              ? 'You'
-              : move.user_id || '-'
-          )
+            badge(
+              move.movement_type,
+              move.movement_type === 'IN'
+            ),
 
-        ])
+            esc(
+              move.items?.name || '-'
+            ),
+
+            money(
+              move.quantity
+            ),
+
+            weight
+              ? weight.toFixed(2) + ' kg'
+              : '—',
+
+            total
+              ? total.toFixed(2) + ' kg'
+              : '—',
+
+            esc(
+              move.storage_type ||
+              move.items?.storage_type ||
+              '—'
+            ),
+
+            esc(
+              move.user_id === currentUser?.id
+                ? 'You'
+                : move.user_id || '-'
+            )
+
+          ];
+
+        })
     );
 
 
-  /* CURRENT STOCK */
-
-  renderStockTable(stock);
+  renderStock(stock);
 
 
   /* ITEMS */
@@ -1640,9 +1717,9 @@ function renderAll(profiles=[]){
         'Barcode',
         'Item',
         'Category',
-        'Weight',
-        'Stored In',
         'Location',
+        'Weight/item',
+        'Stored in',
         'Reorder'
       ],
 
@@ -1658,17 +1735,16 @@ function renderAll(profiles=[]){
 
         esc(row.category),
 
-        Number(
-          row.weight_kg || 0
-        ).toFixed(2) +
-        ' kg',
+        esc(
+          row.location || '—'
+        ),
+
+        numberValue(row.weight_kg)
+          ? numberValue(row.weight_kg).toFixed(2) + ' kg'
+          : '—',
 
         esc(
           row.storage_type || '—'
-        ),
-
-        esc(
-          row.location || '—'
         ),
 
         money(
@@ -1722,38 +1798,71 @@ function renderAll(profiles=[]){
         'Type',
         'Item',
         'Qty',
+        'Weight/item',
+        'Total weight',
+        'Stored in',
         'Reference',
         'Batch'
       ],
 
-      moves.map(move => [
+      moves.map(move => {
 
-        new Date(
-          move.created_at
-        ).toLocaleString(),
+        const weight =
+          numberValue(
+            move.weight_kg ||
+            move.items?.weight_kg
+          );
 
-        badge(
-          move.movement_type,
-          move.movement_type === 'IN'
-        ),
+        const total =
+          numberValue(
+            move.quantity
+          ) *
+          weight;
 
-        esc(
-          move.items?.name || '-'
-        ),
+        return [
 
-        money(
-          move.quantity
-        ),
+          new Date(
+            move.created_at
+          ).toLocaleString(),
 
-        esc(
-          move.reference || '—'
-        ),
+          badge(
+            move.movement_type,
+            move.movement_type === 'IN'
+          ),
 
-        esc(
-          move.batch_ref || '—'
-        )
+          esc(
+            move.items?.name || '-'
+          ),
 
-      ])
+          money(
+            move.quantity
+          ),
+
+          weight
+            ? weight.toFixed(2) + ' kg'
+            : '—',
+
+          total
+            ? total.toFixed(2) + ' kg'
+            : '—',
+
+          esc(
+            move.storage_type ||
+            move.items?.storage_type ||
+            '—'
+          ),
+
+          esc(
+            move.reference || '—'
+          ),
+
+          esc(
+            move.batch_ref || '—'
+          )
+
+        ];
+
+      })
     );
 
 
@@ -1800,26 +1909,6 @@ function renderAll(profiles=[]){
 
   /* USERS */
 
-  const userRows =
-    profiles.map(profile => [
-
-      esc(
-        profile.full_name || '—'
-      ),
-
-      esc(
-        profile.role || '—'
-      ),
-
-      profile.active
-        ? 'Active'
-        : 'Inactive',
-
-      esc(profile.id)
-
-    ]);
-
-
   $('usersTable').innerHTML =
     table(
       [
@@ -1828,7 +1917,26 @@ function renderAll(profiles=[]){
         'Status',
         'User ID'
       ],
-      userRows
+
+      profiles.map(profile => [
+
+        esc(
+          profile.full_name || '—'
+        ),
+
+        esc(
+          profile.role || '—'
+        ),
+
+        profile.active
+          ? 'Active'
+          : 'Inactive',
+
+        esc(
+          profile.id
+        )
+
+      ])
     );
 
 
@@ -1838,10 +1946,10 @@ function renderAll(profiles=[]){
 
 
 /* =========================================================
-   CURRENT STOCK TABLE
+   CURRENT STOCK
 ========================================================= */
 
-function renderStockTable(rows){
+function renderStock(rows){
 
   $('stockTable').innerHTML =
     table(
@@ -1849,65 +1957,58 @@ function renderStockTable(rows){
         'SKU',
         'Item',
         'Category',
-        'Weight',
-        'Stored In',
         'Location',
         'Qty',
+        'Weight/item',
+        'Total weight',
+        'Stored in',
         'Reorder'
       ],
 
       rows.map(row => {
 
-        const item =
-          itemForStock(row);
+        const weight =
+          numberValue(
+            row.weight_kg
+          );
+
+        const quantity =
+          numberValue(
+            row.current_quantity
+          );
+
+        const total =
+          weight *
+          quantity;
 
         return [
 
+          esc(row.sku),
+
+          esc(row.name),
+
+          esc(row.category),
+
           esc(
-            row.sku ||
-            item?.sku ||
-            '—'
+            row.location || '—'
           ),
 
-          esc(
-            row.name ||
-            item?.name ||
-            '—'
-          ),
+          money(quantity),
+
+          weight
+            ? weight.toFixed(2) + ' kg'
+            : '—',
+
+          total
+            ? total.toFixed(2) + ' kg'
+            : '—',
 
           esc(
-            row.category ||
-            item?.category ||
-            '—'
-          ),
-
-          Number(
-            item?.weight_kg ||
-            row.weight_kg ||
-            0
-          ).toFixed(2) +
-          ' kg',
-
-          esc(
-            item?.storage_type ||
-            row.storage_type ||
-            '—'
-          ),
-
-          esc(
-            row.location ||
-            item?.location ||
-            '—'
+            row.storage_type || '—'
           ),
 
           money(
-            row.current_quantity
-          ),
-
-          money(
-            row.reorder_level ||
-            item?.reorder_level ||
-            0
+            row.reorder_level
           )
 
         ];
@@ -1919,7 +2020,7 @@ function renderStockTable(rows){
 
 
 /* =========================================================
-   TABLE HELPERS
+   TABLE
 ========================================================= */
 
 function badge(text,green){
@@ -1995,54 +2096,10 @@ function table(headers,rows){
 
 
 /* =========================================================
-   SELECT BOXES
+   ORGANISATION SELECTS
 ========================================================= */
 
 function fillSelects(){
-
-  /* TYPEABLE ITEM LIST */
-
-  $('itemList').innerHTML =
-    items
-      .map(
-        item =>
-          '<option value="' +
-          esc(
-            item.sku +
-            ' — ' +
-            item.name
-          ) +
-          '"></option>'
-      )
-      .join('');
-
-
-  /* STOCK OUT */
-
-  const itemOptions =
-    '<option value="">Select…</option>' +
-
-    items
-      .map(
-        item =>
-          '<option value="' +
-          esc(item.id) +
-          '">' +
-          esc(
-            item.sku +
-            ' — ' +
-            item.name
-          ) +
-          '</option>'
-      )
-      .join('');
-
-
-  $('outItem').innerHTML =
-    itemOptions;
-
-
-  /* DONORS */
 
   const donorOptions =
     '<option value="">None / not recorded</option>' +
@@ -2068,8 +2125,6 @@ function fillSelects(){
       )
       .join('');
 
-
-  /* RECIPIENTS */
 
   const recipientOptions =
     '<option value="">None / not recorded</option>' +
@@ -2105,10 +2160,155 @@ function fillSelects(){
 
 
 /* =========================================================
-   STOCK MOVEMENTS
+   FIND OR CREATE ITEM
 ========================================================= */
 
-async function addMove(type,form){
+async function getOrCreateItem(
+  description,
+  weightKg,
+  storageType
+){
+
+  const name =
+    description.trim();
+
+
+  if(!name)
+    return null;
+
+
+  let existing =
+    items.find(
+      item =>
+        String(
+          item.name || ''
+        )
+        .trim()
+        .toLowerCase() ===
+        name.toLowerCase()
+    );
+
+
+  /* EXISTING ITEM */
+
+  if(existing){
+
+    const changes = {};
+
+
+    if(
+      weightKg !== null &&
+      weightKg !== undefined &&
+      !Number.isNaN(weightKg)
+    ){
+
+      changes.weight_kg =
+        weightKg;
+
+    }
+
+
+    if(storageType){
+
+      changes.storage_type =
+        storageType;
+
+    }
+
+
+    if(
+      Object.keys(changes).length
+    ){
+
+      const { error } =
+        await sb
+          .from('items')
+          .update(changes)
+          .eq('id',existing.id);
+
+
+      if(error){
+
+        console.warn(
+          'Item update warning:',
+          error
+        );
+
+      }
+
+    }
+
+
+    return existing.id;
+
+  }
+
+
+  /* NEW ITEM */
+
+  const sku =
+    'ITEM-' +
+    Date.now()
+      .toString()
+      .slice(-8);
+
+
+  const object = {
+
+    sku:sku,
+
+    name:name,
+
+    category:'Food',
+
+    unit:'units',
+
+    location:'',
+
+    reorder_level:0,
+
+    weight_kg:
+      weightKg || 0,
+
+    storage_type:
+      storageType || '',
+
+    active:true
+
+  };
+
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from('items')
+      .insert(object)
+      .select()
+      .single();
+
+
+  if(error)
+    throw error;
+
+
+  items.push(data);
+
+
+  return data.id;
+
+}
+
+
+/* =========================================================
+   STOCK MOVEMENT
+========================================================= */
+
+async function addMove(
+  type,
+  form
+){
 
   if(!canWrite()){
 
@@ -2122,42 +2322,14 @@ async function addMove(type,form){
   }
 
 
-  let itemId;
-
-
-  /* STOCK IN USES TYPEABLE ITEM */
-
-  if(type === 'IN'){
-
-    const typed =
-      $('inItem').value.trim();
-
-    const foundItem =
-      findItemFromText(typed);
-
-    if(!foundItem){
-
-      notify(
-        'Please select an existing item from the suggestions.',
-        false
-      );
-
-      return;
-
-    }
-
-    itemId =
-      foundItem.id;
-
-    $('inItemId').value =
-      foundItem.id;
-
-  }else{
-
-    itemId =
-      $('outItem').value;
-
-  }
+  const itemDescription =
+    $(
+      type === 'IN'
+        ? 'inItem'
+        : 'outItem'
+    )
+    .value
+    .trim();
 
 
   const qty =
@@ -2170,12 +2342,36 @@ async function addMove(type,form){
     );
 
 
+  const weightInput =
+    $(
+      type === 'IN'
+        ? 'inWeight'
+        : 'outWeight'
+    ).value;
+
+
+  const weightKg =
+    weightInput === ''
+      ? null
+      : Number(weightInput);
+
+
+  const storageType =
+    $(
+      type === 'IN'
+        ? 'inStorage'
+        : 'outStorage'
+    ).value ||
+    null;
+
+
   const organisationId =
     $(
       type === 'IN'
         ? 'inOrg'
         : 'outOrg'
-    ).value || null;
+    ).value ||
+    null;
 
 
   const batch =
@@ -2183,7 +2379,10 @@ async function addMove(type,form){
       type === 'IN'
         ? 'inBatch'
         : 'outBatch'
-    ).value.trim() || null;
+    )
+    .value
+    .trim() ||
+    null;
 
 
   const reference =
@@ -2191,7 +2390,10 @@ async function addMove(type,form){
       type === 'IN'
         ? 'inRef'
         : 'outRef'
-    ).value.trim() || null;
+    )
+    .value
+    .trim() ||
+    null;
 
 
   const notes =
@@ -2199,13 +2401,19 @@ async function addMove(type,form){
       type === 'IN'
         ? 'inNotes'
         : 'outNotes'
-    ).value.trim() || null;
+    )
+    .value
+    .trim() ||
+    null;
 
 
-  if(!itemId || qty < 1){
+  if(
+    !itemDescription ||
+    qty < 1
+  ){
 
     notify(
-      'Please select an item and enter a quantity.',
+      'Please type an item description and enter a quantity.',
       false
     );
 
@@ -2214,63 +2422,175 @@ async function addMove(type,form){
   }
 
 
-  /* CHECK AVAILABLE STOCK BEFORE OUT */
+  if(
+    weightKg !== null &&
+    (
+      !Number.isFinite(weightKg) ||
+      weightKg < 0
+    )
+  ){
 
-  if(type === 'OUT'){
+    notify(
+      'Please enter a valid weight.',
+      false
+    );
 
-    const stockRow =
-      stock.find(
-        row =>
-          row.item_id === itemId ||
-          row.id === itemId
-      );
-
-
-    if(
-      stockRow &&
-      qty >
-      Number(
-        stockRow.current_quantity || 0
-      )
-    ){
-
-      notify(
-        'Not enough stock available.',
-        false
-      );
-
-      return;
-
-    }
+    return;
 
   }
 
 
-  const { error } =
-    await sb
-      .from('stock_movements')
-      .insert({
+  try{
 
-        movement_type:type,
-
-        item_id:itemId,
-
-        quantity:qty,
-
-        user_id:currentUser.id,
-
-        organisation_id:organisationId,
-
-        reference:reference,
-
-        batch_ref:batch,
-
-        notes:notes
-
-      });
+    const itemId =
+      await getOrCreateItem(
+        itemDescription,
+        weightKg,
+        storageType
+      );
 
 
-  if(error){
+    /* CHECK STOCK */
+
+    if(type === 'OUT'){
+
+      const stockRow =
+        stock.find(
+          row =>
+            row.item_id === itemId ||
+            row.id === itemId ||
+            String(
+              row.name || ''
+            )
+            .trim()
+            .toLowerCase() ===
+            itemDescription
+              .toLowerCase()
+        );
+
+
+      if(
+        stockRow &&
+        qty >
+        Number(
+          stockRow.current_quantity || 0
+        )
+      ){
+
+        notify(
+          'Not enough stock available.',
+          false
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    /* MOVEMENT */
+
+    const {
+      error
+    } =
+      await sb
+        .from('stock_movements')
+        .insert({
+
+          movement_type:type,
+
+          item_id:itemId,
+
+          quantity:qty,
+
+          user_id:
+            currentUser.id,
+
+          organisation_id:
+            organisationId,
+
+          reference:
+            reference,
+
+          batch_ref:
+            batch,
+
+          notes:
+            notes,
+
+          weight_kg:
+            weightKg,
+
+          storage_type:
+            storageType
+
+        });
+
+
+    if(error)
+      throw error;
+
+
+    /* AUDIT */
+
+    const auditResult =
+      await sb
+        .from('audit_log')
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          action:
+            'STOCK_' + type,
+
+          table_name:
+            'stock_movements',
+
+          details:{
+            item_id:itemId,
+            item_description:itemDescription,
+            quantity:qty,
+            weight_kg:weightKg,
+            storage_type:storageType,
+            reference:reference
+          }
+
+        });
+
+
+    if(auditResult.error){
+
+      console.warn(
+        'Audit log error:',
+        auditResult.error
+      );
+
+    }
+
+
+    form.reset();
+
+
+    $('inQty').value =
+      '1';
+
+    $('outQty').value =
+      '1';
+
+
+    await refresh();
+
+
+    notify(
+      'Stock ' +
+      type.toLowerCase() +
+      ' recorded'
+    );
+
+
+  }catch(error){
 
     console.error(
       'Stock movement error:',
@@ -2278,63 +2598,12 @@ async function addMove(type,form){
     );
 
     notify(
-      error.message,
+      error.message ||
+      'Unable to record stock movement',
       false
     );
 
-    return;
-
   }
-
-
-  /* AUDIT LOG */
-
-  const auditResult =
-    await sb
-      .from('audit_log')
-      .insert({
-
-        user_id:currentUser.id,
-
-        action:'STOCK_' + type,
-
-        table_name:'stock_movements',
-
-        details:{
-          item_id:itemId,
-          quantity:qty,
-          reference:reference
-        }
-
-      });
-
-
-  if(auditResult.error){
-
-    console.warn(
-      'Audit log error:',
-      auditResult.error
-    );
-
-  }
-
-
-  form.reset();
-
-  $('inItemId').value = '';
-
-  $('inItemInfo').classList.add(
-    'hidden'
-  );
-
-
-  await refresh();
-
-  notify(
-    'Stock ' +
-    type.toLowerCase() +
-    ' recorded'
-  );
 
 }
 
@@ -2356,9 +2625,12 @@ function showPage(name){
   const page =
     $('page-' + name);
 
+
   if(page){
 
-    page.classList.remove('hidden');
+    page.classList.remove(
+      'hidden'
+    );
 
   }
 
@@ -2376,15 +2648,20 @@ function showPage(name){
 
   const titles = {
 
-    dashboard:'Dashboard',
+    dashboard:
+      'Dashboard',
 
-    stock:'Current Stock',
+    stock:
+      'Current Stock',
 
-    in:'Stock In',
+    in:
+      'Stock In',
 
-    out:'Stock Out',
+    out:
+      'Stock Out',
 
-    items:'Items',
+    items:
+      'Items',
 
     organisations:
       'Donors & Recipients',
@@ -2395,7 +2672,8 @@ function showPage(name){
     history:
       'Audit / Movements',
 
-    users:'Users'
+    users:
+      'Users'
 
   };
 
@@ -2426,178 +2704,210 @@ function openItemEditor(){
 
   $('itemEditor').innerHTML = `
 
-    <form
-      id="itemForm"
-      class="formgrid panel"
-      style="margin:0 0 16px"
+<form
+  id="itemForm"
+  class="formgrid panel"
+  style="margin:0 0 16px"
+>
+
+  <div>
+
+    <label>
+      SKU
+    </label>
+
+    <input
+      name="sku"
+      required
     >
 
-      <div>
-
-        <label>SKU</label>
-
-        <input
-          name="sku"
-          required
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Barcode</label>
+    <label>
+      Barcode
+    </label>
 
-        <input
-          name="barcode"
-        >
+    <input
+      name="barcode"
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Name / Description</label>
-
-        <input
-          name="name"
-          placeholder="e.g. Tinned tomatoes 400g"
-          required
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Category</label>
+    <label>
+      Name / Description
+    </label>
 
-        <input
-          name="category"
-          required
-        >
+    <input
+      name="name"
+      placeholder="e.g. Tinned Tomatoes"
+      required
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Unit</label>
-
-        <input
-          name="unit"
-          value="units"
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Weight per item (kg)</label>
+    <label>
+      Category
+    </label>
 
-        <input
-          name="weight_kg"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="e.g. 0.50"
-        >
+    <input
+      name="category"
+      required
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Stored in</label>
-
-        <select name="storage_type">
-
-          <option value="">
-            Select...
-          </option>
-
-          <option value="Box">
-            Box
-          </option>
-
-          <option value="Tray">
-            Tray
-          </option>
-
-          <option value="Pallet">
-            Pallet
-          </option>
-
-          <option value="Pallet Cage">
-            Pallet Cage
-          </option>
-
-          <option value="Bag">
-            Bag
-          </option>
-
-          <option value="Crate">
-            Crate
-          </option>
-
-          <option value="Other">
-            Other
-          </option>
-
-        </select>
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Location</label>
+    <label>
+      Unit
+    </label>
 
-        <input
-          name="location"
-          placeholder="e.g. A1"
-        >
+    <input
+      name="unit"
+      value="units"
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Reorder level</label>
-
-        <input
-          name="reorder_level"
-          type="number"
-          min="0"
-          value="0"
-        >
-
-      </div>
+  </div>
 
 
-      <div class="actions">
+  <div>
 
-        <button
-          type="button"
-          class="btn secondary"
-          onclick="$('itemEditor').innerHTML=''"
-        >
-          Cancel
-        </button>
+    <label>
+      Location
+    </label>
 
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Save item
-        </button>
+    <input
+      name="location"
+      placeholder="e.g. Aisle 2"
+    >
 
-      </div>
+  </div>
 
-    </form>
 
-  `;
+  <div>
+
+    <label>
+      Weight per individual item (kg)
+    </label>
+
+    <input
+      name="weight_kg"
+      type="number"
+      min="0"
+      step="0.01"
+      placeholder="e.g. 0.50"
+    >
+
+  </div>
+
+
+  <div>
+
+    <label>
+      Stored in
+    </label>
+
+    <select
+      name="storage_type"
+    >
+
+      <option value="">
+        Select storage
+      </option>
+
+      <option value="Box">
+        Box
+      </option>
+
+      <option value="Tray">
+        Tray
+      </option>
+
+      <option value="Pallet">
+        Pallet
+      </option>
+
+      <option value="Pallet cage">
+        Pallet cage
+      </option>
+
+      <option value="Crate">
+        Crate
+      </option>
+
+      <option value="Bag">
+        Bag
+      </option>
+
+      <option value="Sack">
+        Sack
+      </option>
+
+      <option value="Container">
+        Container
+      </option>
+
+      <option value="Shelf">
+        Shelf
+      </option>
+
+      <option value="Other">
+        Other
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div>
+
+    <label>
+      Reorder level
+    </label>
+
+    <input
+      name="reorder_level"
+      type="number"
+      min="0"
+      value="0"
+    >
+
+  </div>
+
+
+  <div class="actions">
+
+    <button
+      type="button"
+      class="btn secondary"
+      onclick="$('itemEditor').innerHTML=''"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      class="btn primary"
+    >
+      Save item
+    </button>
+
+  </div>
+
+</form>
+
+`;
 
 
   $('itemForm').onsubmit =
@@ -2606,36 +2916,31 @@ function openItemEditor(){
       event.preventDefault();
 
 
-      const formData =
-        new FormData(
-          event.target
-        );
-
-
       const object =
         Object.fromEntries(
-          formData
+          new FormData(
+            event.target
+          )
         );
 
 
       object.reorder_level =
         Number(
-          object.reorder_level || 0
+          object.reorder_level ||
+          0
         );
 
 
       object.weight_kg =
         Number(
-          object.weight_kg || 0
+          object.weight_kg ||
+          0
         );
 
 
-      object.storage_type =
-        object.storage_type ||
-        null;
-
-
-      const { error } =
+      const {
+        error
+      } =
         await sb
           .from('items')
           .insert(object);
@@ -2656,7 +2961,9 @@ function openItemEditor(){
       $('itemEditor').innerHTML =
         '';
 
+
       await refresh();
+
 
       notify(
         'Item created'
@@ -2687,140 +2994,156 @@ function openOrgEditor(){
 
   $('orgEditor').innerHTML = `
 
-    <form
-      id="orgForm"
-      class="formgrid panel"
-      style="margin:0 0 16px"
+<form
+  id="orgForm"
+  class="formgrid panel"
+  style="margin:0 0 16px"
+>
+
+  <div>
+
+    <label>
+      Name
+    </label>
+
+    <input
+      name="name"
+      required
     >
 
-      <div>
-
-        <label>Name</label>
-
-        <input
-          name="name"
-          required
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Type</label>
+    <label>
+      Type
+    </label>
 
-        <select name="type">
+    <select name="type">
 
-          <option value="DONOR">
-            DONOR
-          </option>
+      <option value="DONOR">
+        DONOR
+      </option>
 
-          <option value="RECIPIENT">
-            RECIPIENT
-          </option>
+      <option value="RECIPIENT">
+        RECIPIENT
+      </option>
 
-          <option value="PARTNER">
-            PARTNER
-          </option>
+      <option value="PARTNER">
+        PARTNER
+      </option>
 
-          <option value="SUPPLIER">
-            SUPPLIER
-          </option>
+      <option value="SUPPLIER">
+        SUPPLIER
+      </option>
 
-        </select>
+    </select>
 
-      </div>
-
-
-      <div>
-
-        <label>Contact</label>
-
-        <input
-          name="contact_name"
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Phone</label>
+    <label>
+      Contact
+    </label>
 
-        <input
-          name="phone"
-        >
+    <input
+      name="contact_name"
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Email</label>
-
-        <input
-          name="email"
-          type="email"
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Postcode</label>
+    <label>
+      Phone
+    </label>
 
-        <input
-          name="postcode"
-        >
+    <input
+      name="phone"
+    >
 
-      </div>
-
-
-      <div class="full">
-
-        <label>Address</label>
-
-        <input
-          name="address"
-        >
-
-      </div>
+  </div>
 
 
-      <div class="full">
+  <div>
 
-        <label>Notes</label>
+    <label>
+      Email
+    </label>
 
-        <textarea
-          name="notes"
-        ></textarea>
+    <input
+      name="email"
+      type="email"
+    >
 
-      </div>
+  </div>
 
 
-      <div class="full actions">
+  <div>
 
-        <button
-          type="button"
-          class="btn secondary"
-          onclick="$('orgEditor').innerHTML=''"
-        >
-          Cancel
-        </button>
+    <label>
+      Postcode
+    </label>
 
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Save organisation
-        </button>
+    <input
+      name="postcode"
+    >
 
-      </div>
+  </div>
 
-    </form>
 
-  `;
+  <div class="full">
+
+    <label>
+      Address
+    </label>
+
+    <input
+      name="address"
+    >
+
+  </div>
+
+
+  <div class="full">
+
+    <label>
+      Notes
+    </label>
+
+    <textarea
+      name="notes"
+    ></textarea>
+
+  </div>
+
+
+  <div class="full actions">
+
+    <button
+      type="button"
+      class="btn secondary"
+      onclick="$('orgEditor').innerHTML=''"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      class="btn primary"
+    >
+      Save organisation
+    </button>
+
+  </div>
+
+</form>
+
+`;
 
 
   $('orgForm').onsubmit =
@@ -2837,7 +3160,9 @@ function openOrgEditor(){
         );
 
 
-      const { error } =
+      const {
+        error
+      } =
         await sb
           .from('organisations')
           .insert(object);
@@ -2858,7 +3183,9 @@ function openOrgEditor(){
       $('orgEditor').innerHTML =
         '';
 
+
       await refresh();
+
 
       notify(
         'Organisation created'
@@ -2870,7 +3197,7 @@ function openOrgEditor(){
 
 
 /* =========================================================
-   DELIVERY NOTE EDITOR
+   DELIVERY EDITOR
 ========================================================= */
 
 function openDeliveryEditor(){
@@ -2926,146 +3253,148 @@ function openDeliveryEditor(){
 
   $('deliveryEditor').innerHTML = `
 
-    <form
-      id="deliveryForm"
-      class="formgrid panel"
-      style="margin:0 0 16px"
+<form
+  id="deliveryForm"
+  class="formgrid panel"
+  style="margin:0 0 16px"
+>
+
+  <div>
+
+    <label>
+      Delivery Note No.
+    </label>
+
+    <input
+      name="delivery_number"
+      value="${esc(number)}"
+      required
     >
 
-      <div>
-
-        <label>
-          Delivery Note No.
-        </label>
-
-        <input
-          name="delivery_number"
-          value="${esc(number)}"
-          required
-        >
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Date</label>
+    <label>
+      Date
+    </label>
 
-        <input
-          name="delivery_date"
-          type="date"
-          value="${today}"
-          required
-        >
+    <input
+      name="delivery_date"
+      type="date"
+      value="${today}"
+      required
+    >
 
-      </div>
-
-
-      <div>
-
-        <label>Recipient</label>
-
-        <select
-          name="recipient_id"
-        >
-
-          <option value="">
-            Select recipient
-          </option>
-
-          ${recipientOptions}
-
-        </select>
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>Method</label>
+    <label>
+      Recipient
+    </label>
 
-        <select
-          name="delivery_method"
-        >
+    <select name="recipient_id">
 
-          <option value="Van">
-            Van
-          </option>
+      <option value="">
+        Select recipient
+      </option>
 
-          <option value="Collection">
-            Collection
-          </option>
+      ${recipientOptions}
 
-          <option value="Other">
-            Other
-          </option>
+    </select>
 
-        </select>
-
-      </div>
+  </div>
 
 
-      <div>
+  <div>
 
-        <label>
-          Driver / Collected By
-        </label>
+    <label>
+      Method
+    </label>
 
-        <input
-          name="driver_name"
-        >
+    <select name="delivery_method">
 
-      </div>
+      <option value="Van">
+        Van
+      </option>
 
+      <option value="Collection">
+        Collection
+      </option>
 
-      <div>
+      <option value="Other">
+        Other
+      </option>
 
-        <label>
-          Reference
-        </label>
+    </select>
 
-        <input
-          name="reference"
-        >
-
-      </div>
-
-
-      <div class="full">
-
-        <label>
-          Notes
-        </label>
-
-        <textarea
-          name="notes"
-        ></textarea>
-
-      </div>
+  </div>
 
 
-      <div class="full actions">
+  <div>
 
-        <button
-          type="button"
-          class="btn secondary"
-          onclick="$('deliveryEditor').innerHTML=''"
-        >
-          Cancel
-        </button>
+    <label>
+      Driver / Collected By
+    </label>
 
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Create delivery note
-        </button>
+    <input
+      name="driver_name"
+    >
 
-      </div>
+  </div>
 
-    </form>
 
-  `;
+  <div>
+
+    <label>
+      Reference
+    </label>
+
+    <input
+      name="reference"
+    >
+
+  </div>
+
+
+  <div class="full">
+
+    <label>
+      Notes
+    </label>
+
+    <textarea
+      name="notes"
+    ></textarea>
+
+  </div>
+
+
+  <div class="full actions">
+
+    <button
+      type="button"
+      class="btn secondary"
+      onclick="$('deliveryEditor').innerHTML=''"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      class="btn primary"
+    >
+      Create delivery note
+    </button>
+
+  </div>
+
+</form>
+
+`;
 
 
   $('deliveryForm').onsubmit =
@@ -3091,7 +3420,9 @@ function openDeliveryEditor(){
         currentUser.id;
 
 
-      const { error } =
+      const {
+        error
+      } =
         await sb
           .from('delivery_notes')
           .insert(object);
@@ -3112,7 +3443,9 @@ function openDeliveryEditor(){
       $('deliveryEditor').innerHTML =
         '';
 
+
       await refresh();
+
 
       notify(
         'Delivery note created'
@@ -3124,14 +3457,15 @@ function openDeliveryEditor(){
 
 
 /* =========================================================
-   PRINT DELIVERY NOTE
+   PRINT DELIVERY
 ========================================================= */
 
 function printDelivery(id){
 
   const delivery =
     deliveries.find(
-      row => row.id === id
+      row =>
+        row.id === id
     );
 
 
@@ -3480,22 +3814,6 @@ $('newDelivery').onclick =
 
 
 /* =========================================================
-   TYPEABLE STOCK-IN ITEM
-========================================================= */
-
-$('inItem').addEventListener(
-  'input',
-  showItemInfo
-);
-
-
-$('inItem').addEventListener(
-  'change',
-  showItemInfo
-);
-
-
-/* =========================================================
    STOCK SEARCH
 ========================================================= */
 
@@ -3510,40 +3828,67 @@ $('stockSearch').oninput =
 
     const filtered =
       stock.filter(
-        row => {
-
-          const item =
-            itemForStock(row);
-
-          return [
-
+        row =>
+          [
             row.sku,
             row.name,
             row.category,
             row.location,
             row.barcode,
-
-            item?.sku,
-            item?.name,
-            item?.category,
-            item?.location,
-            item?.barcode,
-            item?.storage_type
-
+            row.storage_type
           ]
-            .join(' ')
-            .toLowerCase()
-            .includes(query);
-
-        }
+          .join(' ')
+          .toLowerCase()
+          .includes(query)
       );
 
 
-    renderStockTable(
-      filtered
-    );
+    renderStock(filtered);
 
   };
+
+
+/* =========================================================
+   AUTO FILL WEIGHT/STORAGE ON STOCK OUT
+========================================================= */
+
+$('outItem').addEventListener(
+  'blur',
+  () => {
+
+    const name =
+      $('outItem')
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const item =
+      items.find(
+        row =>
+          String(
+            row.name || ''
+          )
+          .trim()
+          .toLowerCase() ===
+          name
+      );
+
+
+    if(item){
+
+      $('outWeight').value =
+        item.weight_kg ??
+        '';
+
+      $('outStorage').value =
+        item.storage_type ||
+        '';
+
+    }
+
+  }
+);
 
 
 /* =========================================================
