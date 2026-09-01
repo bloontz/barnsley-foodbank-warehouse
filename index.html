@@ -207,14 +207,13 @@ async function loadUser(user){
  $('usersNav').classList.toggle('hidden',role()!=='ADMIN');
  await refresh();showPage('dashboard');
 }
-function showLogin(){$('app').classList.add('hidden');$('login').classList.remove('hidden')}
 async function refresh(){
   try {
     const itemsResult = await sb.from('items').select('*').eq('active',true).order('name');
-    const orgsResult = await sb.from('organisations').select('*').eq('active',true).order('name');
+    const orgsResult = await sb.from('organizations').select('*').eq('active',true).order('name');
     const stockResult = await sb.from('current_stock').select('*').order('name');
-    const movesResult = await sb.from('stock_movements').select('*,items(name,sku),organisations(name)').order('created_at',{ascending:false}).limit(100);
-    const deliveriesResult = await sb.from('delivery_notes').select('*,organisations(name)').order('created_at',{ascending:false}).limit(100);
+    const movesResult = await sb.from('stock_movements').select('*,items(name,sku),organizations(name)').order('created_at',{ascending:false}).limit(100);
+    const deliveriesResult = await sb.from('delivery_notes').select('*,organizations(name)').order('created_at',{ascending:false}).limit(100);
     const profilesResult = await sb.from('profiles').select('*').order('full_name');
 
     if(itemsResult.error) throw itemsResult.error;
@@ -232,11 +231,10 @@ async function refresh(){
 
     renderAll(profilesResult.data || []);
   } catch(error) {
-    notify(error.message || 'Unable to load warehouse data',false);
-    console.error('Refresh error:',error);
- 237  }
-238  }
-239  function renderAll(profiles=[]) {
+    notify(error.message || 'Unable to load warehouse data', false);
+    console.error('Refresh error:', error);
+  }
+}
 240    $('statItems').textContent=items.length;
  $('statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
  $('statMoves').textContent=moves.length;
