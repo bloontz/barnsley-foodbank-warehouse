@@ -338,6 +338,20 @@ form.formgrid{
   padding:25px;
 }
 
+/* ITEM DESCRIPTION */
+
+.item-help{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.item-created{
+  margin-top:8px;
+  font-size:12px;
+  color:#13723a;
+}
+
 /* MOBILE */
 
 @media(max-width:850px){
@@ -641,16 +655,27 @@ form.formgrid{
           class="formgrid"
         >
 
+          <!-- CHANGED: ITEM IS NOW A TEXT BOX -->
+
           <div>
 
             <label for="inItem">
-              Item
+              Item description
             </label>
 
-            <select
+            <input
               id="inItem"
+              type="text"
+              placeholder="Type what the item is, e.g. Tinned Tomatoes 400g"
+              autocomplete="off"
               required
-            ></select>
+            >
+
+            <div class="item-help">
+              Type the description of the item you are receiving.
+              If it already exists, the existing item will be used.
+              If it is new, the system will create it automatically.
+            </div>
 
           </div>
 
@@ -1800,6 +1825,11 @@ function table(headers,rows){
 
 function fillSelects(){
 
+  /*
+    Stock In is now a text box, so we ONLY populate
+    the Stock Out item dropdown here.
+  */
+
   const itemOptions =
     '<option value="">Select…</option>' +
 
@@ -1818,9 +1848,6 @@ function fillSelects(){
       )
       .join('');
 
-
-  $('inItem').innerHTML =
-    itemOptions;
 
   $('outItem').innerHTML =
     itemOptions;
@@ -1885,6 +1912,132 @@ function fillSelects(){
 
 
 /* =========================================================
+   FIND OR CREATE ITEM FROM DESCRIPTION
+========================================================= */
+
+async function getOrCreateItem(description){
+
+  const name =
+    description.trim();
+
+
+  if(!name){
+
+    throw new Error(
+      'Please enter a description of the item.'
+    );
+
+  }
+
+
+  /*
+    First try to find an existing item by name.
+  */
+
+  const existing =
+    items.find(
+      item =>
+        String(item.name || '')
+          .trim()
+          .toLowerCase() ===
+        name.toLowerCase()
+    );
+
+
+  if(existing){
+
+    return existing.id;
+
+  }
+
+
+  /*
+    Also allow entering an existing SKU.
+  */
+
+  const existingSku =
+    items.find(
+      item =>
+        String(item.sku || '')
+          .trim()
+          .toLowerCase() ===
+        name.toLowerCase()
+    );
+
+
+  if(existingSku){
+
+    return existingSku.id;
+
+  }
+
+
+  /*
+    Item doesn't exist.
+    Create it automatically.
+  */
+
+  const generatedSku =
+    'AUTO-' +
+    Date.now().toString(36).toUpperCase();
+
+
+  const newItem = {
+
+    sku:generatedSku,
+
+    name:name,
+
+    category:'Uncategorised',
+
+    unit:'units',
+
+    location:null,
+
+    reorder_level:0
+
+  };
+
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from('items')
+      .insert(newItem)
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      'Automatic item creation error:',
+      error
+    );
+
+    throw new Error(
+      'The item does not exist and could not be created. ' +
+      error.message
+    );
+
+  }
+
+
+  /*
+    Add the new item to local memory immediately.
+  */
+
+  items.push(data);
+
+
+  return data.id;
+
+}
+
+
+/* =========================================================
    STOCK MOVEMENTS
 ========================================================= */
 
@@ -1902,12 +2055,68 @@ async function addMove(type,form){
   }
 
 
-  const itemId =
-    $(
-      type === 'IN'
-        ? 'inItem'
-        : 'outItem'
-    ).value;
+  let itemId = null;
+
+
+  /*
+    STOCK IN NOW USES THE TYPED ITEM DESCRIPTION
+  */
+
+  if(type === 'IN'){
+
+    const description =
+      $('inItem')
+        .value
+        .trim();
+
+
+    if(!description){
+
+      notify(
+        'Please type a description of the item.',
+        false
+      );
+
+      return;
+
+    }
+
+
+    try{
+
+      itemId =
+        await getOrCreateItem(
+          description
+        );
+
+    }catch(error){
+
+      console.error(
+        'Item error:',
+        error
+      );
+
+      notify(
+        error.message ||
+        'Unable to create/find item.',
+        false
+      );
+
+      return;
+
+    }
+
+  }else{
+
+    /*
+      STOCK OUT CONTINUES TO USE THE
+      EXISTING ITEM DROPDOWN.
+    */
+
+    itemId =
+      $('outItem').value;
+
+  }
 
 
   const qty =
@@ -1955,7 +2164,7 @@ async function addMove(type,form){
   if(!itemId || qty < 1){
 
     notify(
-      'Please select an item and enter a quantity.',
+      'Please select/type an item and enter a quantity.',
       false
     );
 
