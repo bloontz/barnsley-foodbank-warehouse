@@ -236,10 +236,10 @@ async function refresh(){
   }
 }
 
-240    $('statItems').textContent=items.length;
- $('statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
- $('statMoves').textContent=moves.length;
- $('recentMoves').innerHTML=table(['Date','Type','Item','Qty','User'],moves.slice(0,10).map(m=>[
+function renderAll(profiles=[]){
+  $('#statItems').textContent=items.length;
+  $('#statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
+  $('#statMoves').textContent=moves.length;
   new Date(m.created_at).toLocaleString(),badge(m.movement_type,m.movement_type==='IN'),esc(m.items?.name),money(m.quantity),esc(m.user_id===currentUser.id?'You':m.user_id)
  ]));
  $('stockTable').innerHTML=table(['SKU','Item','Category','Location','Qty','Reorder'],stock.map(x=>[
