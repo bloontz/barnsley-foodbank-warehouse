@@ -337,12 +337,7 @@ function renderAll(profiles=[]){
 
   fillSelects();
 }
-        esc(x.location || '-'),
-        money(x.current_quantity),
-        money(x.reorder_level)
-      ];
-    })
-  );
+     
 
   $('#itemsTable').innerHTML = table(
     ['SKU','Barcode','Item','Category','Location','Reorder'],
