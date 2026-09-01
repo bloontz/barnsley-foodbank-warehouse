@@ -237,34 +237,107 @@ async function refresh(){
 }
 
 function renderAll(profiles=[]){
-  $('#statItems').textContent = items.length;
+  if($('#statItems')) $('#statItems').textContent=items.length;
+  if($('#statLow')) $('#statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
+  if($('#statMoves')) $('#statMoves').textContent=moves.length;
 
-  $('#statLow').textContent = stock.filter(function(x){
-    return Number(x.current_quantity || 0) <= Number(x.reorder_level || 0);
-  }).length;
-
-  $('#statMoves').textContent = moves.length;
-
-  $('#recentMoves').innerHTML = table(
-    ['Date','Type','Item','Qty','User'],
-    moves.slice(0,10).map(function(m){
-      return [
+  if($('#recentMoves')){
+    $('#recentMoves').innerHTML=table(
+      ['Date','Type','Item','Qty','User'],
+      moves.slice(0,10).map(m=>[
         new Date(m.created_at).toLocaleString(),
-        badge(m.movement_type, m.movement_type === 'IN'),
-        esc(m.items ? m.items.name : '-'),
+        badge(m.movement_type,m.movement_type==='IN'),
+        esc(m.items?.name),
         money(m.quantity),
-        esc(m.user_id === currentUser.id ? 'You' : m.user_id)
-      ];
-    })
-  );
+        esc(m.user_id===currentUser?.id?'You':m.user_id)
+      ])
+    );
+  }
 
-  $('#stockTable').innerHTML = table(
-    ['SKU','Item','Category','Location','Qty','Reorder'],
-    stock.map(function(x){
-      return [
+  if($('#stockTable')){
+    $('#stockTable').innerHTML=table(
+      ['SKU','Item','Category','Location','Qty','Reorder'],
+      stock.map(x=>[
         esc(x.sku),
         esc(x.name),
         esc(x.category),
+        esc(x.location||'-'),
+        money(x.current_quantity),
+        money(x.reorder_level)
+      ])
+    );
+  }
+
+  if($('#itemsTable')){
+    $('#itemsTable').innerHTML=table(
+      ['SKU','Barcode','Item','Category','Location','Reorder'],
+      items.map(x=>[
+        esc(x.sku),
+        esc(x.barcode||'-'),
+        esc(x.name),
+        esc(x.category),
+        esc(x.location||'-'),
+        money(x.reorder_level)
+      ])
+    );
+  }
+
+  if($('#orgsTable')){
+    $('#orgsTable').innerHTML=table(
+      ['Name','Type','Contact','Phone','Postcode'],
+      orgs.map(x=>[
+        esc(x.name),
+        esc(x.type),
+        esc(x.contact_name||'-'),
+        esc(x.phone||'-'),
+        esc(x.postcode||'-')
+      ])
+    );
+  }
+
+  if($('#historyTable')){
+    $('#historyTable').innerHTML=table(
+      ['Date','Type','Item','Qty','Reference','Batch'],
+      moves.map(m=>[
+        new Date(m.created_at).toLocaleString(),
+        badge(m.movement_type,m.movement_type==='IN'),
+        esc(m.items?.name),
+        money(m.quantity),
+        esc(m.reference||'-'),
+        esc(m.batch_ref||'-')
+      ])
+    );
+  }
+
+  if($('#deliveriesTable')){
+    $('#deliveriesTable').innerHTML=table(
+      ['Number','Date','Recipient','Status','Action'],
+      deliveries.map(d=>[
+        esc(d.delivery_number),
+        esc(d.delivery_date),
+        esc(d.organizations?.name||'-'),
+        badge(d.status,d.status==='COMPLETED'),
+        `<button class="btn secondary" onclick="printDelivery('${d.id}')">Print</button>`
+      ])
+    );
+  }
+
+  const userRows=profiles.map(p=>[
+    esc(p.full_name),
+    esc(p.role),
+    p.active?'Active':'Inactive',
+    esc(p.id)
+  ]);
+
+  if($('#usersTable')){
+    $('#usersTable').innerHTML=table(
+      ['Name','Role','Status','User ID'],
+      userRows
+    );
+  }
+
+  fillSelects();
+}
         esc(x.location || '-'),
         money(x.current_quantity),
         money(x.reorder_level)
