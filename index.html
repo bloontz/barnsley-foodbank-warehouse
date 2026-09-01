@@ -198,7 +198,7 @@ async function boot(){
  });
 }
 async function loadUser(user){
- currentUser=user;A
+ currentUser=user;
  const {data,error}=await sb.from('profiles').select('*').eq('id',user.id).single();
  if(error||!data||!data.active){await sb.auth.signOut();showLogin();$('loginError').textContent='Your account is not active or has no warehouse profile.';$('loginError').classList.remove('hidden');return}
  currentProfile=data;
