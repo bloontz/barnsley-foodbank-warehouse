@@ -235,7 +235,7 @@ async function refresh(){
     console.error('Refresh error:', error);
   }
 }
-}
+
 240    $('statItems').textContent=items.length;
  $('statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
  $('statMoves').textContent=moves.length;
