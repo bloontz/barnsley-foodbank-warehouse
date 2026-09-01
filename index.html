@@ -209,19 +209,33 @@ async function loadUser(user){
 }
 function showLogin(){$('app').classList.add('hidden');$('login').classList.remove('hidden')}
 async function refresh(){
- const [a,b,c,d,e,f]=await Promise.all([
-  sb.from('items').select('*').eq('active',true).order('name'),
-  sb.from('organisations').select('*').eq('active',true).order('name'),
-  sb.from('current_stock').select('*').order('name'),
-  sb.from('stock_movements').select('*,items(name,sku),organisations(name)').order('created_at',{ascending:false}).limit(100),
-  sb.from('delivery_notes').select('*,organisations(name)').order('created_at',{ascending:false}).limit(100),
-  sb.from('profiles').select('*').order('full_name')
- ]);
- if(a.error) notify(a.error.message,false);
- items=a.data||[];orgs=b.data||[];stock=c.data||[];moves=d.data||[];deliveries=e.data||[];
- renderAll(f.data||[]);
+  try {
+    const itemsResult = await sb.from('items').select('*').eq('active',true).order('name');
+    const orgsResult = await sb.from('organisations').select('*').eq('active',true).order('name');
+    const stockResult = await sb.from('current_stock').select('*').order('name');
+    const movesResult = await sb.from('stock_movements').select('*,items(name,sku),organisations(name)').order('created_at',{ascending:false}).limit(100);
+    const deliveriesResult = await sb.from('delivery_notes').select('*,organisations(name)').order('created_at',{ascending:false}).limit(100);
+    const profilesResult = await sb.from('profiles').select('*').order('full_name');
+
+    if(itemsResult.error) throw itemsResult.error;
+    if(orgsResult.error) throw orgsResult.error;
+    if(stockResult.error) throw stockResult.error;
+    if(movesResult.error) throw movesResult.error;
+    if(deliveriesResult.error) throw deliveriesResult.error;
+    if(profilesResult.error) throw profilesResult.error;
+
+    items = itemsResult.data || [];
+    orgs = orgsResult.data || [];
+    stock = stockResult.data || [];
+    moves = movesResult.data || [];
+    deliveries = deliveriesResult.data || [];
+
+    renderAll(profilesResult.data || []);
+  } catch(error) {
+    notify(error.message || 'Unable to load warehouse data',false);
+    console.error('Refresh error:',error);
+  }
 }
-function renderAll(profiles=[]){
  $('statItems').textContent=items.length;
  $('statUnits').textContent=money(stock.reduce((s,x)=>s+Number(x.current_quantity||0),0));
  $('statLow').textContent=stock.filter(x=>Number(x.current_quantity||0)<=Number(x.reorder_level||0)).length;
