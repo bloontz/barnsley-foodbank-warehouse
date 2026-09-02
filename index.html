@@ -2084,11 +2084,6 @@ function openItemEditor(){
       </div>
 
       <div>
-        <label>Unit</label>
-        <input name="unit" value="units">
-      </div>
-
-      <div>
         <label>Weight per item (kg)</label>
         <input name="weight_per_unit_kg" type="number" step="0.001" min="0">
       </div>
@@ -2103,16 +2098,6 @@ function openItemEditor(){
       <div>
         <label>Location</label>
         <input name="location">
-      </div>
-
-      <div>
-        <label>Reorder level</label>
-        <input
-          name="reorder_level"
-          type="number"
-          min="0"
-          value="0"
-        >
       </div>
 
       <div class="actions">
@@ -2167,7 +2152,8 @@ function openItemEditor(){
       let obj=
         Object.fromEntries(f);
 
-      obj.reorder_level=Number(obj.reorder_level||0);
+      obj.unit='units';
+      obj.reorder_level=0;
       obj.weight_per_unit_kg=Number(obj.weight_per_unit_kg||0);
 
 
