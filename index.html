@@ -2060,7 +2060,8 @@ function openItemEditor(){
 
       <div>
         <label>SKU</label>
-        <input name="sku" required>
+        <input name="sku" id="generatedItemSku" value="Generating..." readonly required>
+        <small class="muted">Automatically generated</small>
       </div>
 
       <div>
@@ -2128,6 +2129,27 @@ function openItemEditor(){
 
     </form>
   `;
+
+
+  /* Generate the next simple warehouse SKU automatically. */
+  (async()=>{
+    const {data}=await sb
+      .from('items')
+      .select('sku')
+      .like('sku','ITM-%')
+      .order('sku',{ascending:false})
+      .limit(1);
+
+    let next=1;
+    const latest=data&&data[0]&&data[0].sku
+      ? String(data[0].sku).match(/^ITM-(\d+)$/i)
+      : null;
+
+    if(latest) next=Number(latest[1])+1;
+
+    $('generatedItemSku').value=
+      'ITM-'+String(next).padStart(4,'0');
+  })();
 
 
   $('itemForm').onsubmit=
