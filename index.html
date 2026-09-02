@@ -3,206 +3,2911 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Barnsley Foodbank Partnership — Warehouse Operations</title>
+<title>Barnsley Foodbank Partnership — Warehouse</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--green:#078b40;--dark:#123d28;--bg:#f3f6f4;--card:#fff;--muted:#68766e;--line:#dce5df;--danger:#b42318;--amber:#9a6700;--blue:#175cd3}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:#16201a}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#edf7f0,#f7faf8)}.login-card{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:0 20px 50px #00000012}.login-card img{width:260px;max-width:100%;margin-bottom:15px}.login-card h1{font-size:23px;margin:4px 0}.login-card p{color:var(--muted)}
-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,select,textarea{width:100%;border:1px solid #cdd8d1;border-radius:8px;padding:10px;background:#fff}textarea{min-height:100px;resize:vertical}
-.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:700}.primary{background:var(--green);color:#fff}.secondary{background:#e9efeb;color:#173c29}.danger{background:#fce8e6;color:var(--danger)}.full{grid-column:1/-1}.error{background:#fff0ef;color:#9d2319;padding:10px;border-radius:8px;margin:12px 0;font-size:13px}.ok{background:#eaf7ee;color:#126d37;padding:10px;border-radius:8px;margin:12px 0;font-size:13px}
-.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.side{background:var(--dark);color:#fff;padding:20px 14px;min-height:100vh}.brand img{width:180px;background:#fff;border-radius:5px;padding:5px}.brand small{display:block;margin-top:8px;color:#cfe5d6}.nav{margin-top:25px}.nav button{display:block;width:100%;text-align:left;background:transparent;color:#e8f5eb;border:0;padding:10px 12px;border-radius:8px;margin:2px 0}.nav button.active,.nav button:hover{background:#ffffff18}.nav .section{font-size:10px;text-transform:uppercase;color:#9fcab0;padding:14px 12px 5px;font-weight:800}.userbox{position:absolute;bottom:20px;width:220px;font-size:12px;color:#cfe5d6}.userbox button{margin-top:8px}
-main{padding:25px;min-width:0}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:22px}.top h1{margin:0;font-size:26px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}.stat b{font-size:27px}.stat small{display:block;color:var(--muted);margin-bottom:7px}
-.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}.panel h2{margin:0 0 14px;font-size:18px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px}th{font-size:12px;text-transform:uppercase;color:#607067}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#edf1ee}.badge.green{background:#e7f6ec;color:#13723a}.badge.red{background:#fce8e6;color:#a1261c}.badge.amber{background:#fff4d6;color:#805700}.badge.blue{background:#eaf2ff;color:#175cd3}
-form.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 14px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}.empty{text-align:center;color:var(--muted);padding:25px}.hint{font-size:12px;color:var(--muted);margin-top:4px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mini{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fbfcfb}.mini b{display:block;font-size:22px;margin-top:4px}.split{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.progress{height:9px;background:#e9efeb;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--green)}
-@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.split{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}}
-@media(max-width:850px){.app{grid-template-columns:1fr}.side{position:static;min-height:auto}.userbox{position:static;width:auto;margin-top:20px}.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:550px){main{padding:14px}.grid,.cards{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr!important}}
+:root{
+  --green:#078b40;
+  --dark:#163124;
+  --bg:#f3f6f4;
+  --card:#fff;
+  --muted:#6a766f;
+  --line:#dce5df;
+  --danger:#b42318;
+  --amber:#9a6700
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:#16201a
+}
+
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(135deg,#edf7f0,#f7faf8)
+}
+
+.login-card{
+  width:min(440px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:30px;
+  box-shadow:0 20px 50px #00000012
+}
+
+.login-card img{
+  width:260px;
+  max-width:100%;
+  margin-bottom:15px
+}
+
+.login-card h1{
+  font-size:23px;
+  margin:4px 0
+}
+
+.login-card p{
+  color:var(--muted)
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin:12px 0 6px
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid #cdd8d1;
+  border-radius:8px;
+  padding:10px;
+  background:#fff
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:700
+}
+
+.primary{
+  background:var(--green);
+  color:#fff
+}
+
+.secondary{
+  background:#e9efeb;
+  color:#173c29
+}
+
+.danger{
+  background:#fce8e6;
+  color:var(--danger)
+}
+
+.full{
+  grid-column:1/-1
+}
+
+.error{
+  background:#fff0ef;
+  color:#9d2319;
+  padding:10px;
+  border-radius:8px;
+  margin:12px 0;
+  font-size:13px
+}
+
+.ok{
+  background:#eaf7ee;
+  color:#126d37;
+  padding:10px;
+  border-radius:8px;
+  margin:12px 0;
+  font-size:13px
+}
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:240px 1fr
+}
+
+.side{
+  background:#143d28;
+  color:#fff;
+  padding:20px 14px
+}
+
+.brand img{
+  width:180px;
+  background:#fff;
+  border-radius:5px;
+  padding:5px
+}
+
+.brand small{
+  display:block;
+  margin-top:8px;
+  color:#cfe5d6
+}
+
+.nav{
+  margin-top:28px
+}
+
+.nav button{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:transparent;
+  color:#e8f5eb;
+  border:0;
+  padding:11px 12px;
+  border-radius:8px;
+  margin:3px 0
+}
+
+.nav button.active,
+.nav button:hover{
+  background:#ffffff18
+}
+
+.userbox{
+  position:absolute;
+  bottom:20px;
+  width:210px;
+  font-size:12px;
+  color:#cfe5d6
+}
+
+.userbox button{
+  margin-top:8px
+}
+
+main{
+  padding:25px;
+  min-width:0
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+  margin-bottom:22px
+}
+
+.top h1{
+  margin:0;
+  font-size:26px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px
+}
+
+.stat b{
+  font-size:27px
+}
+
+.stat small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:7px
+}
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin-top:16px
+}
+
+.panel h2{
+  margin:0 0 14px;
+  font-size:18px
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px
+}
+
+.tablewrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px
+}
+
+th,td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid var(--line);
+  font-size:13px
+}
+
+th{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#607067
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:#edf1ee
+}
+
+.badge.green{
+  background:#e7f6ec;
+  color:#13723a
+}
+
+.badge.red{
+  background:#fce8e6;
+  color:#a1261c
+}
+
+.badge.amber{
+  background:#fff4d6;
+  color:#805700
+}
+
+form.formgrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:2px 14px
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:8px
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:25px
+}
+
+@media(max-width:850px){
+  .app{
+    grid-template-columns:1fr
+  }
+
+  .side{
+    position:static
+  }
+
+  .userbox{
+    position:static;
+    width:auto;
+    margin-top:20px
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr)
+  }
+}
+
+@media(max-width:550px){
+  main{
+    padding:14px
+  }
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  .formgrid{
+    grid-template-columns:1fr!important
+  }
+}
 </style>
 </head>
+
 <body>
-<div id="login" class="login"><div class="login-card">
-<img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
-<h1>Warehouse Operations System</h1><p>Receiving, inventory, allocation, dispatch, waste and traceability for Barnsley Foodbank Partnership.</p>
-<div id="loginError" class="error hidden"></div>
-<form id="loginForm"><label>Email</label><input id="email" type="email" autocomplete="username" required><label>Password</label><input id="password" type="password" autocomplete="current-password" required><button class="btn primary" style="width:100%;margin-top:16px">Sign in</button></form>
-</div></div>
 
-<div id="app" class="app hidden">
-<aside class="side"><div class="brand"><img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank"><small>Warehouse Operations System</small></div>
-<div class="nav">
-<div class="section">Operations</div>
-<button data-page="dashboard">Dashboard</button><button data-page="receive">Goods In / Receive</button><button data-page="inventory">Inventory</button><button data-page="allocate">Allocations / Picking</button><button data-page="dispatch">Dispatch / Goods Out</button><button data-page="waste">Waste / Disposal</button><button data-page="transfers">Transfers</button>
-<div class="section">Master Data</div>
-<button data-page="items">Items</button><button data-page="organisations">Donors & Recipients</button><button data-page="locations">Locations</button>
-<div class="section">Control</div>
-<button data-page="deliveries">Delivery Notes</button><button data-page="trace">Traceability</button><button data-page="reports">Reports</button><button data-page="users" id="usersNav">Users</button>
+<!-- LOGIN -->
+<div id="login" class="login">
+  <div class="login-card">
+
+    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+
+    <h1>Warehouse Management System</h1>
+
+    <p>
+      Secure sign-in for Barnsley Foodbank Partnership warehouse staff.
+    </p>
+
+    <div id="loginError" class="error hidden"></div>
+
+    <form id="loginForm">
+
+      <label>Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
+
+      <label>Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:16px"
+      >
+        Sign in
+      </button>
+
+      <button
+        type="button"
+        id="forgotPassword"
+        class="btn secondary"
+        style="width:100%;margin-top:10px"
+      >
+        Forgot password?
+      </button>
+
+    </form>
+
+  </div>
 </div>
-<div class="userbox"><b id="userName"></b><br><span id="userRole"></span><br><button id="logout" class="btn secondary">Sign out</button></div>
-</aside>
-<main>
-<div class="top"><h1 id="pageTitle">Dashboard</h1><span id="status"></span></div>
 
-<section id="page-dashboard" class="page">
-<div class="grid"><div class="stat"><small>Active items</small><b id="statItems">0</b></div><div class="stat"><small>Units in stock</small><b id="statUnits">0</b></div><div class="stat"><small>Weight in stock</small><b id="statWeight">0 kg</b></div><div class="stat"><small>Low / attention</small><b id="statLow">0</b></div></div>
-<div class="cards" style="margin-top:14px"><div class="mini"><small>Received this month</small><b id="statReceived">0 kg</b></div><div class="mini"><small>Dispatched this month</small><b id="statDispatched">0 kg</b></div><div class="mini"><small>Waste this month</small><b id="statWaste">0 kg</b></div></div>
-<div class="split"><div class="panel"><h2>Recent operational movements</h2><div id="recentMoves" class="tablewrap"></div></div><div class="panel"><h2>Expiry / stock attention</h2><div id="attention"></div></div></div>
-</section>
 
-<section id="page-receive" class="page hidden"><div class="panel"><h2>Goods In / Receive Food</h2><p class="hint">Record each received stock line with traceability, weight and storage information.</p>
-<form id="receiveForm" class="formgrid">
-<div><label>Item</label><select id="receiveItem" required></select></div><div><label>Quantity</label><input id="receiveQty" type="number" min="1" value="1" required></div>
-<div><label>Weight per unit (kg)</label><input id="receiveUnitWeight" type="number" step="0.001" min="0" placeholder="e.g. 0.400"><div class="hint">Enter the actual weight of one unit.</div></div>
-<div><label>Total weight (kg)</label><input id="receiveTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated automatically"></div>
-<div><label>Donor / Supplier</label><select id="receiveOrg"></select></div><div><label>Receipt / delivery reference</label><input id="receiveRef" placeholder="e.g. DON-2026-001"></div>
-<div><label>Batch / lot reference</label><input id="receiveBatch"></div><div><label>Best-before / use-by</label><input id="receiveExpiry" type="date"></div>
-<div><label>Storage container</label><select id="receiveContainer"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select></div><div><label>Storage location</label><select id="receiveLocation"></select></div>
-<div><label>Temperature zone</label><select id="receiveTemp"><option>Ambient</option><option>Chilled</option><option>Frozen</option><option>Fresh</option></select></div><div><label>Haulier / driver</label><input id="receiveHaulier"></div>
-<div class="full"><label>Notes</label><textarea id="receiveNotes"></textarea></div>
-<div class="full actions"><button type="submit" class="btn primary">Receive stock</button></div>
-</form></div></section>
+<!-- PASSWORD RESET -->
+<div id="reset" class="login hidden">
+  <div class="login-card">
 
-<section id="page-inventory" class="page hidden"><div class="panel"><h2>Inventory</h2><div class="toolbar"><input id="inventorySearch" placeholder="Search item, SKU, barcode, batch, donor or location"><select id="inventoryZone"><option value="">All temperature zones</option><option>Ambient</option><option>Chilled</option><option>Frozen</option><option>Fresh</option></select></div><div id="inventoryTable" class="tablewrap"></div></div></section>
+    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
 
-<section id="page-allocate" class="page hidden"><div class="panel"><h2>Allocations / Picking</h2><form id="allocateForm" class="formgrid">
-<div><label>Recipient</label><select id="allocateOrg" required></select></div><div><label>Required date</label><input id="allocateDate" type="date"></div>
-<div><label>Item</label><select id="allocateItem" required></select></div><div><label>Quantity</label><input id="allocateQty" type="number" min="1" required></div>
-<div><label>Batch (optional)</label><select id="allocateBatch"></select></div><div><label>Reference</label><input id="allocateRef"></div>
-<div class="full"><label>Notes</label><textarea id="allocateNotes"></textarea></div><div class="full actions"><button class="btn primary">Create allocation</button></div>
-</form></div><div class="panel"><h2>Open allocations</h2><div id="allocationsTable" class="tablewrap"></div></div></section>
+    <h1>Set a new password</h1>
 
-<section id="page-dispatch" class="page hidden"><div class="panel"><h2>Dispatch / Goods Out</h2><form id="dispatchForm" class="formgrid">
-<div><label>Recipient</label><select id="dispatchOrg" required></select></div><div><label>Item</label><select id="dispatchItem" required></select></div>
-<div><label>Quantity</label><input id="dispatchQty" type="number" min="1" required></div><div><label>Batch / lot</label><select id="dispatchBatch"></select></div>
-<div><label>Total weight (kg)</label><input id="dispatchWeight" type="number" step="0.001" min="0"></div><div><label>Delivery / dispatch reference</label><input id="dispatchRef"></div>
-<div><label>Delivery method</label><select id="dispatchMethod"><option>Van</option><option>Collection</option><option>Courier</option><option>Other</option></select></div><div><label>Driver / collected by</label><input id="dispatchDriver"></div>
-<div class="full"><label>Notes</label><textarea id="dispatchNotes"></textarea></div><div class="full actions"><button class="btn primary">Dispatch stock</button></div>
-</form></div></section>
+    <p>
+      Choose a new password for your warehouse account.
+    </p>
 
-<section id="page-waste" class="page hidden"><div class="panel"><h2>Waste / Disposal</h2><form id="wasteForm" class="formgrid">
-<div><label>Item</label><select id="wasteItem" required></select></div><div><label>Quantity</label><input id="wasteQty" type="number" min="1" required></div>
-<div><label>Batch / lot</label><select id="wasteBatch"></select></div><div><label>Weight (kg)</label><input id="wasteWeight" type="number" step="0.001" min="0"></div>
-<div><label>Reason</label><select id="wasteReason"><option>Expired</option><option>Damaged</option><option>Contaminated</option><option>Quality issue</option><option>Temperature failure</option><option>Other</option></select></div><div><label>Disposal method</label><select id="wasteMethod"><option>Food waste</option><option>Animal feed</option><option>Anaerobic digestion</option><option>General waste</option><option>Other</option></select></div>
-<div class="full"><label>Notes</label><textarea id="wasteNotes"></textarea></div><div class="full actions"><button class="btn danger">Record waste</button></div>
-</form></div></section>
+    <div id="resetError" class="error hidden"></div>
+    <div id="resetOk" class="ok hidden"></div>
 
-<section id="page-transfers" class="page hidden"><div class="panel"><h2>Stock Transfer</h2><form id="transferForm" class="formgrid">
-<div><label>Item</label><select id="transferItem" required></select></div><div><label>Quantity</label><input id="transferQty" type="number" min="1" required></div>
-<div><label>From location</label><select id="transferFrom" required></select></div><div><label>To location</label><select id="transferTo" required></select></div>
-<div><label>Batch / lot</label><select id="transferBatch"></select></div><div><label>Reference</label><input id="transferRef"></div>
-<div class="full"><label>Notes</label><textarea id="transferNotes"></textarea></div><div class="full actions"><button class="btn primary">Transfer stock</button></div>
-</form></div></section>
+    <form id="resetForm">
 
-<section id="page-items" class="page hidden"><div class="panel"><h2>Items / Product Master</h2><div class="toolbar"><button id="newItem" class="btn primary">+ New Item</button></div><div id="itemEditor"></div><div id="itemsTable" class="tablewrap"></div></div></section>
+      <label>New password</label>
+      <input
+        id="newPassword"
+        type="password"
+        autocomplete="new-password"
+        minlength="8"
+        required
+      >
 
-<section id="page-organisations" class="page hidden"><div class="panel"><h2>Donors & Recipients</h2><div class="toolbar"><button id="newOrg" class="btn primary">+ New Organisation</button></div><div id="orgEditor"></div><div id="orgsTable" class="tablewrap"></div></div></section>
+      <label>Confirm new password</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        autocomplete="new-password"
+        minlength="8"
+        required
+      >
 
-<section id="page-locations" class="page hidden"><div class="panel"><h2>Warehouse Locations</h2><div class="toolbar"><button id="newLocation" class="btn primary">+ New Location</button></div><div id="locationEditor"></div><div id="locationsTable" class="tablewrap"></div></div></section>
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:16px"
+      >
+        Set new password
+      </button>
 
-<section id="page-deliveries" class="page hidden"><div class="panel"><h2>Delivery Notes</h2><div class="toolbar"><button id="newDelivery" class="btn primary">+ New Delivery Note</button></div><div id="deliveryEditor"></div><div id="deliveriesTable" class="tablewrap"></div></div></section>
+    </form>
 
-<section id="page-trace" class="page hidden"><div class="panel"><h2>Traceability</h2><p class="hint">Search by batch, receipt reference, item or transaction to see where food came from and what happened to it.</p><div class="toolbar"><input id="traceSearch" placeholder="Batch, receipt, item, SKU or reference"><button id="traceBtn" class="btn primary">Search</button></div><div id="traceTable" class="tablewrap"></div></div></section>
+    <button
+      type="button"
+      id="backToLogin"
+      class="btn secondary"
+      style="width:100%;margin-top:10px"
+    >
+      Back to sign in
+    </button>
 
-<section id="page-reports" class="page hidden"><div class="panel"><h2>Operational Reports</h2><div class="toolbar"><button id="reportMonth" class="btn primary">This month</button><button id="reportToday" class="btn secondary">Today</button></div><div id="reportCards" class="cards"></div><div class="panel" style="margin-top:14px"><h2>Transactions</h2><div id="reportTable" class="tablewrap"></div></div></div></section>
+  </div>
+</div>
 
-<section id="page-users" class="page hidden"><div class="panel"><h2>Users</h2><p class="hint">Create authentication accounts in Supabase Authentication, then manage their warehouse profile here.</p><div id="usersTable" class="tablewrap"></div></div></section>
-</main></div>
+
+<!-- APPLICATION -->
+<div id="app" class="app hidden">
+
+  <aside class="side">
+
+    <div class="brand">
+      <img
+        src="barnsley-foodbank-logo.png"
+        alt="Barnsley Foodbank"
+      >
+      <small>Warehouse Management System</small>
+    </div>
+
+    <div class="nav">
+
+      <button data-page="dashboard">
+        Dashboard
+      </button>
+
+      <button data-page="stock">
+        Current Stock
+      </button>
+
+      <button data-page="in">
+        Stock In
+      </button>
+
+      <button data-page="out">
+        Stock Out
+      </button>
+
+      <button data-page="items">
+        Items
+      </button>
+
+      <button data-page="organisations">
+        Donors & Recipients
+      </button>
+
+      <button data-page="deliveries">
+        Delivery Notes
+      </button>
+
+      <button data-page="history">
+        Audit / Movements
+      </button>
+
+      <button data-page="users" id="usersNav">
+        Users
+      </button>
+
+    </div>
+
+    <div class="userbox">
+      <b id="userName"></b>
+      <br>
+      <span id="userRole"></span>
+      <br>
+
+      <button id="logout" class="btn secondary">
+        Sign out
+      </button>
+    </div>
+
+  </aside>
+
+
+  <main>
+
+    <div class="top">
+      <h1 id="pageTitle">Dashboard</h1>
+      <span id="status"></span>
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page">
+
+      <div class="grid">
+
+        <div class="stat">
+          <small>Items</small>
+          <b id="statItems">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Units in stock</small>
+          <b id="statUnits">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Low stock</small>
+          <b id="statLow">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Movements</small>
+          <b id="statMoves">0</b>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <h2>Recent stock movements</h2>
+        <div id="recentMoves" class="tablewrap"></div>
+      </div>
+
+    </section>
+
+
+    <!-- CURRENT STOCK -->
+    <section id="page-stock" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Current Stock</h2>
+
+        <div class="toolbar">
+          <input
+            id="stockSearch"
+            placeholder="Search item, SKU, barcode or location"
+          >
+        </div>
+
+        <div id="stockTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- STOCK IN -->
+    <section id="page-in" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Record Stock In</h2>
+
+        <form id="inForm" class="formgrid">
+
+          <div>
+            <label>Item</label>
+            <select id="inItem" required></select>
+          </div>
+
+          <div>
+            <label>Quantity</label>
+            <input
+              id="inQty"
+              type="number"
+              min="1"
+              required
+            >
+          </div>
+
+          <div>
+            <label>Weight per item (kg)</label>
+            <input id="inUnitWeight" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
+          </div>
+
+          <div>
+            <label>Total weight (kg)</label>
+            <input id="inTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated from quantity × weight">
+          </div>
+
+          <div>
+            <label>Stored in</label>
+            <select id="inStorageType">
+              <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Donor</label>
+            <select id="inOrg"></select>
+          </div>
+
+          <div>
+            <label>Batch reference</label>
+            <input id="inBatch">
+          </div>
+
+          <div>
+            <label>Best-before</label>
+            <input id="inBB" type="date">
+          </div>
+
+          <div>
+            <label>Reference</label>
+            <input id="inRef">
+          </div>
+
+          <div class="full">
+            <label>Notes</label>
+            <textarea id="inNotes"></textarea>
+          </div>
+
+          <div class="full actions">
+            <button class="btn primary">
+              Record stock in
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- STOCK OUT -->
+    <section id="page-out" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Record Stock Out</h2>
+
+        <form id="outForm" class="formgrid">
+
+          <div>
+            <label>Item</label>
+            <select id="outItem" required></select>
+          </div>
+
+          <div>
+            <label>Quantity</label>
+            <input
+              id="outQty"
+              type="number"
+              min="1"
+              required
+            >
+          </div>
+
+          <div>
+            <label>Weight per item (kg)</label>
+            <input id="outUnitWeight" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
+          </div>
+
+          <div>
+            <label>Total weight (kg)</label>
+            <input id="outTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated from quantity × weight">
+          </div>
+
+          <div>
+            <label>Stored in</label>
+            <select id="outStorageType">
+              <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Recipient</label>
+            <select id="outOrg"></select>
+          </div>
+
+          <div>
+            <label>Batch reference</label>
+            <input id="outBatch">
+          </div>
+
+          <div>
+            <label>Reference</label>
+            <input id="outRef">
+          </div>
+
+          <div class="full">
+            <label>Notes</label>
+            <textarea id="outNotes"></textarea>
+          </div>
+
+          <div class="full actions">
+            <button class="btn primary">
+              Record stock out
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- ITEMS -->
+    <section id="page-items" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Items</h2>
+
+        <div class="toolbar">
+          <button id="newItem" class="btn primary">
+            + New Item
+          </button>
+        </div>
+
+        <div id="itemEditor"></div>
+
+        <div id="itemsTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ORGANISATIONS -->
+    <section id="page-organisations" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Donors & Recipients</h2>
+
+        <div class="toolbar">
+          <button id="newOrg" class="btn primary">
+            + New Organisation
+          </button>
+        </div>
+
+        <div id="orgEditor"></div>
+
+        <div id="orgsTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- DELIVERY NOTES -->
+    <section id="page-deliveries" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Delivery Notes</h2>
+
+        <div class="toolbar">
+          <button id="newDelivery" class="btn primary">
+            + New Delivery Note
+          </button>
+        </div>
+
+        <div id="deliveryEditor"></div>
+
+        <div id="deliveriesTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HISTORY -->
+    <section id="page-history" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Audit / Movements</h2>
+
+        <div id="historyTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- USERS -->
+    <section id="page-users" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Users</h2>
+
+        <p style="color:#68766e">
+          Create staff accounts in Supabase Authentication,
+          then add/update their profile here.
+          Only administrators can manage profiles.
+        </p>
+
+        <div id="usersTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
 
 <script src="config.js"></script>
+
 <script>
+
 const {createClient}=supabase;
-const sb=createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-let currentUser=null,currentProfile=null,items=[],orgs=[],stock=[],moves=[],deliveries=[],allocations=[],locations=[],profiles=[];
+
+const sb=createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true
+    }
+  }
+);
+
+
+let currentUser=null;
+let currentProfile=null;
+
+let items=[];
+let orgs=[];
+let stock=[];
+let moves=[];
+let deliveries=[];
+
+
 const $=id=>document.getElementById(id);
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num=v=>Number(v||0);
-const money=v=>num(v).toLocaleString();
-const kg=v=>num(v).toLocaleString(undefined,{maximumFractionDigits:3})+' kg';
-function notify(message,good=true){$('status').innerHTML='<span class="badge '+(good?'green':'red')+'">'+esc(message)+'</span>';setTimeout(()=>{$('status').innerHTML=''},3500)}
-function role(){return currentProfile?.role||'READ_ONLY'} function canWrite(){return ['ADMIN','MANAGER','OPERATIVE'].includes(role())} function canManage(){return ['ADMIN','MANAGER'].includes(role())}
-function table(headers,rows){if(!rows.length)return '<div class="empty">No records found.</div>';return '<table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>'}
-function badge(t,g=true){return '<span class="badge '+(g?'green':'amber')+'">'+esc(t)+'</span>'}
-function isoDate(d){return new Date(d).toLocaleDateString()}
-function monthStart(){let d=new Date();return new Date(d.getFullYear(),d.getMonth(),1).toISOString()}
-async function login(e){e.preventDefault();$('loginError').classList.add('hidden');const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){$('loginError').textContent=error.message;$('loginError').classList.remove('hidden')}}
-function showLogin(){$('app').classList.add('hidden');$('login').classList.remove('hidden')}
-async function loadUser(user){currentUser=user;const {data,error}=await sb.from('profiles').select('*').eq('id',user.id).single();if(error||!data||!data.active){await sb.auth.signOut();showLogin();$('loginError').textContent='Your account is not active or has no warehouse profile.';$('loginError').classList.remove('hidden');return}currentProfile=data;$('login').classList.add('hidden');$('app').classList.remove('hidden');$('userName').textContent=data.full_name||user.email||'User';$('userRole').textContent=String(data.role||'').replaceAll('_',' ');$('usersNav').classList.toggle('hidden',role()!=='ADMIN');await refresh();showPage('dashboard')}
-async function fetchMaybe(tableName,query){const r=await query;if(r.error&&r.error.code!=='PGRST205')throw r.error;return r.data||[]}
+
+
+const esc=v=>
+  String(v??'').replace(
+    /[&<>"']/g,
+    c=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[c])
+  );
+
+
+const money=n=>
+  Number(n||0).toLocaleString();
+
+
+function notify(msg,good=true){
+
+  $('status').innerHTML=
+    '<span class="badge '+
+    (good?'green':'red')+
+    '">'+
+    esc(msg)+
+    '</span>';
+
+  setTimeout(()=>{
+    $('status').innerHTML=''
+  },3500);
+
+}
+
+
+function role(){
+  return currentProfile?.role||'READ_ONLY';
+}
+
+
+function canWrite(){
+  return [
+    'ADMIN',
+    'MANAGER',
+    'OPERATIVE'
+  ].includes(role());
+}
+
+
+function canManage(){
+  return [
+    'ADMIN',
+    'MANAGER'
+  ].includes(role());
+}
+
+
+function clearMessage(id){
+
+  $(id).classList.add('hidden');
+  $(id).textContent='';
+
+}
+
+
+function showMessage(id,msg){
+
+  $(id).textContent=msg;
+  $(id).classList.remove('hidden');
+
+}
+
+
+function recoveryRedirect(){
+
+  return window.location.origin+
+         window.location.pathname;
+
+}
+
+
+/* LOGIN */
+
+async function login(e){
+
+  e.preventDefault();
+
+  clearMessage('loginError');
+
+  const email=$('email').value.trim();
+  const password=$('password').value;
+
+  const {error}=await sb.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    showMessage(
+      'loginError',
+      error.message
+    );
+  }
+
+}
+
+
+/* FORGOT PASSWORD */
+
+async function forgotPassword(){
+
+  clearMessage('loginError');
+
+  const email=$('email').value.trim();
+
+  if(!email){
+
+    showMessage(
+      'loginError',
+      'Enter your email address first, then click “Forgot password?”.'
+    );
+
+    return;
+  }
+
+  const {error}=
+    await sb.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:recoveryRedirect()
+      }
+    );
+
+  if(error){
+
+    showMessage(
+      'loginError',
+      error.message
+    );
+
+  }else{
+
+    showMessage(
+      'loginError',
+      'If that email is registered, a password reset email has been sent. Check your inbox and spam folder.'
+    );
+
+  }
+
+}
+
+
+/* PASSWORD RESET */
+
+function showReset(){
+
+  $('login').classList.add('hidden');
+  $('app').classList.add('hidden');
+  $('reset').classList.remove('hidden');
+
+  clearMessage('resetError');
+  clearMessage('resetOk');
+
+}
+
+
+function showLogin(){
+
+  $('reset').classList.add('hidden');
+  $('app').classList.add('hidden');
+  $('login').classList.remove('hidden');
+
+}
+
+
+async function setNewPassword(e){
+
+  e.preventDefault();
+
+  clearMessage('resetError');
+  clearMessage('resetOk');
+
+  const p=$('newPassword').value;
+  const c=$('confirmPassword').value;
+
+  if(p.length<8){
+
+    showMessage(
+      'resetError',
+      'Your new password must be at least 8 characters.'
+    );
+
+    return;
+  }
+
+  if(p!==c){
+
+    showMessage(
+      'resetError',
+      'The passwords do not match.'
+    );
+
+    return;
+  }
+
+  const {error}=
+    await sb.auth.updateUser({
+      password:p
+    });
+
+  if(error){
+
+    showMessage(
+      'resetError',
+      error.message
+    );
+
+    return;
+  }
+
+  $('resetForm').reset();
+
+  showMessage(
+    'resetOk',
+    'Password changed successfully. You can now sign in with your new password.'
+  );
+
+  await sb.auth.signOut();
+
+  setTimeout(
+    ()=>showLogin(),
+    1200
+  );
+
+}
+
+
+let recoveryMode=false;
+
+
+/* START APPLICATION */
+
+async function boot(){
+
+  const isRecovery=
+    location.hash.includes('type=recovery');
+
+  if(isRecovery){
+
+    recoveryMode=true;
+    showReset();
+
+  }
+
+  const {
+    data:{session}
+  }=await sb.auth.getSession();
+
+  if(session && !recoveryMode){
+
+    await loadUser(session.user);
+
+  }
+
+  sb.auth.onAuthStateChange(
+    (event,session)=>{
+
+      if(event==='PASSWORD_RECOVERY'){
+
+        recoveryMode=true;
+        showReset();
+
+        return;
+      }
+
+      if(recoveryMode){
+
+        return;
+      }
+
+      if(session){
+
+        setTimeout(
+          ()=>loadUser(session.user),
+          0
+        );
+
+      }else{
+
+        showLogin();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* LOAD USER */
+
+async function loadUser(user){
+
+  currentUser=user;
+
+  const {
+    data,
+    error
+  }=await sb
+    .from('profiles')
+    .select('*')
+    .eq('id',user.id)
+    .single();
+
+  if(
+    error ||
+    !data ||
+    !data.active
+  ){
+
+    await sb.auth.signOut();
+
+    showLogin();
+
+    showMessage(
+      'loginError',
+      'Your account is not active or has no warehouse profile.'
+    );
+
+    return;
+  }
+
+  currentProfile=data;
+
+  $('login').classList.add('hidden');
+  $('reset').classList.add('hidden');
+  $('app').classList.remove('hidden');
+
+  $('userName').textContent=
+    data.full_name;
+
+  $('userRole').textContent=
+    data.role.replace('_',' ');
+
+  $('usersNav').classList.toggle(
+    'hidden',
+    role()!=='ADMIN'
+  );
+
+  await refresh();
+
+  showPage('dashboard');
+
+}
+
+
+/* REFRESH DATA */
+
 async function refresh(){
-try{
-items=await fetchMaybe('items',sb.from('items').select('*').eq('active',true).order('name'));
-orgs=await fetchMaybe('organisations',sb.from('organisations').select('*').eq('active',true).order('name'));
-stock=await fetchMaybe('current_stock',sb.from('current_stock').select('*').order('name'));
-moves=await fetchMaybe('stock_movements',sb.from('stock_movements').select('*,items(name,sku),organisations(name)').order('created_at',{ascending:false}).limit(500));
-deliveries=await fetchMaybe('delivery_notes',sb.from('delivery_notes').select('*,organisations(name)').order('created_at',{ascending:false}).limit(200));
-allocations=await fetchMaybe('allocations',sb.from('allocations').select('*,items(name,sku),organisations(name)').order('created_at',{ascending:false}).limit(200));
-locations=await fetchMaybe('warehouse_locations',sb.from('warehouse_locations').select('*').eq('active',true).order('code'));
-profiles=await fetchMaybe('profiles',sb.from('profiles').select('*').order('full_name'));
-renderAll()
-}catch(e){console.error(e);notify(e.message||'Unable to load warehouse data',false)}
+
+  try{
+
+    const itemsResult=
+      await sb
+        .from('items')
+        .select('*')
+        .eq('active',true)
+        .order('name');
+
+
+    const orgsResult=
+      await sb
+        .from('organisations')
+        .select('*')
+        .eq('active',true)
+        .order('name');
+
+
+    const stockResult=
+      await sb
+        .from('current_stock')
+        .select('*')
+        .order('name');
+
+
+    const movesResult=
+      await sb
+        .from('stock_movements')
+        .select(
+          '*,items(name,sku),organisations(name)'
+        )
+        .order(
+          'created_at',
+          {ascending:false}
+        )
+        .limit(100);
+
+
+    const deliveriesResult=
+      await sb
+        .from('delivery_notes')
+        .select(
+          '*,organisations(name)'
+        )
+        .order(
+          'created_at',
+          {ascending:false}
+        )
+        .limit(100);
+
+
+    const profilesResult=
+      await sb
+        .from('profiles')
+        .select('*')
+        .order('full_name');
+
+
+    if(itemsResult.error)
+      throw itemsResult.error;
+
+    if(orgsResult.error)
+      throw orgsResult.error;
+
+    if(stockResult.error)
+      throw stockResult.error;
+
+    if(movesResult.error)
+      throw movesResult.error;
+
+    if(deliveriesResult.error)
+      throw deliveriesResult.error;
+
+    if(profilesResult.error)
+      throw profilesResult.error;
+
+
+    items=itemsResult.data||[];
+    orgs=orgsResult.data||[];
+    stock=stockResult.data||[];
+    moves=movesResult.data||[];
+    deliveries=deliveriesResult.data||[];
+
+
+    renderAll(
+      profilesResult.data||[]
+    );
+
+
+  }catch(error){
+
+    notify(
+      error.message ||
+      'Unable to load warehouse data',
+      false
+    );
+
+    console.error(
+      'Refresh error:',
+      error
+    );
+
+  }
+
 }
-function renderAll(){
-$('statItems').textContent=items.length;
-$('statUnits').textContent=money(stock.reduce((s,r)=>s+num(r.current_quantity),0));
-$('statWeight').textContent=kg(stock.reduce((s,r)=>s+num(r.current_weight_kg),0));
-$('statLow').textContent=stock.filter(r=>num(r.current_quantity)<=num(r.reorder_level)).length;
-const start=monthStart(),month=moves.filter(m=>new Date(m.created_at)>=new Date(start));
-$('statReceived').textContent=kg(month.filter(m=>m.movement_type==='IN').reduce((s,m)=>s+num(m.total_weight_kg||m.weight_kg),0));
-$('statDispatched').textContent=kg(month.filter(m=>m.movement_type==='OUT').reduce((s,m)=>s+num(m.total_weight_kg||m.weight_kg),0));
-$('statWaste').textContent=kg(month.filter(m=>m.movement_type==='WASTE').reduce((s,m)=>s+num(m.total_weight_kg||m.weight_kg),0));
-$('recentMoves').innerHTML=table(['Date','Type','Item','Qty','Weight','Batch','Organisation'],moves.slice(0,12).map(m=>[isoDate(m.created_at),badge(m.movement_type,m.movement_type==='IN'),esc(m.items?.name||'-'),money(m.quantity),kg(m.total_weight_kg||m.weight_kg),esc(m.batch_ref||'-'),esc(m.organisations?.name||'-')]));
-const attention=stock.filter(r=>num(r.current_quantity)<=num(r.reorder_level)|| (r.nearest_expiry&&new Date(r.nearest_expiry)<new Date(Date.now()+14*86400000))).slice(0,12);
-$('attention').innerHTML=attention.length?attention.map(r=>'<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+esc(r.name)+'</b><br><span class="hint">'+money(r.current_quantity)+' units · '+kg(r.current_weight_kg)+' · '+esc(r.nearest_expiry||'')+'</span></div>').join(''):'<div class="empty">No immediate attention items.</div>';
-$('itemsTable').innerHTML=table(['SKU','Barcode','Item','Category','Unit','Weight/unit','Storage','Location','Reorder'],items.map(i=>[esc(i.sku),esc(i.barcode||'-'),esc(i.name),esc(i.category),esc(i.unit||'units'),kg(i.weight_per_unit_kg),esc(i.storage_type||'-'),esc(i.location||'-'),money(i.reorder_level)]));
-$('orgsTable').innerHTML=table(['Name','Type','Contact','Phone','Postcode'],orgs.map(o=>[esc(o.name),esc(o.type),esc(o.contact_name||'-'),esc(o.phone||'-'),esc(o.postcode||'-')]));
-$('locationsTable').innerHTML=table(['Code','Name','Zone','Temperature','Capacity'],locations.map(l=>[esc(l.code),esc(l.name),esc(l.zone||'-'),esc(l.temperature_zone||'-'),esc(l.capacity||'-')]));
-$('deliveriesTable').innerHTML=table(['Number','Date','Recipient','Status','Action'],deliveries.map(d=>[esc(d.delivery_number),esc(d.delivery_date),esc(d.organisations?.name||'-'),badge(d.status||'OPEN',d.status==='COMPLETED'),'<button class="btn secondary" onclick="printDelivery('+JSON.stringify(d.id)+')">Print</button>']));
-$('usersTable').innerHTML=table(['Name','Role','Status','User ID'],profiles.map(p=>[esc(p.full_name||'-'),esc(p.role||'-'),p.active?badge('Active'):badge('Inactive',false),esc(p.id)]));
-$('allocationsTable').innerHTML=table(['Date','Reference','Recipient','Item','Qty','Status','Action'],allocations.filter(a=>!['COMPLETED','CANCELLED'].includes(a.status)).map(a=>[isoDate(a.created_at),esc(a.reference||'-'),esc(a.organisations?.name||'-'),esc(a.items?.name||'-'),money(a.quantity),badge(a.status||'OPEN',a.status==='PICKED'),'<button class="btn primary" onclick="dispatchAllocation('+JSON.stringify(a.id)+')">Dispatch</button>']));
-fillSelects();renderInventory();renderReports()
+
+
+/* RENDER */
+
+function renderAll(profiles=[]){
+
+  $('statItems').textContent=
+    items.length;
+
+
+  $('statUnits').textContent=
+    money(
+      stock.reduce(
+        (s,x)=>
+          s+
+          Number(
+            x.current_quantity||0
+          ),
+        0
+      )
+    );
+
+
+  $('statLow').textContent=
+    stock.filter(
+      function(x){
+
+        return Number(
+          x.current_quantity||0
+        )<=Number(
+          x.reorder_level||0
+        );
+
+      }
+    ).length;
+
+
+  $('statMoves').textContent=
+    moves.length;
+
+
+  $('recentMoves').innerHTML=
+    table(
+      [
+        'Date',
+        'Type',
+        'Item',
+        'Qty',
+        'User'
+      ],
+
+      moves
+        .slice(0,10)
+        .map(function(m){
+
+          return [
+
+            new Date(
+              m.created_at
+            ).toLocaleString(),
+
+            badge(
+              m.movement_type,
+              m.movement_type==='IN'
+            ),
+
+            esc(
+              m.items
+                ? m.items.name
+                : '-'
+            ),
+
+            money(m.quantity),
+
+            esc(
+              m.user_id===currentUser.id
+                ? 'You'
+                : m.user_id
+            )
+
+          ];
+
+        })
+    );
+
+
+  $('stockTable').innerHTML=
+    table(
+      [
+        'SKU',
+        'Item',
+        'Category',
+        'Location',
+        'Qty',
+        'Weight',
+        'Stored In',
+        'Reorder'
+      ],
+
+      stock.map(function(x){
+
+        return [
+
+          esc(x.sku),
+
+          esc(x.name),
+
+          esc(x.category),
+
+          esc(x.location||'-'),
+
+          money(
+            x.current_quantity
+          ),
+
+          x.current_weight_kg ? Number(x.current_weight_kg).toFixed(3)+' kg' : '-',
+
+          esc(x.storage_type||x.latest_storage_type||'-'),
+
+          money(
+            x.reorder_level
+          )
+
+        ];
+
+      })
+    );
+
+
+  $('itemsTable').innerHTML=
+    table(
+      [
+        'SKU',
+        'Barcode',
+        'Item',
+        'Category',
+        'Location',
+        'Weight / Item',
+        'Stored In',
+        'Reorder'
+      ],
+
+      items.map(function(x){
+
+        return [
+
+          esc(x.sku),
+
+          esc(
+            x.barcode||'-'
+          ),
+
+          esc(x.name),
+
+          esc(x.category),
+
+          esc(
+            x.location||'-'
+          ),
+
+          x.weight_per_unit_kg ? Number(x.weight_per_unit_kg).toFixed(3)+' kg' : '-',
+
+          esc(x.storage_type||'-'),
+
+          money(
+            x.reorder_level
+          )
+
+        ];
+
+      })
+    );
+
+
+  $('orgsTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Type',
+        'Contact',
+        'Phone',
+        'Postcode'
+      ],
+
+      orgs.map(function(x){
+
+        return [
+
+          esc(x.name),
+
+          esc(x.type),
+
+          esc(
+            x.contact_name||'-'
+          ),
+
+          esc(
+            x.phone||'-'
+          ),
+
+          esc(
+            x.postcode||'-'
+          )
+
+        ];
+
+      })
+    );
+
+
+  $('historyTable').innerHTML=
+    table(
+      [
+        'Date',
+        'Type',
+        'Item',
+        'Qty',
+        'Reference',
+        'Batch'
+      ],
+
+      moves.map(function(m){
+
+        return [
+
+          new Date(
+            m.created_at
+          ).toLocaleDateString(),
+
+          badge(
+            m.movement_type,
+            m.movement_type==='IN'
+          ),
+
+          esc(
+            m.items
+              ? m.items.name
+              : '-'
+          ),
+
+          money(m.quantity),
+
+          esc(
+            m.reference||'-'
+          ),
+
+          esc(
+            m.batch_ref||'-'
+          )
+
+        ];
+
+      })
+    );
+
+
+  $('deliveriesTable').innerHTML=
+    table(
+      [
+        'Number',
+        'Date',
+        'Recipient',
+        'Status',
+        'Action'
+      ],
+
+      deliveries.map(function(d){
+
+        return [
+
+          esc(
+            d.delivery_number
+          ),
+
+          esc(
+            d.delivery_date
+          ),
+
+          esc(
+            d.organisations
+              ? d.organisations.name
+              : '-'
+          ),
+
+          badge(
+            d.status,
+            d.status==='COMPLETED'
+          ),
+
+          '<button class="btn secondary" onclick="printDelivery('+
+          JSON.stringify(d.id)+
+          ')">Print</button>'
+
+        ];
+
+      })
+    );
+
+
+  const userRows=
+    profiles.map(function(p){
+
+      return [
+
+        esc(p.full_name),
+
+        esc(p.role),
+
+        p.active
+          ? 'Active'
+          : 'Inactive',
+
+        esc(p.id)
+
+      ];
+
+    });
+
+
+  $('usersTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Role',
+        'Status',
+        'User ID'
+      ],
+      userRows
+    );
+
+
+  fillSelects();
+
 }
-function options(list,placeholder='Select…'){return '<option value="">'+esc(placeholder)+'</option>'+list.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.label||x.name)+'</option>').join('')}
+
+
+/* HELPERS */
+
+function badge(t,green){
+
+  return '<span class="badge '+
+    (green?'green':'amber')+
+    '">'+
+    esc(t)+
+    '</span>';
+
+}
+
+
+function table(headers,rows){
+
+  if(!rows.length){
+
+    return '<div class="empty">No records found.</div>';
+
+  }
+
+  return (
+    '<table>'+
+      '<thead>'+
+        '<tr>'+
+          headers
+            .map(
+              h=>'<th>'+h+'</th>'
+            )
+            .join('')+
+        '</tr>'+
+      '</thead>'+
+      '<tbody>'+
+        rows
+          .map(
+            r=>
+              '<tr>'+
+              r
+                .map(
+                  x=>'<td>'+x+'</td>'
+                )
+                .join('')+
+              '</tr>'
+          )
+          .join('')+
+      '</tbody>'+
+    '</table>'
+  );
+
+}
+
+
+/* SELECT BOXES */
+
 function fillSelects(){
-const io=options(items.map(i=>({id:i.id,label:(i.sku||'')+' — '+i.name})));
-['receiveItem','allocateItem','dispatchItem','wasteItem','transferItem'].forEach(id=>$(id).innerHTML=io);
-const donors=orgs.filter(o=>['DONOR','SUPPLIER','PARTNER'].includes(o.type));const recips=orgs.filter(o=>['RECIPIENT','PARTNER'].includes(o.type));
-$('receiveOrg').innerHTML=options(donors,'None / not recorded');$('allocateOrg').innerHTML=options(recips,'Select recipient');$('dispatchOrg').innerHTML=options(recips,'Select recipient');
-const lo=options(locations.map(l=>({id:l.id,label:(l.code||'')+' — '+l.name})));
-['receiveLocation','transferFrom','transferTo'].forEach(id=>$(id).innerHTML=lo);
+
+  const opts=
+    '<option value="">Select…</option>'+
+    items
+      .map(
+        i=>
+          '<option value="'+
+          i.id+
+          '">'+
+          esc(
+            i.sku+
+            ' — '+
+            i.name
+          )+
+          '</option>'
+      )
+      .join('');
+
+  $('inItem').innerHTML=opts;
+  $('outItem').innerHTML=opts;
+
+
+  const donor=
+    '<option value="">None / not recorded</option>'+
+    orgs
+      .filter(
+        o=>
+          [
+            'DONOR',
+            'SUPPLIER',
+            'PARTNER'
+          ].includes(o.type)
+      )
+      .map(
+        o=>
+          '<option value="'+
+          o.id+
+          '">'+
+          esc(o.name)+
+          '</option>'
+      )
+      .join('');
+
+
+  const rec=
+    '<option value="">None / not recorded</option>'+
+    orgs
+      .filter(
+        o=>
+          [
+            'RECIPIENT',
+            'PARTNER'
+          ].includes(o.type)
+      )
+      .map(
+        o=>
+          '<option value="'+
+          o.id+
+          '">'+
+          esc(o.name)+
+          '</option>'
+      )
+      .join('');
+
+
+  $('inOrg').innerHTML=donor;
+  $('outOrg').innerHTML=rec;
+
 }
-function renderInventory(){
-let q=($('inventorySearch')?.value||'').toLowerCase(),zone=$('inventoryZone')?.value||'';
-let rows=stock.filter(r=>(!zone||r.temperature_zone===zone)&&[r.sku,r.name,r.barcode,r.batch_ref,r.organisation_name,r.location].join(' ').toLowerCase().includes(q));
-$('inventoryTable').innerHTML=table(['SKU','Item','Batch','Expiry','Qty','Weight','Container','Location','Zone','Reorder'],rows.map(r=>[esc(r.sku),esc(r.name),esc(r.batch_ref||'-'),esc(r.nearest_expiry||'-'),money(r.current_quantity),kg(r.current_weight_kg),esc(r.storage_type||'-'),esc(r.location||'-'),esc(r.temperature_zone||'-'),money(r.reorder_level)]))
+
+
+/* STOCK MOVEMENTS */
+
+async function addMove(type,form){
+
+  if(!canWrite()){
+
+    notify(
+      'Your role cannot change stock',
+      false
+    );
+
+    return;
+  }
+
+
+  const itemId=
+    $(
+      type==='IN'
+        ? 'inItem'
+        : 'outItem'
+    ).value;
+
+
+  const qty=
+    Number(
+      $(
+        type==='IN'
+          ? 'inQty'
+          : 'outQty'
+      ).value
+    );
+
+
+  const org=
+    $(
+      type==='IN'
+        ? 'inOrg'
+        : 'outOrg'
+    ).value||null;
+
+
+  const batch=
+    $(
+      type==='IN'
+        ? 'inBatch'
+        : 'outBatch'
+    ).value||null;
+
+
+  const ref=
+    $(
+      type==='IN'
+        ? 'inRef'
+        : 'outRef'
+    ).value||null;
+
+
+  const notes=
+    $(
+      type==='IN'
+        ? 'inNotes'
+        : 'outNotes'
+    ).value||null;
+
+
+  if(!itemId||qty<1){
+
+    notify(
+      'Please select an item and enter a quantity.',
+      false
+    );
+
+    return;
+  }
+
+
+  if(type==='OUT'){
+
+    const itemRow=
+      stock.find(
+        x=>
+          x.item_id===itemId ||
+          x.id===itemId
+      );
+
+
+    if(
+      itemRow &&
+      qty>
+      Number(
+        itemRow.current_quantity||0
+      )
+    ){
+
+      notify(
+        'Not enough stock available',
+        false
+      );
+
+      return;
+    }
+
+  }
+
+
+  const unitWeight=Number($(type==='IN'?'inUnitWeight':'outUnitWeight').value||0);
+  const enteredTotal=Number($(type==='IN'?'inTotalWeight':'outTotalWeight').value||0);
+  const totalWeight=enteredTotal || (unitWeight ? qty*unitWeight : 0);
+  const storageType=$(type==='IN'?'inStorageType':'outStorageType').value || null;
+
+  const {error}=
+    await sb
+      .from('stock_movements')
+      .insert({
+
+        movement_type:type,
+
+        item_id:itemId,
+
+        quantity:qty,
+
+        unit_weight_kg:unitWeight || null,
+
+        total_weight_kg:totalWeight || null,
+
+        storage_type:storageType,
+
+        user_id:currentUser.id,
+
+        organisation_id:org,
+
+        reference:ref,
+
+        batch_ref:batch,
+
+        notes:notes
+
+      });
+
+
+  if(error){
+
+    notify(
+      error.message,
+      false
+    );
+
+    return;
+  }
+
+
+  await sb
+    .from('audit_log')
+    .insert({
+
+      user_id:currentUser.id,
+
+      action:'STOCK_'+type,
+
+      table_name:'stock_movements',
+
+      details:{
+        item_id:itemId,
+        quantity:qty,
+        reference:ref
+      }
+
+    });
+
+
+  form.reset();
+
+  await refresh();
+
+  notify(
+    'Stock '+
+    type.toLowerCase()+
+    ' recorded'
+  );
+
 }
-async function insertMove(payload){
-if(!canWrite()){notify('Your role cannot change stock',false);return false}
-const {error}=await sb.from('stock_movements').insert({...payload,user_id:currentUser.id});
-if(error){notify(error.message,false);return false}
-await refresh();return true
+
+
+/* NAVIGATION */
+
+function showPage(name){
+
+  document
+    .querySelectorAll('.page')
+    .forEach(
+      x=>
+        x.classList.add('hidden')
+    );
+
+
+  $('page-'+name)
+    .classList.remove('hidden');
+
+
+  document
+    .querySelectorAll('.nav button')
+    .forEach(
+      x=>
+        x.classList.toggle(
+          'active',
+          x.dataset.page===name
+        )
+    );
+
+
+  const titles={
+    dashboard:'Dashboard',
+    stock:'Current Stock',
+    in:'Stock In',
+    out:'Stock Out',
+    items:'Items',
+    organisations:'Donors & Recipients',
+    deliveries:'Delivery Notes',
+    history:'Audit / Movements',
+    users:'Users'
+  };
+
+
+  $('pageTitle').textContent=
+    titles[name]||name;
+
 }
-$('receiveForm').onsubmit=async e=>{e.preventDefault();const qty=num($('receiveQty').value),uw=num($('receiveUnitWeight').value),tw=num($('receiveTotalWeight').value)||qty*uw;if(!tw){notify('Enter a weight per unit or total weight.',false);return}const ok=await insertMove({movement_type:'IN',item_id:$('receiveItem').value,quantity:qty,unit_weight_kg:uw,total_weight_kg:tw,organisation_id:$('receiveOrg').value||null,reference:$('receiveRef').value.trim()||null,batch_ref:$('receiveBatch').value.trim()||null,expiry_date:$('receiveExpiry').value||null,storage_type:$('receiveContainer').value,location_id:$('receiveLocation').value||null,temperature_zone:$('receiveTemp').value,haulier:$('receiveHaulier').value.trim()||null,notes:$('receiveNotes').value.trim()||null});if(ok){e.target.reset();$('receiveQty').value=1;notify('Stock received')}}
-$('dispatchForm').onsubmit=async e=>{e.preventDefault();const qty=num($('dispatchQty').value);if(!qty){notify('Enter a quantity.',false);return}const ok=await insertMove({movement_type:'OUT',item_id:$('dispatchItem').value,quantity:qty,total_weight_kg:num($('dispatchWeight').value)||null,organisation_id:$('dispatchOrg').value,reference:$('dispatchRef').value.trim()||null,batch_ref:$('dispatchBatch').value||null,delivery_method:$('dispatchMethod').value,driver_name:$('dispatchDriver').value.trim()||null,notes:$('dispatchNotes').value.trim()||null});if(ok){e.target.reset();notify('Stock dispatched')}}
-$('wasteForm').onsubmit=async e=>{e.preventDefault();const ok=await insertMove({movement_type:'WASTE',item_id:$('wasteItem').value,quantity:num($('wasteQty').value),total_weight_kg:num($('wasteWeight').value)||null,batch_ref:$('wasteBatch').value||null,waste_reason:$('wasteReason').value,waste_method:$('wasteMethod').value,notes:$('wasteNotes').value.trim()||null});if(ok){e.target.reset();notify('Waste recorded')}}
-$('transferForm').onsubmit=async e=>{e.preventDefault();const ok=await insertMove({movement_type:'TRANSFER',item_id:$('transferItem').value,quantity:num($('transferQty').value),batch_ref:$('transferBatch').value||null,from_location_id:$('transferFrom').value,to_location_id:$('transferTo').value,reference:$('transferRef').value.trim()||null,notes:$('transferNotes').value.trim()||null});if(ok){e.target.reset();notify('Stock transfer recorded')}}
-$('allocateForm').onsubmit=async e=>{e.preventDefault();if(!canWrite()){notify('Your role cannot create allocations',false);return}const {error}=await sb.from('allocations').insert({organisation_id:$('allocateOrg').value,item_id:$('allocateItem').value,quantity:num($('allocateQty').value),required_date:$('allocateDate').value||null,batch_ref:$('allocateBatch').value||null,reference:$('allocateRef').value.trim()||null,notes:$('allocateNotes').value.trim()||null,created_by:currentUser.id,status:'OPEN'});if(error){notify(error.message,false);return}e.target.reset();await refresh();notify('Allocation created')}
-async function dispatchAllocation(id){const a=allocations.find(x=>x.id===id);if(!a)return;const ok=await insertMove({movement_type:'OUT',item_id:a.item_id,quantity:a.quantity,organisation_id:a.organisation_id,batch_ref:a.batch_ref||null,reference:a.reference||null,notes:'Dispatched from allocation '+id});if(ok){await sb.from('allocations').update({status:'COMPLETED',completed_at:new Date().toISOString()}).eq('id',id);await refresh();notify('Allocation dispatched')}}
-function itemBatchOptions(itemId,el){const rows=moves.filter(m=>m.item_id===itemId&&m.movement_type==='IN'&&m.batch_ref);$(el).innerHTML=options([...new Map(rows.map(r=>[r.batch_ref,{id:r.batch_ref,label:r.batch_ref+' — '+(r.expiry_date||'no date')}])).values()],'Select batch / FEFO')}
-['allocateItem','dispatchItem','wasteItem','transferItem'].forEach(id=>$(id).onchange=()=>{const map={allocateItem:'allocateBatch',dispatchItem:'dispatchBatch',wasteItem:'wasteBatch',transferItem:'transferBatch'};if($(map[id]))itemBatchOptions($(id).value,map[id])});
-$('inventorySearch').oninput=renderInventory;$('inventoryZone').onchange=renderInventory;
-function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('page-'+name)?.classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));const titles={dashboard:'Dashboard',receive:'Goods In / Receive',inventory:'Inventory',allocate:'Allocations / Picking',dispatch:'Dispatch / Goods Out',waste:'Waste / Disposal',transfers:'Stock Transfers',items:'Items / Product Master',organisations:'Donors & Recipients',locations:'Warehouse Locations',deliveries:'Delivery Notes',trace:'Traceability',reports:'Operational Reports',users:'Users'};$('pageTitle').textContent=titles[name]||name}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-function openItemEditor(){if(!canManage()){notify('Manager or Administrator access required',false);return}$('itemEditor').innerHTML=`<form id="itemForm" class="formgrid panel" style="margin:0 0 16px"><div><label>SKU</label><input name="sku" required></div><div><label>Barcode</label><input name="barcode"></div><div><label>Name</label><input name="name" required></div><div><label>Category</label><input name="category" required></div><div><label>Unit</label><input name="unit" value="units"></div><div><label>Weight per unit (kg)</label><input name="weight_per_unit_kg" type="number" step="0.001" min="0"></div><div><label>Storage / packaging</label><select name="storage_type"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select></div><div><label>Default location</label><input name="location"></div><div><label>Temperature zone</label><select name="temperature_zone"><option>Ambient</option><option>Chilled</option><option>Frozen</option><option>Fresh</option></select></div><div><label>Reorder level</label><input name="reorder_level" type="number" min="0" value="0"></div><div class="full actions"><button type="button" class="btn secondary" onclick="$('itemEditor').innerHTML=''">Cancel</button><button class="btn primary">Save item</button></div></form>`;$('itemForm').onsubmit=async e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));o.reorder_level=num(o.reorder_level);o.weight_per_unit_kg=num(o.weight_per_unit_kg);const {error}=await sb.from('items').insert(o);if(error){notify(error.message,false);return}$('itemEditor').innerHTML='';await refresh();notify('Item created')}}
-function openOrgEditor(){if(!canWrite()){notify('Your role cannot create organisations',false);return}$('orgEditor').innerHTML=`<form id="orgForm" class="formgrid panel" style="margin:0 0 16px"><div><label>Name</label><input name="name" required></div><div><label>Type</label><select name="type"><option>DONOR</option><option>RECIPIENT</option><option>PARTNER</option><option>SUPPLIER</option></select></div><div><label>Contact</label><input name="contact_name"></div><div><label>Phone</label><input name="phone"></div><div><label>Email</label><input name="email" type="email"></div><div><label>Postcode</label><input name="postcode"></div><div class="full"><label>Address</label><input name="address"></div><div class="full"><label>Notes</label><textarea name="notes"></textarea></div><div class="full actions"><button type="button" class="btn secondary" onclick="$('orgEditor').innerHTML=''">Cancel</button><button class="btn primary">Save organisation</button></div></form>`;$('orgForm').onsubmit=async e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));const {error}=await sb.from('organisations').insert(o);if(error){notify(error.message,false);return}$('orgEditor').innerHTML='';await refresh();notify('Organisation created')}}
-function openLocationEditor(){if(!canManage()){notify('Manager or Administrator access required',false);return}$('locationEditor').innerHTML=`<form id="locationForm" class="formgrid panel" style="margin:0 0 16px"><div><label>Code</label><input name="code" placeholder="A-01" required></div><div><label>Name</label><input name="name" placeholder="Ambient Rack A1" required></div><div><label>Zone</label><input name="zone" placeholder="Ambient"></div><div><label>Temperature</label><select name="temperature_zone"><option>Ambient</option><option>Chilled</option><option>Frozen</option><option>Fresh</option></select></div><div><label>Capacity</label><input name="capacity"></div><div class="actions"><button type="button" class="btn secondary" onclick="$('locationEditor').innerHTML=''">Cancel</button><button class="btn primary">Save location</button></div></form>`;$('locationForm').onsubmit=async e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));const {error}=await sb.from('warehouse_locations').insert(o);if(error){notify(error.message,false);return}$('locationEditor').innerHTML='';await refresh();notify('Location created')}}
-function openDeliveryEditor(){if(!canWrite()){notify('Your role cannot create delivery notes',false);return}const today=new Date().toISOString().slice(0,10),number='DN-'+today.replaceAll('-','')+'-'+String(deliveries.length+1).padStart(4,'0');$('deliveryEditor').innerHTML=`<form id="deliveryForm" class="formgrid panel" style="margin:0 0 16px"><div><label>Delivery note no.</label><input name="delivery_number" value="${number}" required></div><div><label>Date</label><input name="delivery_date" type="date" value="${today}" required></div><div><label>Recipient</label><select name="recipient_id">${options(orgs.filter(o=>['RECIPIENT','PARTNER'].includes(o.type)))}</select></div><div><label>Method</label><select name="delivery_method"><option>Van</option><option>Collection</option><option>Other</option></select></div><div><label>Driver / collected by</label><input name="driver_name"></div><div><label>Reference</label><input name="reference"></div><div class="full"><label>Notes</label><textarea name="notes"></textarea></div><div class="full actions"><button type="button" class="btn secondary" onclick="$('deliveryEditor').innerHTML=''">Cancel</button><button class="btn primary">Create delivery note</button></div></form>`;$('deliveryForm').onsubmit=async e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));o.recipient_id=o.recipient_id||null;o.created_by=currentUser.id;const {error}=await sb.from('delivery_notes').insert(o);if(error){notify(error.message,false);return}$('deliveryEditor').innerHTML='';await refresh();notify('Delivery note created')}}
-$('newItem').onclick=openItemEditor;$('newOrg').onclick=openOrgEditor;$('newLocation').onclick=openLocationEditor;$('newDelivery').onclick=openDeliveryEditor;
-$('traceBtn').onclick=async()=>{const q=$('traceSearch').value.trim();if(!q){notify('Enter a batch, item or reference',false);return}const {data,error}=await sb.from('stock_movements').select('*,items(name,sku),organisations(name)').or('batch_ref.ilike.%'+q+'%,reference.ilike.%'+q+'%').order('created_at',{ascending:false});if(error){notify(error.message,false);return}$('traceTable').innerHTML=table(['Date','Type','Item','Qty','Weight','Batch','Reference','Organisation'],(data||[]).map(m=>[isoDate(m.created_at),badge(m.movement_type,m.movement_type==='IN'),esc(m.items?.name||'-'),money(m.quantity),kg(m.total_weight_kg||m.weight_kg),esc(m.batch_ref||'-'),esc(m.reference||'-'),esc(m.organisations?.name||'-')]))};
-function renderReports(){const start=monthStart(),m=moves.filter(x=>new Date(x.created_at)>=new Date(start));const r=[['Received',m.filter(x=>x.movement_type==='IN').reduce((s,x)=>s+num(x.total_weight_kg),0)],['Dispatched',m.filter(x=>x.movement_type==='OUT').reduce((s,x)=>s+num(x.total_weight_kg),0)],['Waste',m.filter(x=>x.movement_type==='WASTE').reduce((s,x)=>s+num(x.total_weight_kg),0)],['Transfers',m.filter(x=>x.movement_type==='TRANSFER').reduce((s,x)=>s+num(x.total_weight_kg),0)]];$('reportCards').innerHTML=r.map(x=>'<div class="mini"><small>'+x[0]+'</small><b>'+kg(x[1])+'</b></div>').join('');$('reportTable').innerHTML=table(['Date','Type','Item','Qty','Weight','Reference'],m.map(x=>[isoDate(x.created_at),badge(x.movement_type,x.movement_type==='IN'),esc(x.items?.name||'-'),money(x.quantity),kg(x.total_weight_kg),esc(x.reference||'-')]))}
-$('reportMonth').onclick=renderReports;$('reportToday').onclick=()=>{const today=new Date().toISOString().slice(0,10);$('reportTable').innerHTML=table(['Date','Type','Item','Qty','Weight','Reference'],moves.filter(x=>x.created_at.slice(0,10)===today).map(x=>[isoDate(x.created_at),badge(x.movement_type,x.movement_type==='IN'),esc(x.items?.name||'-'),money(x.quantity),kg(x.total_weight_kg),esc(x.reference||'-')]))};
-function printDelivery(id){const d=deliveries.find(x=>x.id===id);if(!d)return;const w=window.open('','_blank');if(!w){notify('Please allow pop-ups to print.',false);return}w.document.write('<html><head><title>'+esc(d.delivery_number)+'</title><style>body{font-family:Arial;margin:35px}.head{display:flex;justify-content:space-between;border-bottom:3px solid #078b40;padding-bottom:16px}.logo{width:240px}h1{color:#078b40}.box{border:1px solid #aaa;padding:14px;margin:16px 0}.sign{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:35px}.line{border-bottom:1px solid #333;height:35px}</style></head><body><div class="head"><img class="logo" src="barnsley-foodbank-logo.png"><div><b>Barnsley Foodbank Partnership</b><br>Warehouse Delivery Note</div></div><h1>DELIVERY NOTE</h1><div class="box"><b>Note:</b> '+esc(d.delivery_number)+'<br><b>Date:</b> '+esc(d.delivery_date)+'<br><b>Recipient:</b> '+esc(d.organisations?.name||'')+'<br><b>Method:</b> '+esc(d.delivery_method||'')+'<br><b>Driver:</b> '+esc(d.driver_name||'')+'</div><div class="box"><b>Notes</b><br><br>'+esc(d.notes||'')+'</div><div class="sign"><div>Received by:<div class="line"></div></div><div>Signature:<div class="line"></div></div></div><script>window.onload=()=>window.print();<\/script></body></html>');w.document.close()}
-$('loginForm').addEventListener('submit',login);$('logout').onclick=()=>sb.auth.signOut();
-sb.auth.onAuthStateChange((event,session)=>{if(session)setTimeout(()=>loadUser(session.user),0);else showLogin()});
-async function boot(){const {data:{session}}=await sb.auth.getSession();if(session)await loadUser(session.user);else showLogin()}boot();
+
+
+/* ITEM EDITOR */
+
+function openItemEditor(){
+
+  if(!canManage()){
+
+    notify(
+      'Manager or Administrator access required',
+      false
+    );
+
+    return;
+  }
+
+
+  $('itemEditor').innerHTML=`
+
+    <form
+      id="itemForm"
+      class="formgrid panel"
+      style="margin:0 0 16px"
+    >
+
+      <div>
+        <label>SKU</label>
+        <input name="sku" required>
+      </div>
+
+      <div>
+        <label>Barcode</label>
+        <input name="barcode">
+      </div>
+
+      <div>
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+
+      <div>
+        <label>Category</label>
+        <input name="category" required>
+      </div>
+
+      <div>
+        <label>Unit</label>
+        <input name="unit" value="units">
+      </div>
+
+      <div>
+        <label>Weight per item (kg)</label>
+        <input name="weight_per_unit_kg" type="number" step="0.001" min="0">
+      </div>
+
+      <div>
+        <label>Stored in</label>
+        <select name="storage_type">
+          <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Location</label>
+        <input name="location">
+      </div>
+
+      <div>
+        <label>Reorder level</label>
+        <input
+          name="reorder_level"
+          type="number"
+          min="0"
+          value="0"
+        >
+      </div>
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="$('itemEditor').innerHTML=''"
+        >
+          Cancel
+        </button>
+
+        <button class="btn primary">
+          Save item
+        </button>
+
+      </div>
+
+    </form>
+  `;
+
+
+  $('itemForm').onsubmit=
+    async e=>{
+
+      e.preventDefault();
+
+      let f=
+        new FormData(e.target);
+
+      let obj=
+        Object.fromEntries(f);
+
+      obj.reorder_level=Number(obj.reorder_level||0);
+      obj.weight_per_unit_kg=Number(obj.weight_per_unit_kg||0);
+
+
+      const {error}=
+        await sb
+          .from('items')
+          .insert(obj);
+
+
+      if(error){
+
+        notify(
+          error.message,
+          false
+        );
+
+      }else{
+
+        $('itemEditor').innerHTML='';
+
+        await refresh();
+
+        notify(
+          'Item created'
+        );
+
+      }
+
+    };
+
+}
+
+
+/* ORGANISATION EDITOR */
+
+function openOrgEditor(){
+
+  if(!canWrite()){
+
+    notify(
+      'Your role cannot create organisations',
+      false
+    );
+
+    return;
+  }
+
+
+  $('orgEditor').innerHTML=`
+
+    <form
+      id="orgForm"
+      class="formgrid panel"
+      style="margin:0 0 16px"
+    >
+
+      <div>
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+
+      <div>
+        <label>Type</label>
+
+        <select name="type">
+
+          <option>DONOR</option>
+          <option>RECIPIENT</option>
+          <option>PARTNER</option>
+          <option>SUPPLIER</option>
+
+        </select>
+
+      </div>
+
+      <div>
+        <label>Contact</label>
+        <input name="contact_name">
+      </div>
+
+      <div>
+        <label>Phone</label>
+        <input name="phone">
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input name="email">
+      </div>
+
+      <div>
+        <label>Postcode</label>
+        <input name="postcode">
+      </div>
+
+      <div class="full">
+        <label>Address</label>
+        <input name="address">
+      </div>
+
+      <div class="full">
+        <label>Delivery items</label>
+        <div id="deliveryLines"></div>
+        <button type="button" class="btn secondary" id="addDeliveryLine">+ Add item</button>
+      </div>
+
+      <div class="full">
+        <label>Notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+
+      <div class="full actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="$('orgEditor').innerHTML=''"
+        >
+          Cancel
+        </button>
+
+        <button class="btn primary">
+          Save organisation
+        </button>
+
+      </div>
+
+    </form>
+  `;
+
+
+  $('orgForm').onsubmit=
+    async e=>{
+
+      e.preventDefault();
+
+      let obj=
+        Object.fromEntries(
+          new FormData(e.target)
+        );
+
+
+      const {error}=
+        await sb
+          .from('organisations')
+          .insert(obj);
+
+
+      if(error){
+
+        notify(
+          error.message,
+          false
+        );
+
+      }else{
+
+        $('orgEditor').innerHTML='';
+
+        await refresh();
+
+        notify(
+          'Organisation created'
+        );
+
+      }
+
+    };
+
+}
+
+
+/* DELIVERY EDITOR */
+
+function openDeliveryEditor(){
+
+  if(!canWrite()){
+
+    notify(
+      'Your role cannot create delivery notes',
+      false
+    );
+
+    return;
+  }
+
+
+  const today=
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+  const number=
+    'DN-'+
+    today.replaceAll('-','')+
+    '-'+
+    String(
+      deliveries.length+1
+    ).padStart(4,'0');
+
+
+  $('deliveryEditor').innerHTML=`
+
+    <form
+      id="deliveryForm"
+      class="formgrid panel"
+      style="margin:0 0 16px"
+    >
+
+      <div>
+        <label>Delivery Note No.</label>
+        <input
+          name="delivery_number"
+          value="${number}"
+          required
+        >
+      </div>
+
+      <div>
+        <label>Date</label>
+        <input
+          name="delivery_date"
+          type="date"
+          value="${today}"
+          required
+        >
+      </div>
+
+      <div>
+        <label>Recipient</label>
+
+        <select name="recipient_id">
+
+          <option value="">
+            None / not recorded
+          </option>
+
+          ${orgs
+            .filter(
+              o=>
+                [
+                  'RECIPIENT',
+                  'PARTNER'
+                ].includes(o.type)
+            )
+            .map(
+              o=>
+                '<option value="'+
+                o.id+
+                '">'+
+                esc(o.name)+
+                '</option>'
+            )
+            .join('')}
+
+        </select>
+
+      </div>
+
+      <div>
+        <label>Method</label>
+
+        <select name="delivery_method">
+
+          <option>Van</option>
+          <option>Collection</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+      <div>
+        <label>Driver / Collected By</label>
+        <input name="driver_name">
+      </div>
+
+      <div>
+        <label>Reference</label>
+        <input name="reference">
+      </div>
+
+      <div class="full">
+        <label>Notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+
+      <div class="full actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="$('deliveryEditor').innerHTML=''"
+        >
+          Cancel
+        </button>
+
+        <button class="btn primary">
+          Create delivery note
+        </button>
+
+      </div>
+
+    </form>
+  `;
+
+
+  $('addDeliveryLine').onclick=addDeliveryLine;
+  addDeliveryLine();
+
+  $('deliveryForm').onsubmit=
+    async e=>{
+
+      e.preventDefault();
+
+      let obj=
+        Object.fromEntries(
+          new FormData(e.target)
+        );
+
+
+      obj.recipient_id=
+        obj.recipient_id||null;
+
+
+      obj.created_by=
+        currentUser.id;
+
+
+      const {data:created,error}=
+        await sb
+          .from('delivery_notes')
+          .insert(obj)
+          .select('id')
+          .single();
+
+      if(!error && created){
+        const lines=[...document.querySelectorAll('#deliveryLines .delivery-line')].map((row,index)=>({
+          delivery_note_id:created.id,
+          item_id:row.querySelector('.dl-item').value,
+          quantity:Number(row.querySelector('.dl-qty').value||0),
+          weight_per_item_kg:Number(row.querySelector('.dl-weight').value||0)||null,
+          total_weight_kg:Number(row.querySelector('.dl-total').value||0)||null,
+          storage_type:row.querySelector('.dl-storage').value||null,
+          batch_reference:row.querySelector('.dl-batch').value.trim()||null,
+          line_number:index+1
+        })).filter(x=>x.item_id && x.quantity>0);
+        if(lines.length){
+          const lineResult=await sb.from('delivery_note_items').insert(lines);
+          if(lineResult.error){ notify(lineResult.error.message,false); return; }
+        }
+      }
+
+      if(error){
+
+        notify(
+          error.message,
+          false
+        );
+
+      }else{
+
+        $('deliveryEditor').innerHTML='';
+
+        await refresh();
+
+        notify(
+          'Delivery note created'
+        );
+
+      }
+
+    };
+
+}
+
+
+function addDeliveryLine(){
+  const wrap=$('deliveryLines');
+  const row=document.createElement('div');
+  row.className='delivery-line';
+  row.style='display:grid;grid-template-columns:2fr .7fr .9fr .9fr 1fr 1.2fr auto;gap:8px;margin:8px 0;align-items:end';
+  row.innerHTML=`
+    <div><label>Item</label><select class="dl-item">${items.map(i=>'<option value="'+esc(i.id)+'">'+esc((i.sku||'')+' — '+i.name)+'</option>').join('')}</select></div>
+    <div><label>Qty</label><input class="dl-qty" type="number" min="1" value="1"></div>
+    <div><label>Weight/item kg</label><input class="dl-weight" type="number" step="0.001" min="0"></div>
+    <div><label>Total kg</label><input class="dl-total" type="number" step="0.001" min="0"></div>
+    <div><label>Stored in</label><select class="dl-storage"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select></div>
+    <div><label>Batch</label><input class="dl-batch"></div>
+    <button type="button" class="btn danger" onclick="this.parentElement.remove()">Remove</button>`;
+  wrap.appendChild(row);
+}
+
+/* PRINT DELIVERY NOTE */
+
+async function printDelivery(id){
+
+  const d=
+    deliveries.find(
+      x=>x.id===id
+    );
+
+
+  if(!d)return;
+
+
+  const {data:lineItems}=await sb.from('delivery_note_items').select('*,items(name,sku,unit)').eq('delivery_note_id',id).order('line_number');
+
+  const w=
+    window.open(
+      '',
+      '_blank'
+    );
+
+
+  w.document.write(`
+
+    <html>
+
+    <head>
+
+      <title>
+        ${esc(d.delivery_number)}
+      </title>
+
+      <style>
+
+        body{
+          font-family:Arial;
+          margin:35px;
+          color:#111
+        }
+
+        .head{
+          display:flex;
+          justify-content:space-between;
+          border-bottom:3px solid #078b40;
+          padding-bottom:16px
+        }
+
+        .logo{
+          width:250px
+        }
+
+        .addr{
+          text-align:right;
+          font-size:13px;
+          line-height:1.5
+        }
+
+        h1{
+          color:#078b40
+        }
+
+        .box{
+          border:1px solid #aaa;
+          padding:14px;
+          margin:16px 0
+        }
+
+        .sign{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:35px;
+          margin-top:35px
+        }
+
+        .line{
+          border-bottom:1px solid #333;
+          height:35px
+        }
+
+        footer{
+          text-align:center;
+          margin-top:40px;
+          font-size:11px
+        }
+
+        @page{size:A4 landscape;margin:10mm}
+        @media print{body{margin:0}.no-print{display:none}}
+        .items{width:100%;border-collapse:collapse;margin:18px 0}.items th,.items td{border:1px solid #aaa;padding:7px;font-size:12px}.items th{background:#f0f3f1}.total{text-align:right;font-weight:bold}
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="head">
+
+        <img
+          class="logo"
+          src="barnsley-foodbank-logo.png"
+        >
+
+        <div class="addr">
+
+          <b>
+            Barnsley Foodbank Partnership
+          </b>
+
+          <br>
+          Unit 19, Grange Lane Industrial Estate
+
+          <br>
+          Carrwood Road, Stairfoot
+
+          <br>
+          Barnsley, South Yorkshire, S71 5AS
+
+        </div>
+
+      </div>
+
+
+      <h1>DELIVERY NOTE</h1>
+
+
+      <div class="box">
+
+        <b>Note:</b>
+        ${esc(d.delivery_number)}
+
+        <br>
+
+        <b>Date:</b>
+        ${esc(d.delivery_date)}
+
+        <br>
+
+        <b>Recipient:</b>
+        ${esc(
+          d.organisations
+            ?.name||''
+        )}
+
+        <br>
+
+        <b>Method:</b>
+        ${esc(
+          d.delivery_method||''
+        )}
+
+        <br>
+
+        <b>Driver / Collected By:</b>
+        ${esc(
+          d.driver_name||''
+        )}
+
+        <br>
+
+        <b>Reference:</b>
+        ${esc(
+          d.reference||''
+        )}
+
+      </div>
+
+
+      <div class="box">
+        <table class="items">
+          <thead><tr><th>Item / Description</th><th>Qty</th><th>Weight / Item</th><th>Total Weight</th><th>Stored In</th><th>Batch / Reference</th></tr></thead>
+          <tbody>${(lineItems||[]).map(x=>'<tr><td>'+esc(x.item_description||x.items?.name||'-')+'</td><td>'+money(x.quantity)+'</td><td>'+((x.weight_per_item_kg||0).toFixed?Number(x.weight_per_item_kg).toFixed(3)+' kg':'-')+'</td><td>'+Number(x.total_weight_kg||0).toFixed(3)+' kg</td><td>'+esc(x.storage_type||'-')+'</td><td>'+esc(x.batch_reference||x.batch_ref||'-')+'</td></tr>').join('') || '<tr><td colspan="6">No delivery items recorded.</td></tr>'}</tbody>
+        </table>
+        <div class="total">Total delivery weight: ${Number((lineItems||[]).reduce((s,x)=>s+Number(x.total_weight_kg||0),0)).toFixed(3)} kg</div>
+      </div>
+
+      <div class="box">
+
+        <b>Notes</b>
+
+        <br><br>
+
+        ${esc(
+          d.notes||''
+        )}
+
+      </div>
+
+
+      <div class="sign">
+
+        <div>
+          Received by:
+          <div class="line"></div>
+        </div>
+
+        <div>
+          Signature:
+          <div class="line"></div>
+        </div>
+
+        <div>
+          Date:
+          <div class="line"></div>
+        </div>
+
+      </div>
+
+
+      <footer>
+
+        Thank you for working together
+        to support local people in crisis.
+
+        <br><br>
+
+        <b>
+          Barnsley Foodbank Partnership —
+          Together with Trussell
+        </b>
+
+      </footer>
+
+
+      <script>
+        onload=()=>print()
+      <\/script>
+
+    </body>
+
+    </html>
+
+  `);
+
+  w.document.close();
+
+}
+
+
+/* EVENT HANDLERS */
+
+$('loginForm')
+  .addEventListener(
+    'submit',
+    login
+  );
+
+
+$('forgotPassword')
+  .onclick=
+    forgotPassword;
+
+
+$('resetForm')
+  .addEventListener(
+    'submit',
+    setNewPassword
+  );
+
+
+$('backToLogin')
+  .onclick=
+    async()=>{
+      await sb.auth.signOut();
+      showLogin();
+    };
+
+
+$('logout')
+  .onclick=
+    ()=>sb.auth.signOut();
+
+
+document
+  .querySelectorAll('.nav button')
+  .forEach(
+    b=>
+      b.onclick=
+        ()=>showPage(
+          b.dataset.page
+        )
+  );
+
+
+$('inForm').onsubmit=
+  e=>{
+    e.preventDefault();
+    addMove(
+      'IN',
+      e.target
+    );
+  };
+
+
+$('outForm').onsubmit=
+  e=>{
+    e.preventDefault();
+    addMove(
+      'OUT',
+      e.target
+    );
+  };
+
+
+$('newItem')
+  .onclick=
+    openItemEditor;
+
+
+$('newOrg')
+  .onclick=
+    openOrgEditor;
+
+
+$('newDelivery')
+  .onclick=
+    openDeliveryEditor;
+
+
+$('stockSearch').oninput=
+  e=>{
+
+    const q=
+      e.target.value
+        .toLowerCase();
+
+
+    const filtered=
+      stock.filter(
+        x=>
+          [
+            x.sku,
+            x.name,
+            x.category,
+            x.location
+          ]
+          .join(' ')
+          .toLowerCase()
+          .includes(q)
+      );
+
+
+    $('stockTable').innerHTML=
+      table(
+        [
+          'SKU',
+          'Item',
+          'Category',
+          'Location',
+          'Qty',
+          'Reorder'
+        ],
+
+        filtered.map(
+          x=>[
+            esc(x.sku),
+            esc(x.name),
+            esc(x.category),
+            esc(x.location||'—'),
+            money(x.current_quantity),
+            money(x.reorder_level)
+          ]
+        )
+      );
+
+  };
+
+
+/* START */
+
+boot();
+
 </script>
-</body></html>
+
+</body>
+</html>
