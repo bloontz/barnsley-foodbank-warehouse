@@ -834,10 +834,12 @@ form.formgrid{
         <h2>Users</h2>
 
         <p style="color:#68766e">
-          Create staff accounts in Supabase Authentication,
-          then add/update their profile here.
-          Only administrators can manage profiles.
+          Only administrators can create and manage user accounts.
         </p>
+
+        <div id="userAdminControls"></div>
+
+        <div id="userEditor"></div>
 
         <div id="usersTable" class="tablewrap"></div>
 
@@ -1646,11 +1648,18 @@ function renderAll(profiles=[]){
   const userRows=
     profiles.map(function(p){
 
+      const displayRole =
+        p.role==='ADMIN'
+          ? 'ADMIN'
+          : p.role==='READ_ONLY'
+            ? 'READ ONLY'
+            : 'USER';
+
       return [
 
         esc(p.full_name),
 
-        esc(p.role),
+        esc(displayRole),
 
         p.active
           ? 'Active'
@@ -1673,6 +1682,14 @@ function renderAll(profiles=[]){
       ],
       userRows
     );
+
+  if(role()==='ADMIN'){
+    $('userAdminControls').innerHTML=
+      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
+  }else{
+    $('userAdminControls').innerHTML='';
+    $('userEditor').innerHTML='';
+  }
 
 
   fillSelects();
@@ -2323,6 +2340,93 @@ function openOrgEditor(){
 
     };
 
+}
+
+
+/* USER ADMINISTRATION */
+
+function openUserEditor(){
+
+  if(role()!=='ADMIN'){
+    notify('Only administrators can create users',false);
+    return;
+  }
+
+  $('userEditor').innerHTML=`
+    <div class="panel" style="margin:16px 0">
+      <h3>Add User</h3>
+      <form id="userForm">
+        <div class="grid2">
+          <div>
+            <label>Full name</label>
+            <input name="full_name" required>
+          </div>
+          <div>
+            <label>Email address</label>
+            <input name="email" type="email" required>
+          </div>
+          <div>
+            <label>Temporary password</label>
+            <input name="password" type="password" minlength="8" required>
+          </div>
+          <div>
+            <label>Role</label>
+            <select name="role" required>
+              <option value="">Select role...</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+              <option value="READ_ONLY">READ ONLY</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button type="button" class="btn secondary" onclick="closeUserEditor()">Cancel</button>
+          <button type="submit" class="btn">Create User</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  $('userForm').onsubmit=async e=>{
+    e.preventDefault();
+
+    if(role()!=='ADMIN'){
+      notify('Only administrators can create users',false);
+      return;
+    }
+
+    const data=Object.fromEntries(new FormData(e.target));
+    const btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;
+    btn.textContent='Creating...';
+
+    try{
+      const {data:result,error}=await sb.functions.invoke('admin-create-user',{
+        body:{
+          full_name:data.full_name,
+          email:data.email,
+          password:data.password,
+          role:data.role
+        }
+      });
+
+      if(error) throw error;
+      if(!result?.success) throw new Error(result?.error||'Unable to create user');
+
+      closeUserEditor();
+      await refresh();
+      notify('User created successfully');
+
+    }catch(error){
+      notify(error.message||'Unable to create user',false);
+      btn.disabled=false;
+      btn.textContent='Create User';
+    }
+  };
+}
+
+function closeUserEditor(){
+  $('userEditor').innerHTML='';
 }
 
 
