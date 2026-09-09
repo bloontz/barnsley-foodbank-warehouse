@@ -1635,9 +1635,9 @@ function renderAll(profiles=[]){
             d.status==='COMPLETED'
           ),
 
-          '<button class="btn secondary" onclick="printDelivery('+
-          JSON.stringify(d.id)+
-          ')">Print</button>'
+          '<button type="button" class="btn secondary" data-print-delivery="'+
+          esc(d.id)+
+          '">Print</button>'
 
         ];
 
@@ -2759,6 +2759,17 @@ function printDelivery(id){
 }
 
 /* EVENT HANDLERS */
+
+$('deliveriesTable')
+  .addEventListener(
+    'click',
+    function(e){
+      const btn=e.target.closest('[data-print-delivery]');
+      if(!btn) return;
+      printDelivery(btn.dataset.printDelivery);
+    }
+  );
+
 
 $('loginForm')
   .addEventListener(
