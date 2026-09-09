@@ -2665,13 +2665,26 @@ async function printDelivery(id){
   if(!d)return;
 
 
-  const {data:lineItems}=await sb.from('delivery_note_items').select('*,items(name,sku,unit)').eq('delivery_note_id',id).order('line_number');
-
+  // Open the print window immediately while the click is still a user action.
+  // Waiting for Supabase first can make Chrome treat the popup as blocked.
   const w=
     window.open(
       '',
       '_blank'
     );
+
+  if(!w){
+    notify('The print window was blocked by the browser. Please allow pop-ups for this site.',false);
+    return;
+  }
+
+  w.document.write('<p style="font-family:Arial;padding:30px">Preparing delivery note for printing…</p>');
+
+  const {data:lineItems,error:lineItemsError}=await sb.from('delivery_note_items').select('*,items(name,sku,unit)').eq('delivery_note_id',id).order('line_number');
+
+  if(lineItemsError){
+    console.error('Delivery note items error:',lineItemsError);
+  }
 
 
   w.document.write(`
