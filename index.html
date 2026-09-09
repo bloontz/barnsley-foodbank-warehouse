@@ -2656,250 +2656,121 @@ function addDeliveryLine(){
 
 async function printDelivery(id){
 
-  const d=
-    deliveries.find(
-      x=>x.id===id
-    );
-
-
+  const d=deliveries.find(x=>x.id===id);
   if(!d)return;
 
-
-  // Open the print window immediately while the click is still a user action.
-  // Waiting for Supabase first can make Chrome treat the popup as blocked.
-  const w=
-    window.open(
-      '',
-      '_blank'
-    );
-
-  if(!w){
-    notify('The print window was blocked by the browser. Please allow pop-ups for this site.',false);
-    return;
-  }
-
-  w.document.write('<p style="font-family:Arial;padding:30px">Preparing delivery note for printing…</p>');
-
-  const {data:lineItems,error:lineItemsError}=await sb.from('delivery_note_items').select('*,items(name,sku,unit)').eq('delivery_note_id',id).order('line_number');
+  const {data:lineItems,error:lineItemsError}=
+    await sb
+      .from('delivery_note_items')
+      .select('*,items(name,sku,unit)')
+      .eq('delivery_note_id',id)
+      .order('line_number');
 
   if(lineItemsError){
     console.error('Delivery note items error:',lineItemsError);
   }
 
+  const rows=(lineItems||[]).map(x=>`
+    <tr>
+      <td>${esc(x.item_description||x.items?.name||'-')}</td>
+      <td>${money(x.quantity)}</td>
+      <td>${x.weight_per_item_kg!=null?Number(x.weight_per_item_kg).toFixed(3)+' kg':'-'}</td>
+      <td>${Number(x.total_weight_kg||0).toFixed(3)} kg</td>
+      <td>${esc(x.storage_type||'-')}</td>
+      <td>${esc(x.batch_reference||x.batch_ref||'-')}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6">No delivery items recorded.</td></tr>';
 
-  w.document.write(`
+  const totalWeight=(lineItems||[])
+    .reduce((s,x)=>s+Number(x.total_weight_kg||0),0)
+    .toFixed(3);
 
-    <html>
+  const printHtml=`
+    <style>
+      body{font-family:Arial,sans-serif;margin:0;color:#111;background:#fff}
+      .print-page{padding:10mm}
+      .head{display:flex;justify-content:space-between;border-bottom:3px solid #078b40;padding-bottom:16px}
+      .logo{width:250px}
+      .addr{text-align:right;font-size:13px;line-height:1.5}
+      h1{color:#078b40}
+      .box{border:1px solid #aaa;padding:14px;margin:16px 0}
+      .items{width:100%;border-collapse:collapse;margin:18px 0}
+      .items th,.items td{border:1px solid #aaa;padding:7px;font-size:12px}
+      .items th{background:#f0f3f1}
+      .total{text-align:right;font-weight:bold}
+      .sign{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:35px}
+      .line{border-bottom:1px solid #333;height:35px}
+      footer{text-align:center;margin-top:40px;font-size:11px}
+      @page{size:A4 landscape;margin:10mm}
+    </style>
 
-    <head>
-
-      <title>
-        ${esc(d.delivery_number)}
-      </title>
-
-      <style>
-
-        body{
-          font-family:Arial;
-          margin:35px;
-          color:#111
-        }
-
-        .head{
-          display:flex;
-          justify-content:space-between;
-          border-bottom:3px solid #078b40;
-          padding-bottom:16px
-        }
-
-        .logo{
-          width:250px
-        }
-
-        .addr{
-          text-align:right;
-          font-size:13px;
-          line-height:1.5
-        }
-
-        h1{
-          color:#078b40
-        }
-
-        .box{
-          border:1px solid #aaa;
-          padding:14px;
-          margin:16px 0
-        }
-
-        .sign{
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:35px;
-          margin-top:35px
-        }
-
-        .line{
-          border-bottom:1px solid #333;
-          height:35px
-        }
-
-        footer{
-          text-align:center;
-          margin-top:40px;
-          font-size:11px
-        }
-
-        @page{size:A4 landscape;margin:10mm}
-        @media print{body{margin:0}.no-print{display:none}}
-        .items{width:100%;border-collapse:collapse;margin:18px 0}.items th,.items td{border:1px solid #aaa;padding:7px;font-size:12px}.items th{background:#f0f3f1}.total{text-align:right;font-weight:bold}
-
-      </style>
-
-    </head>
-
-    <body>
-
+    <div class="print-page">
       <div class="head">
-
-        <img
-          class="logo"
-          src="barnsley-foodbank-logo.png"
-        >
-
+        <img class="logo" src="barnsley-foodbank-logo.png">
         <div class="addr">
-
-          <b>
-            Barnsley Foodbank Partnership
-          </b>
-
-          <br>
-          Unit 19, Grange Lane Industrial Estate
-
-          <br>
-          Carrwood Road, Stairfoot
-
-          <br>
+          <b>Barnsley Foodbank Partnership</b><br>
+          Unit 19, Grange Lane Industrial Estate<br>
+          Carrwood Road, Stairfoot<br>
           Barnsley, South Yorkshire, S71 5AS
-
         </div>
-
       </div>
-
 
       <h1>DELIVERY NOTE</h1>
 
-
       <div class="box">
-
-        <b>Note:</b>
-        ${esc(d.delivery_number)}
-
-        <br>
-
-        <b>Date:</b>
-        ${esc(d.delivery_date)}
-
-        <br>
-
-        <b>Recipient:</b>
-        ${esc(
-          d.organisations
-            ?.name||''
-        )}
-
-        <br>
-
-        <b>Method:</b>
-        ${esc(
-          d.delivery_method||''
-        )}
-
-        <br>
-
-        <b>Driver / Collected By:</b>
-        ${esc(
-          d.driver_name||''
-        )}
-
-        <br>
-
-        <b>Reference:</b>
-        ${esc(
-          d.reference||''
-        )}
-
+        <b>Note:</b> ${esc(d.delivery_number)}<br>
+        <b>Date:</b> ${esc(d.delivery_date)}<br>
+        <b>Recipient:</b> ${esc(d.organisations?.name||'')}<br>
+        <b>Method:</b> ${esc(d.delivery_method||'')}<br>
+        <b>Driver / Collected By:</b> ${esc(d.driver_name||'')}<br>
+        <b>Reference:</b> ${esc(d.reference||'')}
       </div>
-
 
       <div class="box">
         <table class="items">
-          <thead><tr><th>Item / Description</th><th>Qty</th><th>Weight / Item</th><th>Total Weight</th><th>Stored In</th><th>Batch / Reference</th></tr></thead>
-          <tbody>${(lineItems||[]).map(x=>'<tr><td>'+esc(x.item_description||x.items?.name||'-')+'</td><td>'+money(x.quantity)+'</td><td>'+((x.weight_per_item_kg||0).toFixed?Number(x.weight_per_item_kg).toFixed(3)+' kg':'-')+'</td><td>'+Number(x.total_weight_kg||0).toFixed(3)+' kg</td><td>'+esc(x.storage_type||'-')+'</td><td>'+esc(x.batch_reference||x.batch_ref||'-')+'</td></tr>').join('') || '<tr><td colspan="6">No delivery items recorded.</td></tr>'}</tbody>
+          <thead>
+            <tr>
+              <th>Item / Description</th>
+              <th>Qty</th>
+              <th>Weight / Item</th>
+              <th>Total Weight</th>
+              <th>Stored In</th>
+              <th>Batch / Reference</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
         </table>
-        <div class="total">Total delivery weight: ${Number((lineItems||[]).reduce((s,x)=>s+Number(x.total_weight_kg||0),0)).toFixed(3)} kg</div>
+        <div class="total">Total delivery weight: ${totalWeight} kg</div>
       </div>
 
       <div class="box">
-
-        <b>Notes</b>
-
-        <br><br>
-
-        ${esc(
-          d.notes||''
-        )}
-
+        <b>Notes</b><br><br>${esc(d.notes||'')}
       </div>
-
 
       <div class="sign">
-
-        <div>
-          Received by:
-          <div class="line"></div>
-        </div>
-
-        <div>
-          Signature:
-          <div class="line"></div>
-        </div>
-
-        <div>
-          Date:
-          <div class="line"></div>
-        </div>
-
+        <div>Received by:<div class="line"></div></div>
+        <div>Signature:<div class="line"></div></div>
+        <div>Date:<div class="line"></div></div>
       </div>
 
-
       <footer>
-
-        Thank you for working together
-        to support local people in crisis.
-
+        Thank you for working together to support local people in crisis.
         <br><br>
-
-        <b>
-          Barnsley Foodbank Partnership —
-          Together with Trussell
-        </b>
-
+        <b>Barnsley Foodbank Partnership — Together with Trussell</b>
       </footer>
+    </div>
+  `;
 
+  document.body.innerHTML=printHtml;
+  document.title='Delivery Note '+d.delivery_number;
 
-      <script>
-        onload=()=>print()
-      <\/script>
+  window.onafterprint=()=>{
+    window.location.reload();
+  };
 
-    </body>
-
-    </html>
-
-  `);
-
-  w.document.close();
-
+  setTimeout(()=>{
+    window.print();
+  },150);
 }
 
 
