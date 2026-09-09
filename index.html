@@ -1635,9 +1635,9 @@ function renderAll(profiles=[]){
             d.status==='COMPLETED'
           ),
 
-          '<button type="button" class="btn secondary" data-print-delivery="'+
+          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
           esc(d.id)+
-          '">Print</button>'
+          '\')">Print</button>'
 
         ];
 
@@ -2669,12 +2669,27 @@ function printDelivery(id){
   const driver=d.driver_name || '-';
   const reference=d.reference || '-';
 
-  const printHtml=`
+  const existing=document.getElementById('printArea');
+  if(existing) existing.remove();
+
+  const area=document.createElement('div');
+  area.id='printArea';
+
+  area.innerHTML=`
     <style>
+      #printArea{display:none}
       @page{size:A4 landscape;margin:10mm}
-      *{box-sizing:border-box}
-      html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,sans-serif}
-      body{padding:10mm}
+      @media print{
+        body > *:not(#printArea){display:none!important}
+        body{margin:0!important;padding:0!important;background:#fff!important}
+        #printArea{
+          display:block!important;
+          width:100%!important;
+          color:#111!important;
+          background:#fff!important;
+          font-family:Arial,sans-serif!important;
+        }
+      }
       .print-page{width:100%;max-width:277mm;margin:0 auto}
       .head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #078b40;padding-bottom:12px}
       .logo{width:220px;height:auto}
@@ -2747,14 +2762,19 @@ function printDelivery(id){
     </div>
   `;
 
-  document.body.innerHTML=printHtml;
+  document.body.appendChild(area);
   document.title='Delivery Note '+deliveryNumber;
 
-  window.onafterprint=()=>{
-    window.location.reload();
+  const cleanup=()=>{
+    const printArea=document.getElementById('printArea');
+    if(printArea) printArea.remove();
+    document.title='Barnsley Foodbank Partnership — Warehouse';
+    window.removeEventListener('afterprint',cleanup);
   };
 
-  // Run print immediately while this function is still being called by the button.
+  window.addEventListener('afterprint',cleanup);
+
+  // Directly invoke the browser printer while the click is active.
   window.print();
 }
 
