@@ -2654,59 +2654,46 @@ function addDeliveryLine(){
 
 /* PRINT DELIVERY NOTE */
 
-async function printDelivery(id){
-
+function printDelivery(id){
   const d=deliveries.find(x=>x.id===id);
-  if(!d)return;
 
-  const {data:lineItems,error:lineItemsError}=
-    await sb
-      .from('delivery_note_items')
-      .select('*,items(name,sku,unit)')
-      .eq('delivery_note_id',id)
-      .order('line_number');
-
-  if(lineItemsError){
-    console.error('Delivery note items error:',lineItemsError);
+  if(!d){
+    notify('Delivery note could not be found.',false);
+    return;
   }
 
-  const rows=(lineItems||[]).map(x=>`
-    <tr>
-      <td>${esc(x.item_description||x.items?.name||'-')}</td>
-      <td>${money(x.quantity)}</td>
-      <td>${x.weight_per_item_kg!=null?Number(x.weight_per_item_kg).toFixed(3)+' kg':'-'}</td>
-      <td>${Number(x.total_weight_kg||0).toFixed(3)} kg</td>
-      <td>${esc(x.storage_type||'-')}</td>
-      <td>${esc(x.batch_reference||x.batch_ref||'-')}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="6">No delivery items recorded.</td></tr>';
-
-  const totalWeight=(lineItems||[])
-    .reduce((s,x)=>s+Number(x.total_weight_kg||0),0)
-    .toFixed(3);
+  const recipient=d.organisations?.name || '-';
+  const deliveryNumber=d.delivery_number || '-';
+  const deliveryDate=d.delivery_date || '-';
+  const method=d.delivery_method || '-';
+  const driver=d.driver_name || '-';
+  const reference=d.reference || '-';
 
   const printHtml=`
     <style>
-      body{font-family:Arial,sans-serif;margin:0;color:#111;background:#fff}
-      .print-page{padding:10mm}
-      .head{display:flex;justify-content:space-between;border-bottom:3px solid #078b40;padding-bottom:16px}
-      .logo{width:250px}
-      .addr{text-align:right;font-size:13px;line-height:1.5}
-      h1{color:#078b40}
-      .box{border:1px solid #aaa;padding:14px;margin:16px 0}
-      .items{width:100%;border-collapse:collapse;margin:18px 0}
-      .items th,.items td{border:1px solid #aaa;padding:7px;font-size:12px}
-      .items th{background:#f0f3f1}
-      .total{text-align:right;font-weight:bold}
-      .sign{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:35px}
-      .line{border-bottom:1px solid #333;height:35px}
-      footer{text-align:center;margin-top:40px;font-size:11px}
       @page{size:A4 landscape;margin:10mm}
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,sans-serif}
+      body{padding:10mm}
+      .print-page{width:100%;max-width:277mm;margin:0 auto}
+      .head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #078b40;padding-bottom:12px}
+      .logo{width:220px;height:auto}
+      .addr{text-align:right;font-size:12px;line-height:1.45}
+      h1{margin:18px 0 12px;color:#078b40;font-size:24px}
+      .box{border:1px solid #aaa;padding:12px;margin:12px 0}
+      .details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 24px;font-size:12px;line-height:1.5}
+      .items{width:100%;border-collapse:collapse;margin:12px 0}
+      .items th,.items td{border:1px solid #aaa;padding:7px;font-size:11px;text-align:left}
+      .items th{background:#f0f3f1}
+      .empty{text-align:center;padding:20px!important}
+      .sign{display:grid;grid-template-columns:1fr 1fr 1fr;gap:25px;margin-top:25px;font-size:11px}
+      .line{border-bottom:1px solid #333;height:28px;margin-bottom:5px}
+      footer{text-align:center;margin-top:25px;font-size:10px}
     </style>
 
     <div class="print-page">
       <div class="head">
-        <img class="logo" src="barnsley-foodbank-logo.png">
+        <img class="logo" src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
         <div class="addr">
           <b>Barnsley Foodbank Partnership</b><br>
           Unit 19, Grange Lane Industrial Estate<br>
@@ -2718,12 +2705,14 @@ async function printDelivery(id){
       <h1>DELIVERY NOTE</h1>
 
       <div class="box">
-        <b>Note:</b> ${esc(d.delivery_number)}<br>
-        <b>Date:</b> ${esc(d.delivery_date)}<br>
-        <b>Recipient:</b> ${esc(d.organisations?.name||'')}<br>
-        <b>Method:</b> ${esc(d.delivery_method||'')}<br>
-        <b>Driver / Collected By:</b> ${esc(d.driver_name||'')}<br>
-        <b>Reference:</b> ${esc(d.reference||'')}
+        <div class="details">
+          <div><b>Note Number:</b><br>${esc(deliveryNumber)}</div>
+          <div><b>Date:</b><br>${esc(deliveryDate)}</div>
+          <div><b>Recipient:</b><br>${esc(recipient)}</div>
+          <div><b>Delivery Method:</b><br>${esc(method)}</div>
+          <div><b>Driver / Collected By:</b><br>${esc(driver)}</div>
+          <div><b>Reference:</b><br>${esc(reference)}</div>
+        </div>
       </div>
 
       <div class="box">
@@ -2731,48 +2720,43 @@ async function printDelivery(id){
           <thead>
             <tr>
               <th>Item / Description</th>
-              <th>Qty</th>
+              <th>Quantity</th>
               <th>Weight / Item</th>
               <th>Total Weight</th>
               <th>Stored In</th>
               <th>Batch / Reference</th>
             </tr>
           </thead>
-          <tbody>${rows}</tbody>
+          <tbody>
+            <tr>
+              <td colspan="6" class="empty">No delivery items recorded.</td>
+            </tr>
+          </tbody>
         </table>
-        <div class="total">Total delivery weight: ${totalWeight} kg</div>
-      </div>
-
-      <div class="box">
-        <b>Notes</b><br><br>${esc(d.notes||'')}
       </div>
 
       <div class="sign">
-        <div>Received by:<div class="line"></div></div>
-        <div>Signature:<div class="line"></div></div>
-        <div>Date:<div class="line"></div></div>
+        <div><b>Received By</b><div class="line"></div>Name</div>
+        <div><b>Signature</b><div class="line"></div>Signature</div>
+        <div><b>Date Received</b><div class="line"></div>Date</div>
       </div>
 
       <footer>
-        Thank you for working together to support local people in crisis.
-        <br><br>
-        <b>Barnsley Foodbank Partnership — Together with Trussell</b>
+        Barnsley Foodbank Partnership — Delivery Note ${esc(deliveryNumber)}
       </footer>
     </div>
   `;
 
   document.body.innerHTML=printHtml;
-  document.title='Delivery Note '+d.delivery_number;
+  document.title='Delivery Note '+deliveryNumber;
 
   window.onafterprint=()=>{
     window.location.reload();
   };
 
-  setTimeout(()=>{
-    window.print();
-  },150);
+  // Run print immediately while this function is still being called by the button.
+  window.print();
 }
-
 
 /* EVENT HANDLERS */
 
