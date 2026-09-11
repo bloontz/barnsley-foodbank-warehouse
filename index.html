@@ -837,6 +837,18 @@ form.formgrid{
                 <option value="OUT">Delivered</option>
               </select>
             </div>
+            <div>
+              <label>Received from donor</label>
+              <select id="historyDonor">
+                <option value="ALL">All donors</option>
+              </select>
+            </div>
+            <div>
+              <label>Delivered to</label>
+              <select id="historyRecipient">
+                <option value="ALL">All recipients</option>
+              </select>
+            </div>
             <div class="actions">
               <button type="button" class="btn primary" id="applyHistoryFilters">Apply filters</button>
               <button type="button" class="btn secondary" id="clearHistoryFilters">Clear</button>
@@ -856,6 +868,7 @@ form.formgrid{
         </div>
 
         <div id="historyTable" class="tablewrap"></div>
+        <div id="deliveryDetail" class="panel hidden" style="margin-top:16px"></div>
 
       </div>
 
@@ -1596,16 +1609,39 @@ function renderAll(profiles=[]){
   renderHistory(profiles);
 
 
+function populateHistoryOrganisationFilters(){
+  const donor=$('historyDonor');
+  const recipient=$('historyRecipient');
+  if(!donor || !recipient) return;
+
+  const donorOptions=orgs
+    .filter(o=>['DONOR','SUPPLIER','PARTNER'].includes(o.type))
+    .map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>')
+    .join('');
+
+  const recipientOptions=orgs
+    .filter(o=>['RECIPIENT','PARTNER'].includes(o.type))
+    .map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>')
+    .join('');
+
+  donor.innerHTML='<option value="ALL">All donors</option>'+donorOptions;
+  recipient.innerHTML='<option value="ALL">All recipients</option>'+recipientOptions;
+}
+
 function renderHistory(profiles=[]){
   const from=$('historyDateFrom')?.value||'';
   const to=$('historyDateTo')?.value||'';
   const type=$('historyType')?.value||'ALL';
+  const donor=$('historyDonor')?.value||'ALL';
+  const recipient=$('historyRecipient')?.value||'ALL';
 
   const filtered=moves.filter(function(m){
     const day=new Date(m.created_at).toISOString().slice(0,10);
     if(from && day<from) return false;
     if(to && day>to) return false;
     if(type!=='ALL' && m.movement_type!==type) return false;
+    if(donor!=='ALL' && (m.movement_type!=='IN' || String(m.organisation_id||'')!==String(donor))) return false;
+    if(recipient!=='ALL' && (m.movement_type!=='OUT' || String(m.organisation_id||'')!==String(recipient))) return false;
     return true;
   });
 
@@ -1625,27 +1661,100 @@ function renderHistory(profiles=[]){
   if($('historyDeliveredSummary'))
     $('historyDeliveredSummary').textContent=money(sumQty(delivered))+' units / '+sumWeight(delivered).toFixed(3)+' kg';
 
+  // Group movement lines into individual deliveries. If a reference is entered,
+  // all lines sharing the same date, organisation, type and reference form one delivery.
+  // If no reference exists, the individual movement remains its own delivery.
+  const groups=new Map();
+  filtered.forEach(function(m){
+    const day=new Date(m.created_at).toISOString().slice(0,10);
+    const ref=(m.reference||'').trim();
+    const key=ref
+      ? [m.movement_type,day,m.organisation_id||'',ref].join('|')
+      : [m.movement_type,m.id].join('|');
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(m);
+  });
+
+  const grouped=[...groups.entries()].map(function(entry){
+    const lines=entry[1];
+    const first=lines[0];
+    return {
+      id:entry[0],
+      lines,
+      movement_type:first.movement_type,
+      created_at:first.created_at,
+      organisation_id:first.organisation_id,
+      organisation_name:first.organisations?.name||'Not recorded',
+      reference:first.reference||'',
+      batch:first.batch_ref||'',
+      recorded_by:(profiles.find(p=>p.id===first.user_id)?.full_name)||'-',
+      quantity:sumQty(lines),
+      weight:sumWeight(lines)
+    };
+  }).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
   $('historyTable').innerHTML=table(
-    ['Date','Movement','Item','Qty','Weight','From','To','Reference','Batch','Recorded By'],
-    filtered.map(function(m){
-      const isIn=m.movement_type==='IN';
-      const organisation=m.organisations?.name||'Not recorded';
-      const profile=profiles.find(p=>p.id===m.user_id);
-      const weight=weightFor(m);
+    ['Date','Delivery','From','To','Lines','Qty','Weight','Reference','Recorded By','Action'],
+    grouped.map(function(g){
+      const isIn=g.movement_type==='IN';
       return [
-        new Date(m.created_at).toLocaleDateString(),
+        new Date(g.created_at).toLocaleDateString(),
         badge(isIn?'Received':'Delivered',isIn),
-        esc(m.items ? m.items.name : '-'),
-        money(m.quantity),
-        weight ? weight.toFixed(3)+' kg' : '-',
-        esc(isIn ? organisation : 'Warehouse'),
-        esc(isIn ? 'Warehouse' : organisation),
-        esc(m.reference||'-'),
-        esc(m.batch_ref||'-'),
-        esc(profile?.full_name||'-')
+        esc(isIn ? g.organisation_name : 'Warehouse'),
+        esc(isIn ? 'Warehouse' : g.organisation_name),
+        money(g.lines.length),
+        money(g.quantity),
+        g.weight ? g.weight.toFixed(3)+' kg' : '-',
+        esc(g.reference||'-'),
+        esc(g.recorded_by),
+        '<button type="button" class="btn secondary" data-view-delivery="'+esc(g.id)+'">View</button>'
       ];
     })
   );
+
+  window.historyDeliveryGroups=grouped;
+}
+
+function viewHistoryDelivery(key){
+  const g=(window.historyDeliveryGroups||[]).find(x=>x.id===key);
+  const box=$('deliveryDetail');
+  if(!g || !box) return;
+
+  const isIn=g.movement_type==='IN';
+  box.classList.remove('hidden');
+  box.innerHTML=
+    '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">'+
+      '<div><h3 style="margin:0">'+esc(isIn?'Received delivery':'Delivered delivery')+'</h3>'+
+      '<div style="color:#6a766f;margin-top:4px">'+esc(new Date(g.created_at).toLocaleDateString())+' · '+esc(isIn?g.organisation_name:'Warehouse')+' → '+esc(isIn?'Warehouse':g.organisation_name)+'</div></div>'+
+      '<button type="button" class="btn secondary" id="closeDeliveryDetail">Close</button>'+
+    '</div>'+
+    '<div class="tablewrap">'+
+      table(
+        ['Item','Quantity','Weight / Item','Total Weight','Storage','Batch / Reference'],
+        g.lines.map(function(m){
+          const w=weightForHistory(m);
+          return [
+            esc(m.items?.name||'-'),
+            money(m.quantity),
+            m.unit_weight_kg ? Number(m.unit_weight_kg).toFixed(3)+' kg' : '-',
+            w ? w.toFixed(3)+' kg' : '-',
+            esc(m.storage_type||'-'),
+            esc(m.batch_ref||m.reference||'-')
+          ];
+        })
+      )+
+    '</div>'+
+    '<div style="margin-top:12px"><b>Total:</b> '+money(g.quantity)+' units / '+g.weight.toFixed(3)+' kg'+
+    (g.reference?' · <b>Reference:</b> '+esc(g.reference):'')+
+    '</div>';
+
+  $('closeDeliveryDetail').onclick=()=>box.classList.add('hidden');
+}
+
+function weightForHistory(m){
+  const total=Number(m.total_weight_kg||0);
+  if(total) return total;
+  return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
 }
 
 
@@ -2838,6 +2947,8 @@ $('deliveriesTable')
   );
 
 
+populateHistoryOrganisationFilters();
+
 $('applyHistoryFilters')
   .onclick=()=>renderHistory(profilesCache);
 
@@ -2846,12 +2957,23 @@ $('clearHistoryFilters')
     $('historyDateFrom').value='';
     $('historyDateTo').value='';
     $('historyType').value='ALL';
+    $('historyDonor').value='ALL';
+    $('historyRecipient').value='ALL';
+    $('deliveryDetail').classList.add('hidden');
     renderHistory(profilesCache);
   };
 
 $('historyDateFrom').onchange=()=>renderHistory(profilesCache);
 $('historyDateTo').onchange=()=>renderHistory(profilesCache);
 $('historyType').onchange=()=>renderHistory(profilesCache);
+$('historyDonor').onchange=()=>renderHistory(profilesCache);
+$('historyRecipient').onchange=()=>renderHistory(profilesCache);
+
+$('historyTable').addEventListener('click',function(e){
+  const btn=e.target.closest('[data-view-delivery]');
+  if(!btn) return;
+  viewHistoryDelivery(btn.dataset.viewDelivery);
+});
 
 $('loginForm')
   .addEventListener(
