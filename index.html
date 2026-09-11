@@ -595,85 +595,41 @@ form.formgrid{
       <div class="panel">
 
         <h2>Stock In — Receive Goods</h2>
-        <p style="color:#68766e;margin-top:-6px">Enter what has arrived. Existing items are matched automatically; new items are created for you.</p>
+        <p style="color:#68766e;margin-top:-6px">Record a complete delivery. You can add as many different item types as you need to the same delivery.</p>
 
-        <form id="inForm" class="formgrid">
+        <form id="inForm">
 
-          <div>
-            <label>Item / Description</label>
-            <input id="inItemName" list="inItemList" autocomplete="off" placeholder="Type item name or description" required>
-            <datalist id="inItemList"></datalist>
+          <div class="formgrid">
+            <div>
+              <label>Donor</label>
+              <select id="inOrg"></select>
+            </div>
+
+            <div>
+              <label>Delivery Reference</label>
+              <input id="inRef" readonly placeholder="Generated automatically">
+            </div>
+
+            <div class="full">
+              <label>Delivery items</label>
+              <div id="stockInLines"></div>
+              <button type="button" id="addStockInLine" class="btn" style="margin-top:10px">+ Add another item</button>
+            </div>
+
+            <div class="full">
+              <label>Delivery notes</label>
+              <textarea id="inNotes"></textarea>
+            </div>
           </div>
 
-          <div>
-            <label>Category</label>
-            <select id="inCategory">
-              <option value="Food">Food</option>
-              <option value="Non Food">Non Food</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Quantity</label>
-            <input id="inQty" type="number" min="1" required>
-          </div>
-
-          <div>
-            <label>Weight per item (kg)</label>
-            <input id="inUnitWeight" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
-          </div>
-
-          <div>
-            <label>Total weight (kg)</label>
-            <input id="inTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated automatically" readonly>
-          </div>
-
-          <div>
-            <label>Stored in</label>
-            <select id="inStorageType">
-              <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Warehouse location</label>
-            <input id="inLocation" placeholder="e.g. A1, Rack 3">
-          </div>
-
-          <div>
-            <label>Donor</label>
-            <select id="inOrg"></select>
-          </div>
-
-          <div>
-            <label>Batch reference</label>
-            <input id="inBatch" readonly placeholder="Generated automatically">
-          </div>
-
-          <div>
-            <label>Best-before</label>
-            <input id="inBB" type="text" placeholder="Enter date or N/A">
-          </div>
-
-          <div>
-            <label>Reference</label>
-            <input id="inRef" readonly placeholder="Generated automatically">
-          </div>
-
-          <div class="full">
-            <label>Notes</label>
-            <textarea id="inNotes"></textarea>
-          </div>
-
-          <div class="full actions">
-            <button class="btn primary">Record stock in</button>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Record delivery</button>
           </div>
 
         </form>
 
       </div>
     </section>
-
 
     <!-- STOCK OUT -->
     <section id="page-out" class="page hidden">
@@ -1894,82 +1850,197 @@ async function nextStockInNumber(prefix){
   return prefix+'-'+(max+1);
 }
 
-function calculateStockInTotalWeight(){
-  const qty=Number($('inQty')?.value||0);
-  const unit=Number($('inUnitWeight')?.value||0);
-  const total=$('inTotalWeight');
-  if(!total) return;
-  total.value=(qty>0 && unit>0) ? (qty*unit).toFixed(3) : '';
+async function nextStockInNumbers(prefix,count){
+  const {data}=await sb.from('stock_movements')
+    .select('reference,batch_ref')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const value=prefix==='REF'?m.reference:m.batch_ref;
+    const match=String(value||'').match(new RegExp('^'+prefix+'-(\\d+)$','i'));
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return Array.from({length:count},(_,i)=>prefix+'-'+(max+i+1));
+}
+
+function stockInLineHtml(){
+  const id='sil-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  return `
+    <div class="stock-in-line panel" data-line-id="${id}" style="margin:10px 0 0;background:#f7faf8;border:1px solid #dce7e0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px">
+        <strong>Item</strong>
+        <button type="button" class="btn remove-stock-in-line" data-line-id="${id}" style="display:none">Remove</button>
+      </div>
+      <div class="formgrid">
+        <div>
+          <label>Item / Description</label>
+          <input class="sil-name" list="inItemList" autocomplete="off" placeholder="Type item name or description" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select class="sil-category"><option value="Food">Food</option><option value="Non Food">Non Food</option></select>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input class="sil-qty" type="number" min="1" required>
+        </div>
+        <div>
+          <label>Weight per item (kg)</label>
+          <input class="sil-unit" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
+        </div>
+        <div>
+          <label>Total weight (kg)</label>
+          <input class="sil-total" type="number" step="0.001" min="0" placeholder="Calculated automatically" readonly>
+        </div>
+        <div>
+          <label>Stored in</label>
+          <select class="sil-storage"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select>
+        </div>
+        <div>
+          <label>Warehouse location</label>
+          <input class="sil-location" placeholder="e.g. A1, Rack 3">
+        </div>
+        <div>
+          <label>Batch reference</label>
+          <input class="sil-batch" readonly placeholder="Generated automatically">
+        </div>
+        <div>
+          <label>Best-before</label>
+          <input class="sil-bb" type="text" placeholder="Enter date or N/A" required>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calculateStockInLineTotal(line){
+  const qty=Number(line.querySelector('.sil-qty')?.value||0);
+  const unit=Number(line.querySelector('.sil-unit')?.value||0);
+  const total=line.querySelector('.sil-total');
+  if(total) total.value=(qty>0 && unit>0) ? (qty*unit).toFixed(3) : '';
+}
+
+function refreshStockInLineButtons(){
+  const lines=[...document.querySelectorAll('.stock-in-line')];
+  lines.forEach(line=>{
+    const btn=line.querySelector('.remove-stock-in-line');
+    if(btn) btn.style.display=lines.length>1?'inline-block':'none';
+  });
+}
+
+function addStockInLine(){
+  const box=$('stockInLines');
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend',stockInLineHtml());
+  refreshStockInLineButtons();
+  assignStockInBatches();
+}
+
+async function assignStockInBatches(){
+  const lines=[...document.querySelectorAll('.stock-in-line')];
+  const blanks=lines.filter(l=>!l.querySelector('.sil-batch')?.value);
+  if(!blanks.length) return;
+  const nums=await nextStockInNumbers('BATCH',blanks.length);
+  blanks.forEach((line,i)=>{
+    const input=line.querySelector('.sil-batch');
+    if(input && !input.value) input.value=nums[i];
+  });
 }
 
 async function prepareStockInReferences(){
   const ref=$('inRef');
-  const batch=$('inBatch');
   if(ref && !ref.value) ref.value=await nextStockInNumber('REF');
-  if(batch && !batch.value) batch.value=await nextStockInNumber('BATCH');
-  calculateStockInTotalWeight();
+  assignStockInBatches();
+}
+
+function resetStockInForm(){
+  $('inForm')?.reset();
+  const box=$('stockInLines');
+  if(box){ box.innerHTML=''; addStockInLine(); }
+  prepareStockInReferences();
 }
 
 async function addMove(type,form){
   if(!canWrite()){ notify('Your role cannot change stock',false); return; }
 
   if(type==='IN'){
-    const name=$('inItemName').value.trim();
-    const qty=Number($('inQty').value||0);
-    if(!name||qty<1){ notify('Please enter an item and quantity.',false); return; }
+    const lines=[...document.querySelectorAll('.stock-in-line')];
+    if(!lines.length){ notify('Please add at least one item.',false); return; }
+    const donor=$('inOrg').value||null;
+    const generatedRef=$('inRef').value.trim() || await nextStockInNumber('REF');
+    const deliveryNotes=$('inNotes').value.trim();
+    const lineData=[];
 
-    let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
+    for(const line of lines){
+      const name=line.querySelector('.sil-name')?.value.trim()||'';
+      const qty=Number(line.querySelector('.sil-qty')?.value||0);
+      const unitEntered=Number(line.querySelector('.sil-unit')?.value||0);
+      const bb=line.querySelector('.sil-bb')?.value.trim()||'';
+      if(!name||qty<1){ notify('Please enter an item and quantity for every line.',false); return; }
+      if(!bb){ notify('Please enter a best-before date or N/A for every item.',false); return; }
 
-    if(!item){
-      const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
-      const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
-      const next=match ? Number(match[1])+1 : 1;
-      const newItem={
-        sku:'ITM-'+String(next).padStart(4,'0'),
-        name,
-        category:$('inCategory').value||'Food',
-        unit:'units',
-        reorder_level:0,
-        weight_per_unit_kg:Number($('inUnitWeight').value||0),
-        storage_type:$('inStorageType').value||null,
-        location:$('inLocation').value.trim()||null
-      };
-      const created=await sb.from('items').insert(newItem).select('*').single();
-      if(created.error){ notify(created.error.message,false); return; }
-      item=created.data;
+      let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
+      const unit=unitEntered || Number(item?.weight_per_unit_kg||0);
+
+      if(!item){
+        const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
+        const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
+        const next=match ? Number(match[1])+1 : 1;
+        const newItem={
+          sku:'ITM-'+String(next).padStart(4,'0'),
+          name,
+          category:line.querySelector('.sil-category')?.value||'Food',
+          unit:'units',
+          reorder_level:0,
+          weight_per_unit_kg:unit||0,
+          storage_type:line.querySelector('.sil-storage')?.value||null,
+          location:line.querySelector('.sil-location')?.value.trim()||null
+        };
+        const created=await sb.from('items').insert(newItem).select('*').single();
+        if(created.error){ notify(created.error.message,false); return; }
+        item=created.data;
+      }
+
+      const batch=line.querySelector('.sil-batch')?.value.trim()||null;
+      const storage=line.querySelector('.sil-storage')?.value||null;
+      const location=line.querySelector('.sil-location')?.value.trim()||null;
+      const totalWeight=(unit && qty) ? qty*unit : 0;
+      const notes=(deliveryNotes ? deliveryNotes+'\n' : '')+'Best-before: '+bb+(location?'\nWarehouse location: '+location:'');
+      lineData.push({item,qty,unit,batch,storage,totalWeight,notes});
     }
 
-    const unitWeight=Number($('inUnitWeight').value||item.weight_per_unit_kg||0);
-    const totalWeight=(unitWeight && qty) ? qty*unitWeight : 0;
-    const bb=$('inBB').value.trim();
-    if(!bb){ notify('Please enter a best-before date or N/A.',false); return; }
-    let notes=$('inNotes').value.trim();
-    notes=(notes ? notes+'\n' : '')+'Best-before: '+bb;
+    const missingBatches=lineData.filter(x=>!x.batch);
+    if(missingBatches.length){
+      const nums=await nextStockInNumbers('BATCH',missingBatches.length);
+      let n=0;
+      lineData.forEach(x=>{ if(!x.batch) x.batch=nums[n++]; });
+    }
 
-    prepareStockInReferences();
-    const generatedRef=$('inRef').value.trim();
-    const generatedBatch=$('inBatch').value.trim();
+    for(const x of lineData){
+      const {error}=await sb.from('stock_movements').insert({
+        movement_type:'IN',
+        item_id:x.item.id,
+        quantity:x.qty,
+        unit_weight_kg:x.unit||null,
+        total_weight_kg:x.totalWeight||null,
+        storage_type:x.storage,
+        user_id:currentUser.id,
+        organisation_id:donor,
+        reference:generatedRef,
+        batch_ref:x.batch,
+        notes:x.notes||null
+      });
+      if(error){ notify(error.message,false); return; }
+    }
 
-    const {error}=await sb.from('stock_movements').insert({
-      movement_type:'IN',
-      item_id:item.id,
-      quantity:qty,
-      unit_weight_kg:unitWeight||null,
-      total_weight_kg:totalWeight||null,
-      storage_type:$('inStorageType').value||null,
+    await sb.from('audit_log').insert({
       user_id:currentUser.id,
-      organisation_id:$('inOrg').value||null,
-      reference:generatedRef||null,
-      batch_ref:generatedBatch||null,
-      notes:notes||null
+      action:'STOCK_IN',
+      table_name:'stock_movements',
+      details:{items:lineData.map(x=>({item_id:x.item.id,quantity:x.qty,batch_ref:x.batch})),reference:generatedRef,donor_id:donor}
     });
-    if(error){ notify(error.message,false); return; }
-
-    await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_IN',table_name:'stock_movements',details:{item_id:item.id,quantity:qty,reference:generatedRef||null,batch_ref:generatedBatch||null}});
-    form.reset();
-    prepareStockInReferences();
+    resetStockInForm();
     await refresh();
-    notify('Stock received and added to inventory');
+    notify(lineData.length+' item'+(lineData.length===1?'':'s')+' received in delivery '+generatedRef);
     return;
   }
 
@@ -2740,13 +2811,25 @@ $('newDelivery')
     openDeliveryEditor;
 
 
-$('inQty').addEventListener('input',calculateStockInTotalWeight);
-$('inUnitWeight').addEventListener('input',calculateStockInTotalWeight);
+$('addStockInLine').onclick=addStockInLine;
+$('stockInLines').addEventListener('input',e=>{
+  const line=e.target.closest('.stock-in-line');
+  if(line && (e.target.classList.contains('sil-qty')||e.target.classList.contains('sil-unit'))) calculateStockInLineTotal(line);
+});
+$('stockInLines').addEventListener('click',e=>{
+  const btn=e.target.closest('.remove-stock-in-line');
+  if(!btn) return;
+  const line=document.querySelector('.stock-in-line[data-line-id="'+CSS.escape(btn.dataset.lineId)+'"]');
+  if(line) line.remove();
+  refreshStockInLineButtons();
+});
 $('outStockSearch').oninput=renderOutStock;
 
 
 /* START */
 
+addStockInLine();
+prepareStockInReferences();
 boot();
 
 </script>
