@@ -1519,6 +1519,101 @@ function renderAll(profiles=[]){
   renderHistory(profiles);
 
 
+  $('deliveriesTable').innerHTML=
+    table(
+      [
+        'Number',
+        'Date',
+        'Recipient',
+        'Status',
+        'Action'
+      ],
+
+      deliveries.map(function(d){
+
+        return [
+
+          esc(
+            d.delivery_number
+          ),
+
+          esc(
+            d.delivery_date
+          ),
+
+          esc(
+            d.organisations
+              ? d.organisations.name
+              : '-'
+          ),
+
+          badge(
+            d.status,
+            d.status==='COMPLETED'
+          ),
+
+          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
+          esc(d.id)+
+          '\')">Print</button>'
+
+        ];
+
+      })
+    );
+
+
+  const userRows=
+    profiles.map(function(p){
+
+      const displayRole =
+        p.role==='ADMIN'
+          ? 'ADMIN'
+          : p.role==='READ_ONLY'
+            ? 'READ ONLY'
+            : 'USER';
+
+      return [
+
+        esc(p.full_name),
+
+        esc(displayRole),
+
+        p.active
+          ? 'Active'
+          : 'Inactive',
+
+        esc(p.id)
+
+      ];
+
+    });
+
+
+  $('usersTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Role',
+        'Status',
+        'User ID'
+      ],
+      userRows
+    );
+
+  if(role()==='ADMIN'){
+    $('userAdminControls').innerHTML=
+      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
+  }else{
+    $('userAdminControls').innerHTML='';
+    $('userEditor').innerHTML='';
+  }
+
+
+  fillSelects();
+
+}
+
+
 function populateHistoryOrganisationFilters(){
   const donor=$('historyDonor');
   const recipient=$('historyRecipient');
@@ -1667,100 +1762,6 @@ function weightForHistory(m){
   return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
 }
 
-
-  $('deliveriesTable').innerHTML=
-    table(
-      [
-        'Number',
-        'Date',
-        'Recipient',
-        'Status',
-        'Action'
-      ],
-
-      deliveries.map(function(d){
-
-        return [
-
-          esc(
-            d.delivery_number
-          ),
-
-          esc(
-            d.delivery_date
-          ),
-
-          esc(
-            d.organisations
-              ? d.organisations.name
-              : '-'
-          ),
-
-          badge(
-            d.status,
-            d.status==='COMPLETED'
-          ),
-
-          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
-          esc(d.id)+
-          '\')">Print</button>'
-
-        ];
-
-      })
-    );
-
-
-  const userRows=
-    profiles.map(function(p){
-
-      const displayRole =
-        p.role==='ADMIN'
-          ? 'ADMIN'
-          : p.role==='READ_ONLY'
-            ? 'READ ONLY'
-            : 'USER';
-
-      return [
-
-        esc(p.full_name),
-
-        esc(displayRole),
-
-        p.active
-          ? 'Active'
-          : 'Inactive',
-
-        esc(p.id)
-
-      ];
-
-    });
-
-
-  $('usersTable').innerHTML=
-    table(
-      [
-        'Name',
-        'Role',
-        'Status',
-        'User ID'
-      ],
-      userRows
-    );
-
-  if(role()==='ADMIN'){
-    $('userAdminControls').innerHTML=
-      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
-  }else{
-    $('userAdminControls').innerHTML='';
-    $('userEditor').innerHTML='';
-  }
-
-
-  fillSelects();
-
-}
 
 
 /* HELPERS */
