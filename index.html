@@ -901,15 +901,17 @@ form.formgrid{
 </div>
 
 
-<script src="config.js"></script>
-
 <script>
+
+/* Supabase client configuration. The publishable key is safe for browser use. */
+const SUPABASE_URL='https://rfqtzwpynnoezlzyakbv.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_-fg6XDkxUmlYzN3aaipKmw_X9S6qzfH';
 
 const {createClient}=supabase;
 
 const sb=createClient(
-  window.SUPABASE_URL,
-  window.SUPABASE_PUBLISHABLE_KEY,
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
   {
     auth:{
       persistSession:true,
