@@ -1906,7 +1906,10 @@ function stockInLineHtml(){
         </div>
         <div>
           <label>Best-before</label>
-          <input class="sil-bb" type="text" placeholder="Enter date or N/A" required>
+          <input class="sil-bb" type="date">
+          <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-weight:600">
+            <input class="sil-bb-na" type="checkbox" style="width:auto"> No best-before date (N/A)
+          </label>
         </div>
       </div>
     </div>`;
@@ -1931,6 +1934,15 @@ function addStockInLine(){
   const box=$('stockInLines');
   if(!box) return;
   box.insertAdjacentHTML('beforeend',stockInLineHtml());
+  const line=box.lastElementChild;
+  const dateInput=line?.querySelector('.sil-bb');
+  const naInput=line?.querySelector('.sil-bb-na');
+  if(naInput && dateInput){
+    naInput.addEventListener('change',()=>{
+      dateInput.disabled=naInput.checked;
+      if(naInput.checked) dateInput.value='';
+    });
+  }
   refreshStockInLineButtons();
   assignStockInBatches();
 }
@@ -1974,9 +1986,10 @@ async function addMove(type,form){
       const name=line.querySelector('.sil-name')?.value.trim()||'';
       const qty=Number(line.querySelector('.sil-qty')?.value||0);
       const unitEntered=Number(line.querySelector('.sil-unit')?.value||0);
-      const bb=line.querySelector('.sil-bb')?.value.trim()||'';
+      const bbNa=!!line.querySelector('.sil-bb-na')?.checked;
+      const bb=bbNa ? 'N/A' : (line.querySelector('.sil-bb')?.value||'').trim();
       if(!name||qty<1){ notify('Please enter an item and quantity for every line.',false); return; }
-      if(!bb){ notify('Please enter a best-before date or N/A for every item.',false); return; }
+      if(!bb){ notify('Please select a best-before date or tick N/A for every item.',false); return; }
 
       let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
       const unit=unitEntered || Number(item?.weight_per_unit_kg||0);
