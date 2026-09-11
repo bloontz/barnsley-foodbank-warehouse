@@ -819,6 +819,42 @@ form.formgrid{
 
         <h2>Audit / Movements</h2>
 
+        <div class="panel" style="margin:0 0 16px;background:#f7faf8">
+          <div class="formgrid">
+            <div>
+              <label>Date from</label>
+              <input id="historyDateFrom" type="date">
+            </div>
+            <div>
+              <label>Date to</label>
+              <input id="historyDateTo" type="date">
+            </div>
+            <div>
+              <label>Stock movement</label>
+              <select id="historyType">
+                <option value="ALL">All movements</option>
+                <option value="IN">Received</option>
+                <option value="OUT">Delivered</option>
+              </select>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn primary" id="applyHistoryFilters">Apply filters</button>
+              <button type="button" class="btn secondary" id="clearHistoryFilters">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="formgrid" style="margin-bottom:16px">
+          <div class="panel" style="margin:0">
+            <b>Received</b>
+            <div id="historyReceivedSummary" style="font-size:20px;margin-top:6px">0 units / 0.000 kg</div>
+          </div>
+          <div class="panel" style="margin:0">
+            <b>Delivered</b>
+            <div id="historyDeliveredSummary" style="font-size:20px;margin-top:6px">0 units / 0.000 kg</div>
+          </div>
+        </div>
+
         <div id="historyTable" class="tablewrap"></div>
 
       </div>
@@ -878,6 +914,7 @@ let orgs=[];
 let stock=[];
 let moves=[];
 let deliveries=[];
+let profilesCache=[];
 
 
 const $=id=>document.getElementById(id);
@@ -1556,50 +1593,60 @@ function renderAll(profiles=[]){
     );
 
 
-  $('historyTable').innerHTML=
-    table(
-      [
-        'Date',
-        'Type',
-        'Item',
-        'Qty',
-        'Reference',
-        'Batch'
-      ],
+  renderHistory(profiles);
 
-      moves.map(function(m){
 
-        return [
+function renderHistory(profiles=[]){
+  const from=$('historyDateFrom')?.value||'';
+  const to=$('historyDateTo')?.value||'';
+  const type=$('historyType')?.value||'ALL';
 
-          new Date(
-            m.created_at
-          ).toLocaleDateString(),
+  const filtered=moves.filter(function(m){
+    const day=new Date(m.created_at).toISOString().slice(0,10);
+    if(from && day<from) return false;
+    if(to && day>to) return false;
+    if(type!=='ALL' && m.movement_type!==type) return false;
+    return true;
+  });
 
-          badge(
-            m.movement_type,
-            m.movement_type==='IN'
-          ),
+  const weightFor=function(m){
+    const total=Number(m.total_weight_kg||0);
+    if(total) return total;
+    return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
+  };
 
-          esc(
-            m.items
-              ? m.items.name
-              : '-'
-          ),
+  const received=filtered.filter(m=>m.movement_type==='IN');
+  const delivered=filtered.filter(m=>m.movement_type==='OUT');
+  const sumQty=a=>a.reduce((n,m)=>n+Number(m.quantity||0),0);
+  const sumWeight=a=>a.reduce((n,m)=>n+weightFor(m),0);
 
-          money(m.quantity),
+  if($('historyReceivedSummary'))
+    $('historyReceivedSummary').textContent=money(sumQty(received))+' units / '+sumWeight(received).toFixed(3)+' kg';
+  if($('historyDeliveredSummary'))
+    $('historyDeliveredSummary').textContent=money(sumQty(delivered))+' units / '+sumWeight(delivered).toFixed(3)+' kg';
 
-          esc(
-            m.reference||'-'
-          ),
-
-          esc(
-            m.batch_ref||'-'
-          )
-
-        ];
-
-      })
-    );
+  $('historyTable').innerHTML=table(
+    ['Date','Movement','Item','Qty','Weight','From','To','Reference','Batch','Recorded By'],
+    filtered.map(function(m){
+      const isIn=m.movement_type==='IN';
+      const organisation=m.organisations?.name||'Not recorded';
+      const profile=profiles.find(p=>p.id===m.user_id);
+      const weight=weightFor(m);
+      return [
+        new Date(m.created_at).toLocaleDateString(),
+        badge(isIn?'Received':'Delivered',isIn),
+        esc(m.items ? m.items.name : '-'),
+        money(m.quantity),
+        weight ? weight.toFixed(3)+' kg' : '-',
+        esc(isIn ? organisation : 'Warehouse'),
+        esc(isIn ? 'Warehouse' : organisation),
+        esc(m.reference||'-'),
+        esc(m.batch_ref||'-'),
+        esc(profile?.full_name||'-')
+      ];
+    })
+  );
+}
 
 
   $('deliveriesTable').innerHTML=
@@ -2790,6 +2837,21 @@ $('deliveriesTable')
     }
   );
 
+
+$('applyHistoryFilters')
+  .onclick=()=>renderHistory(profilesCache);
+
+$('clearHistoryFilters')
+  .onclick=()=>{
+    $('historyDateFrom').value='';
+    $('historyDateTo').value='';
+    $('historyType').value='ALL';
+    renderHistory(profilesCache);
+  };
+
+$('historyDateFrom').onchange=()=>renderHistory(profilesCache);
+$('historyDateTo').onchange=()=>renderHistory(profilesCache);
+$('historyType').onchange=()=>renderHistory(profilesCache);
 
 $('loginForm')
   .addEventListener(
