@@ -6,6 +6,7 @@
 <title>Barnsley Foodbank Partnership — Warehouse</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 :root{
@@ -745,13 +746,13 @@ form.formgrid{
               </select>
             </div>
             <div>
-              <label>Received from donor</label>
+              <label>Received from donor (one at a time)</label>
               <select id="historyDonor">
                 <option value="ALL">All donors</option>
               </select>
             </div>
             <div>
-              <label>Delivered to</label>
+              <label>Delivered to (one at a time)</label>
               <select id="historyRecipient">
                 <option value="ALL">All recipients</option>
               </select>
@@ -759,9 +760,11 @@ form.formgrid{
             <div class="actions">
               <button type="button" class="btn primary" id="applyHistoryFilters">Apply filters</button>
               <button type="button" class="btn secondary" id="clearHistoryFilters">Clear</button>
+              <button type="button" class="btn secondary" id="exportHistoryExcel">Export to Excel</button>
             </div>
           </div>
         </div>
+        <small style="color:#68766e;display:block;margin:-6px 0 14px">Select a single donor or a single recipient. Choosing one automatically clears the other. Export to Excel uses the filters currently shown.</small>
 
         <div class="formgrid" style="margin-bottom:16px">
           <div class="panel" style="margin:0">
@@ -1676,6 +1679,84 @@ function renderHistory(profiles=[]){
   );
 
   window.historyDeliveryGroups=grouped;
+}
+
+function exportHistoryExcel(){
+  if(typeof XLSX==='undefined'){
+    notify('Excel export is not available. Please refresh the page and try again.',false);
+    return;
+  }
+
+  const from=$('historyDateFrom')?.value||'';
+  const to=$('historyDateTo')?.value||'';
+  const type=$('historyType')?.value||'ALL';
+  const donorId=$('historyDonor')?.value||'ALL';
+  const recipientId=$('historyRecipient')?.value||'ALL';
+  const groups=window.historyDeliveryGroups||[];
+
+  const donorName=donorId==='ALL' ? 'All donors' : (orgs.find(o=>String(o.id)===String(donorId))?.name||'Selected donor');
+  const recipientName=recipientId==='ALL' ? 'All recipients' : (orgs.find(o=>String(o.id)===String(recipientId))?.name||'Selected recipient');
+
+  const summaryRows=groups.map(g=>({
+    'Date':new Date(g.created_at).toLocaleDateString('en-GB'),
+    'Movement':g.movement_type==='IN'?'Received':'Delivered',
+    'From':g.movement_type==='IN'?g.organisation_name:'Warehouse',
+    'To':g.movement_type==='IN'?'Warehouse':g.organisation_name,
+    'Item lines':g.lines.length,
+    'Quantity (units)':Number(g.quantity||0),
+    'Total weight (kg)':Number(g.weight||0),
+    'Reference':g.reference||'',
+    'Recorded by':g.recorded_by||''
+  }));
+
+  const itemRows=[];
+  groups.forEach(g=>{
+    g.lines.forEach(m=>{
+      itemRows.push({
+        'Date':new Date(m.created_at||g.created_at).toLocaleDateString('en-GB'),
+        'Movement':m.movement_type==='IN'?'Received':'Delivered',
+        'From':m.movement_type==='IN'?(m.organisations?.name||g.organisation_name||'Not recorded'):'Warehouse',
+        'To':m.movement_type==='IN'?'Warehouse':(m.organisations?.name||g.organisation_name||'Not recorded'),
+        'Item':m.items?.name||'-',
+        'SKU':m.items?.sku||'',
+        'Quantity (units)':Number(m.quantity||0),
+        'Weight / item (kg)':Number(m.unit_weight_kg||0),
+        'Total weight (kg)':Number(weightForHistory(m)||0),
+        'Stored in':m.storage_type||'',
+        'Batch reference':m.batch_ref||'',
+        'Delivery reference':m.reference||'',
+        'Recorded by':g.recorded_by||''
+      });
+    });
+  });
+
+  const workbook=XLSX.utils.book_new();
+  const summarySheet=XLSX.utils.json_to_sheet(summaryRows.length?summaryRows:[{'Date':'No records','Movement':'','From':'','To':'','Item lines':'','Quantity (units)':'','Total weight (kg)':'','Reference':'','Recorded by':''}]);
+  const itemSheet=XLSX.utils.json_to_sheet(itemRows.length?itemRows:[{'Date':'No records','Movement':'','From':'','To':'','Item':'','SKU':'','Quantity (units)':'','Weight / item (kg)':'','Total weight (kg)':'','Stored in':'','Batch reference':'','Delivery reference':'','Recorded by':''}]);
+
+  const filterSheet=XLSX.utils.aoa_to_sheet([
+    ['Barnsley Foodbank Partnership — Audit / Movements'],
+    ['Date from',from||'All dates'],
+    ['Date to',to||'All dates'],
+    ['Movement',type==='IN'?'Received':type==='OUT'?'Delivered':'All movements'],
+    ['Received from donor',donorName],
+    ['Delivered to',recipientName],
+    ['Deliveries shown',groups.length],
+    ['Units shown',groups.reduce((n,g)=>n+Number(g.quantity||0),0)],
+    ['Weight shown (kg)',groups.reduce((n,g)=>n+Number(g.weight||0),0)]
+  ]);
+
+  XLSX.utils.book_append_sheet(workbook,summarySheet,'Deliveries');
+  XLSX.utils.book_append_sheet(workbook,itemSheet,'Item Details');
+  XLSX.utils.book_append_sheet(workbook,filterSheet,'Filters');
+
+  summarySheet['!cols']=[{wch:12},{wch:12},{wch:24},{wch:24},{wch:12},{wch:16},{wch:18},{wch:18},{wch:24}];
+  itemSheet['!cols']=[{wch:12},{wch:12},{wch:24},{wch:24},{wch:28},{wch:14},{wch:16},{wch:20},{wch:18},{wch:16},{wch:20},{wch:20},{wch:24}];
+  filterSheet['!cols']=[{wch:28},{wch:45}];
+
+  const stamp=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(workbook,'Barnsley-Foodbank-Audit-Movements-'+stamp+'.xlsx');
+  notify('Excel spreadsheet created');
 }
 
 function viewHistoryDelivery(key){
@@ -2745,8 +2826,21 @@ $('clearHistoryFilters')
 $('historyDateFrom').onchange=()=>renderHistory(profilesCache);
 $('historyDateTo').onchange=()=>renderHistory(profilesCache);
 $('historyType').onchange=()=>renderHistory(profilesCache);
-$('historyDonor').onchange=()=>renderHistory(profilesCache);
-$('historyRecipient').onchange=()=>renderHistory(profilesCache);
+$('historyDonor').onchange=()=>{
+  if($('historyDonor').value!=='ALL'){
+    $('historyRecipient').value='ALL';
+    $('historyType').value='IN';
+  }
+  renderHistory(profilesCache);
+};
+$('historyRecipient').onchange=()=>{
+  if($('historyRecipient').value!=='ALL'){
+    $('historyDonor').value='ALL';
+    $('historyType').value='OUT';
+  }
+  renderHistory(profilesCache);
+};
+$('exportHistoryExcel').onclick=exportHistoryExcel;
 
 $('historyTable').addEventListener('click',function(e){
   const btn=e.target.closest('[data-view-delivery]');
