@@ -647,17 +647,17 @@ form.formgrid{
 
           <div>
             <label>Batch reference</label>
-            <input id="inBatch">
+            <input id="inBatch" readonly placeholder="Generated automatically">
           </div>
 
           <div>
             <label>Best-before</label>
-            <input id="inBB" type="date">
+            <input id="inBB" type="text" placeholder="Enter date or N/A">
           </div>
 
           <div>
             <label>Reference</label>
-            <input id="inRef">
+            <input id="inRef" readonly placeholder="Generated automatically">
           </div>
 
           <div class="full">
@@ -1843,6 +1843,7 @@ function fillSelects(){
 
   $('inOrg').innerHTML=donor;
   $('outOrg').innerHTML=rec;
+  prepareStockInReferences();
   renderOutStock();
 }
 
@@ -1880,6 +1881,25 @@ function renderOutStock(){
 
 /* STOCK MOVEMENTS */
 
+function makeStockInReference(prefix){
+  const d=new Date();
+  const stamp=d.getFullYear().toString()+
+    String(d.getMonth()+1).padStart(2,'0')+
+    String(d.getDate()).padStart(2,'0')+'-'+
+    String(d.getHours()).padStart(2,'0')+
+    String(d.getMinutes()).padStart(2,'0')+
+    String(d.getSeconds()).padStart(2,'0');
+  const random=Math.random().toString(36).slice(2,6).toUpperCase();
+  return prefix+'-'+stamp+'-'+random;
+}
+
+function prepareStockInReferences(){
+  const ref=$('inRef');
+  const batch=$('inBatch');
+  if(ref && !ref.value) ref.value=makeStockInReference('REF');
+  if(batch && !batch.value) batch.value=makeStockInReference('BATCH');
+}
+
 async function addMove(type,form){
   if(!canWrite()){ notify('Your role cannot change stock',false); return; }
 
@@ -1912,9 +1932,14 @@ async function addMove(type,form){
     const unitWeight=Number($('inUnitWeight').value||item.weight_per_unit_kg||0);
     const enteredTotal=Number($('inTotalWeight').value||0);
     const totalWeight=enteredTotal || (unitWeight ? qty*unitWeight : 0);
-    const bb=$('inBB').value;
+    const bb=$('inBB').value.trim();
+    if(!bb){ notify('Please enter a best-before date or N/A.',false); return; }
     let notes=$('inNotes').value.trim();
-    if(bb) notes=(notes ? notes+'\n' : '')+'Best-before: '+bb;
+    notes=(notes ? notes+'\n' : '')+'Best-before: '+bb;
+
+    prepareStockInReferences();
+    const generatedRef=$('inRef').value.trim();
+    const generatedBatch=$('inBatch').value.trim();
 
     const {error}=await sb.from('stock_movements').insert({
       movement_type:'IN',
@@ -1925,14 +1950,15 @@ async function addMove(type,form){
       storage_type:$('inStorageType').value||null,
       user_id:currentUser.id,
       organisation_id:$('inOrg').value||null,
-      reference:$('inRef').value.trim()||null,
-      batch_ref:$('inBatch').value.trim()||null,
+      reference:generatedRef||null,
+      batch_ref:generatedBatch||null,
       notes:notes||null
     });
     if(error){ notify(error.message,false); return; }
 
-    await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_IN',table_name:'stock_movements',details:{item_id:item.id,quantity:qty,reference:$('inRef').value.trim()||null}});
+    await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_IN',table_name:'stock_movements',details:{item_id:item.id,quantity:qty,reference:generatedRef||null,batch_ref:generatedBatch||null}});
     form.reset();
+    prepareStockInReferences();
     await refresh();
     notify('Stock received and added to inventory');
     return;
