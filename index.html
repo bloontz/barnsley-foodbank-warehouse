@@ -1191,7 +1191,9 @@ async function loadUser(user){
 
   await refresh();
 
-  showPage('dashboard');
+  const savedPage=localStorage.getItem('warehouseLastPage') || 'dashboard';
+  const validPages=['dashboard','stock','in','out','organisations','deliveries','history','users'];
+  showPage(validPages.includes(savedPage) ? savedPage : 'dashboard');
 
 }
 
@@ -2093,6 +2095,8 @@ async function addMove(type,form){
 /* NAVIGATION */
 
 function showPage(name){
+
+  localStorage.setItem('warehouseLastPage',name);
 
   document
     .querySelectorAll('.page')
