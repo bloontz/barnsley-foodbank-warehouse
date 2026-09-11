@@ -625,7 +625,7 @@ form.formgrid{
 
           <div>
             <label>Total weight (kg)</label>
-            <input id="inTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated from quantity × weight">
+            <input id="inTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated automatically" readonly>
           </div>
 
           <div>
@@ -1881,23 +1881,33 @@ function renderOutStock(){
 
 /* STOCK MOVEMENTS */
 
-function makeStockInReference(prefix){
-  const d=new Date();
-  const stamp=d.getFullYear().toString()+
-    String(d.getMonth()+1).padStart(2,'0')+
-    String(d.getDate()).padStart(2,'0')+'-'+
-    String(d.getHours()).padStart(2,'0')+
-    String(d.getMinutes()).padStart(2,'0')+
-    String(d.getSeconds()).padStart(2,'0');
-  const random=Math.random().toString(36).slice(2,6).toUpperCase();
-  return prefix+'-'+stamp+'-'+random;
+async function nextStockInNumber(prefix){
+  const {data}=await sb.from('stock_movements')
+    .select('reference,batch_ref')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const value=prefix==='REF'?m.reference:m.batch_ref;
+    const match=String(value||'').match(new RegExp('^'+prefix+'-(\\d+)$','i'));
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return prefix+'-'+(max+1);
 }
 
-function prepareStockInReferences(){
+function calculateStockInTotalWeight(){
+  const qty=Number($('inQty')?.value||0);
+  const unit=Number($('inUnitWeight')?.value||0);
+  const total=$('inTotalWeight');
+  if(!total) return;
+  total.value=(qty>0 && unit>0) ? (qty*unit).toFixed(3) : '';
+}
+
+async function prepareStockInReferences(){
   const ref=$('inRef');
   const batch=$('inBatch');
-  if(ref && !ref.value) ref.value=makeStockInReference('REF');
-  if(batch && !batch.value) batch.value=makeStockInReference('BATCH');
+  if(ref && !ref.value) ref.value=await nextStockInNumber('REF');
+  if(batch && !batch.value) batch.value=await nextStockInNumber('BATCH');
+  calculateStockInTotalWeight();
 }
 
 async function addMove(type,form){
@@ -1930,8 +1940,7 @@ async function addMove(type,form){
     }
 
     const unitWeight=Number($('inUnitWeight').value||item.weight_per_unit_kg||0);
-    const enteredTotal=Number($('inTotalWeight').value||0);
-    const totalWeight=enteredTotal || (unitWeight ? qty*unitWeight : 0);
+    const totalWeight=(unitWeight && qty) ? qty*unitWeight : 0;
     const bb=$('inBB').value.trim();
     if(!bb){ notify('Please enter a best-before date or N/A.',false); return; }
     let notes=$('inNotes').value.trim();
@@ -2731,6 +2740,8 @@ $('newDelivery')
     openDeliveryEditor;
 
 
+$('inQty').addEventListener('input',calculateStockInTotalWeight);
+$('inUnitWeight').addEventListener('input',calculateStockInTotalWeight);
 $('outStockSearch').oninput=renderOutStock;
 
 
