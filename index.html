@@ -493,10 +493,6 @@ form.formgrid{
         Stock Out
       </button>
 
-      <button data-page="items">
-        Items
-      </button>
-
       <button data-page="organisations">
         Donors & Recipients
       </button>
@@ -598,23 +594,28 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Record Stock In</h2>
+        <h2>Stock In — Receive Goods</h2>
+        <p style="color:#68766e;margin-top:-6px">Enter what has arrived. Existing items are matched automatically; new items are created for you.</p>
 
         <form id="inForm" class="formgrid">
 
           <div>
-            <label>Item</label>
-            <select id="inItem" required></select>
+            <label>Item / Description</label>
+            <input id="inItemName" list="inItemList" autocomplete="off" placeholder="Type item name or description" required>
+            <datalist id="inItemList"></datalist>
+          </div>
+
+          <div>
+            <label>Category</label>
+            <select id="inCategory">
+              <option value="Food">Food</option>
+              <option value="Non Food">Non Food</option>
+            </select>
           </div>
 
           <div>
             <label>Quantity</label>
-            <input
-              id="inQty"
-              type="number"
-              min="1"
-              required
-            >
+            <input id="inQty" type="number" min="1" required>
           </div>
 
           <div>
@@ -632,6 +633,11 @@ form.formgrid{
             <select id="inStorageType">
               <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
             </select>
+          </div>
+
+          <div>
+            <label>Warehouse location</label>
+            <input id="inLocation" placeholder="e.g. A1, Rack 3">
           </div>
 
           <div>
@@ -660,15 +666,12 @@ form.formgrid{
           </div>
 
           <div class="full actions">
-            <button class="btn primary">
-              Record stock in
-            </button>
+            <button class="btn primary">Record stock in</button>
           </div>
 
         </form>
 
       </div>
-
     </section>
 
 
@@ -677,94 +680,42 @@ form.formgrid{
 
       <div class="panel">
 
-        <h2>Record Stock Out</h2>
+        <h2>Stock Out — Pick Items for Delivery</h2>
+        <p style="color:#68766e;margin-top:-6px">Choose the items and quantities you want to ship. Only stock currently available in the warehouse is shown.</p>
 
-        <form id="outForm" class="formgrid">
-
-          <div>
-            <label>Item</label>
-            <select id="outItem" required></select>
+        <form id="outForm">
+          <div class="formgrid">
+            <div>
+              <label>Recipient</label>
+              <select id="outOrg" required></select>
+            </div>
+            <div>
+              <label>Reference / Delivery No.</label>
+              <input id="outRef">
+            </div>
+            <div class="full">
+              <label>Notes</label>
+              <textarea id="outNotes"></textarea>
+            </div>
           </div>
 
-          <div>
-            <label>Quantity</label>
-            <input
-              id="outQty"
-              type="number"
-              min="1"
-              required
-            >
+          <div class="panel" style="margin:16px 0 0;background:#f7faf8">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+              <div>
+                <h3 style="margin:0 0 4px">Available inventory</h3>
+                <small style="color:#68766e">Tick an item, then enter the quantity to ship.</small>
+              </div>
+              <input id="outStockSearch" placeholder="Search available stock" style="max-width:280px">
+            </div>
+            <div id="outStockTable" class="tablewrap" style="margin-top:12px"></div>
           </div>
 
-          <div>
-            <label>Weight per item (kg)</label>
-            <input id="outUnitWeight" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Record stock out</button>
           </div>
-
-          <div>
-            <label>Total weight (kg)</label>
-            <input id="outTotalWeight" type="number" step="0.001" min="0" placeholder="Calculated from quantity × weight">
-          </div>
-
-          <div>
-            <label>Stored in</label>
-            <select id="outStorageType">
-              <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Recipient</label>
-            <select id="outOrg"></select>
-          </div>
-
-          <div>
-            <label>Batch reference</label>
-            <input id="outBatch">
-          </div>
-
-          <div>
-            <label>Reference</label>
-            <input id="outRef">
-          </div>
-
-          <div class="full">
-            <label>Notes</label>
-            <textarea id="outNotes"></textarea>
-          </div>
-
-          <div class="full actions">
-            <button class="btn primary">
-              Record stock out
-            </button>
-          </div>
-
         </form>
 
       </div>
-
-    </section>
-
-
-    <!-- ITEMS -->
-    <section id="page-items" class="page hidden">
-
-      <div class="panel">
-
-        <h2>Items</h2>
-
-        <div class="toolbar">
-          <button id="newItem" class="btn primary">
-            + New Item
-          </button>
-        </div>
-
-        <div id="itemEditor"></div>
-
-        <div id="itemsTable" class="tablewrap"></div>
-
-      </div>
-
     </section>
 
 
@@ -1527,50 +1478,7 @@ function renderAll(profiles=[]){
     );
 
 
-  $('itemsTable').innerHTML=
-    table(
-      [
-        'SKU',
-        'Barcode',
-        'Item',
-        'Category',
-        'Location',
-        'Weight / Item',
-        'Stored In',
-        'Reorder'
-      ],
-
-      items.map(function(x){
-
-        return [
-
-          esc(x.sku),
-
-          esc(
-            x.barcode||'-'
-          ),
-
-          esc(x.name),
-
-          esc(x.category),
-
-          esc(
-            x.location||'-'
-          ),
-
-          x.weight_per_unit_kg ? Number(x.weight_per_unit_kg).toFixed(3)+' kg' : '-',
-
-          esc(x.storage_type||'-'),
-
-          money(
-            x.reorder_level
-          )
-
-        ];
-
-      })
-    );
-
+  renderOutStock();
 
   $('orgsTable').innerHTML=
     table(
@@ -1579,8 +1487,7 @@ function renderAll(profiles=[]){
         'Type',
         'Contact',
         'Phone',
-        'Postcode',
-        'Action'
+        'Postcode'
       ],
 
       orgs.map(function(x){
@@ -1601,11 +1508,7 @@ function renderAll(profiles=[]){
 
           esc(
             x.postcode||'-'
-          ),
-
-          canWrite()
-            ? '<button class=\"btn secondary btn-edit-org\" data-edit-org=\"'+esc(x.id)+'\">Edit</button>'
-            : '—'
+          )
 
         ];
 
@@ -1615,106 +1518,6 @@ function renderAll(profiles=[]){
 
   renderHistory(profiles);
 
-
-
-
-  $('deliveriesTable').innerHTML=
-    table(
-      [
-        'Number',
-        'Date',
-        'Recipient',
-        'Status',
-        'Action'
-      ],
-
-      deliveries.map(function(d){
-
-        return [
-
-          esc(
-            d.delivery_number
-          ),
-
-          esc(
-            d.delivery_date
-          ),
-
-          esc(
-            d.organisations
-              ? d.organisations.name
-              : '-'
-          ),
-
-          badge(
-            d.status,
-            d.status==='COMPLETED'
-          ),
-
-          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
-          esc(d.id)+
-          '\')">Print</button>'
-
-        ];
-
-      })
-    );
-
-
-  const userRows=
-    profiles.map(function(p){
-
-      const displayRole =
-        p.role==='ADMIN'
-          ? 'ADMIN'
-          : p.role==='READ_ONLY'
-            ? 'READ ONLY'
-            : 'USER';
-
-      return [
-
-        esc(p.full_name),
-
-        esc(displayRole),
-
-        p.active
-          ? 'Active'
-          : 'Inactive',
-
-        esc(p.id)
-
-      ];
-
-    });
-
-
-  $('usersTable').innerHTML=
-    table(
-      [
-        'Name',
-        'Role',
-        'Status',
-        'User ID'
-      ],
-      userRows
-    );
-
-  if(role()==='ADMIN'){
-    $('userAdminControls').innerHTML=
-      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
-  }else{
-    $('userAdminControls').innerHTML='';
-    $('userEditor').innerHTML='';
-  }
-
-
-  fillSelects();
-  populateHistoryOrganisationFilters();
-
-}
-
-
-/* HISTORY */
 
 function populateHistoryOrganisationFilters(){
   const donor=$('historyDonor');
@@ -1864,6 +1667,102 @@ function weightForHistory(m){
   return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
 }
 
+
+  $('deliveriesTable').innerHTML=
+    table(
+      [
+        'Number',
+        'Date',
+        'Recipient',
+        'Status',
+        'Action'
+      ],
+
+      deliveries.map(function(d){
+
+        return [
+
+          esc(
+            d.delivery_number
+          ),
+
+          esc(
+            d.delivery_date
+          ),
+
+          esc(
+            d.organisations
+              ? d.organisations.name
+              : '-'
+          ),
+
+          badge(
+            d.status,
+            d.status==='COMPLETED'
+          ),
+
+          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
+          esc(d.id)+
+          '\')">Print</button>'
+
+        ];
+
+      })
+    );
+
+
+  const userRows=
+    profiles.map(function(p){
+
+      const displayRole =
+        p.role==='ADMIN'
+          ? 'ADMIN'
+          : p.role==='READ_ONLY'
+            ? 'READ ONLY'
+            : 'USER';
+
+      return [
+
+        esc(p.full_name),
+
+        esc(displayRole),
+
+        p.active
+          ? 'Active'
+          : 'Inactive',
+
+        esc(p.id)
+
+      ];
+
+    });
+
+
+  $('usersTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Role',
+        'Status',
+        'User ID'
+      ],
+      userRows
+    );
+
+  if(role()==='ADMIN'){
+    $('userAdminControls').innerHTML=
+      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
+  }else{
+    $('userAdminControls').innerHTML='';
+    $('userEditor').innerHTML='';
+  }
+
+
+  fillSelects();
+
+}
+
+
 /* HELPERS */
 
 function badge(t,green){
@@ -1920,257 +1819,155 @@ function table(headers,rows){
 
 function fillSelects(){
 
-  const opts=
-    '<option value="">Select…</option>'+
-    items
-      .map(
-        i=>
-          '<option value="'+
-          i.id+
-          '">'+
-          esc(
-            i.sku+
-            ' — '+
-            i.name
-          )+
-          '</option>'
-      )
+  const list=$('inItemList');
+  if(list){
+    list.innerHTML=items
+      .map(i=>'<option value="'+esc(i.name)+'">'+esc(i.sku||'')+'</option>')
       .join('');
-
-  $('inItem').innerHTML=opts;
-  $('outItem').innerHTML=opts;
-
+  }
 
   const donor=
     '<option value="">None / not recorded</option>'+
     orgs
-      .filter(
-        o=>
-          [
-            'DONOR',
-            'SUPPLIER',
-            'PARTNER'
-          ].includes(o.type)
-      )
-      .map(
-        o=>
-          '<option value="'+
-          o.id+
-          '">'+
-          esc(o.name)+
-          '</option>'
-      )
+      .filter(o=>['DONOR','SUPPLIER','PARTNER'].includes(o.type))
+      .map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>')
       .join('');
-
 
   const rec=
-    '<option value="">None / not recorded</option>'+
+    '<option value="">Select recipient...</option>'+
     orgs
-      .filter(
-        o=>
-          [
-            'RECIPIENT',
-            'PARTNER'
-          ].includes(o.type)
-      )
-      .map(
-        o=>
-          '<option value="'+
-          o.id+
-          '">'+
-          esc(o.name)+
-          '</option>'
-      )
+      .filter(o=>['RECIPIENT','PARTNER'].includes(o.type))
+      .map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>')
       .join('');
-
 
   $('inOrg').innerHTML=donor;
   $('outOrg').innerHTML=rec;
-
+  renderOutStock();
 }
+
+function renderOutStock(){
+  const box=$('outStockTable');
+  if(!box) return;
+  const q=($('outStockSearch')?.value||'').toLowerCase().trim();
+  const available=stock.filter(x=>Number(x.current_quantity||0)>0 && [x.sku,x.name,x.category,x.location].join(' ').toLowerCase().includes(q));
+  if(!available.length){
+    box.innerHTML='<div class="empty">No available stock matches your search.</div>';
+    return;
+  }
+  box.innerHTML=table(
+    ['Pick','Item','SKU','Available','Weight / Item','Stored In','Location','Quantity to Ship','Batch'],
+    available.map(x=>{
+      const item=items.find(i=>String(i.id)===String(x.item_id));
+      const unit=Number(item?.weight_per_unit_kg||0);
+      const storage=x.storage_type||x.latest_storage_type||item?.storage_type||'-';
+      return [
+        '<input type="checkbox" class="out-pick" data-item-id="'+esc(x.item_id||x.id)+'">',
+        esc(x.name||item?.name||'-'),
+        esc(x.sku||item?.sku||'-'),
+        money(x.current_quantity),
+        unit ? unit.toFixed(3)+' kg' : '-',
+        esc(storage),
+        esc(x.location||item?.location||'-'),
+        '<input class="out-qty" data-item-id="'+esc(x.item_id||x.id)+'" type="number" min="1" max="'+Number(x.current_quantity||0)+'" placeholder="0" style="min-width:90px">',
+        '<input class="out-batch" data-item-id="'+esc(x.item_id||x.id)+'" placeholder="Batch" style="min-width:110px">'
+      ];
+    })
+  );
+}
+
 
 
 /* STOCK MOVEMENTS */
 
 async function addMove(type,form){
+  if(!canWrite()){ notify('Your role cannot change stock',false); return; }
 
-  if(!canWrite()){
+  if(type==='IN'){
+    const name=$('inItemName').value.trim();
+    const qty=Number($('inQty').value||0);
+    if(!name||qty<1){ notify('Please enter an item and quantity.',false); return; }
 
-    notify(
-      'Your role cannot change stock',
-      false
-    );
+    let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
 
-    return;
-  }
-
-
-  const itemId=
-    $(
-      type==='IN'
-        ? 'inItem'
-        : 'outItem'
-    ).value;
-
-
-  const qty=
-    Number(
-      $(
-        type==='IN'
-          ? 'inQty'
-          : 'outQty'
-      ).value
-    );
-
-
-  const org=
-    $(
-      type==='IN'
-        ? 'inOrg'
-        : 'outOrg'
-    ).value||null;
-
-
-  const batch=
-    $(
-      type==='IN'
-        ? 'inBatch'
-        : 'outBatch'
-    ).value||null;
-
-
-  const ref=
-    $(
-      type==='IN'
-        ? 'inRef'
-        : 'outRef'
-    ).value||null;
-
-
-  const notes=
-    $(
-      type==='IN'
-        ? 'inNotes'
-        : 'outNotes'
-    ).value||null;
-
-
-  if(!itemId||qty<1){
-
-    notify(
-      'Please select an item and enter a quantity.',
-      false
-    );
-
-    return;
-  }
-
-
-  if(type==='OUT'){
-
-    const itemRow=
-      stock.find(
-        x=>
-          x.item_id===itemId ||
-          x.id===itemId
-      );
-
-
-    if(
-      itemRow &&
-      qty>
-      Number(
-        itemRow.current_quantity||0
-      )
-    ){
-
-      notify(
-        'Not enough stock available',
-        false
-      );
-
-      return;
+    if(!item){
+      const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
+      const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
+      const next=match ? Number(match[1])+1 : 1;
+      const newItem={
+        sku:'ITM-'+String(next).padStart(4,'0'),
+        name,
+        category:$('inCategory').value||'Food',
+        unit:'units',
+        reorder_level:0,
+        weight_per_unit_kg:Number($('inUnitWeight').value||0),
+        storage_type:$('inStorageType').value||null,
+        location:$('inLocation').value.trim()||null
+      };
+      const created=await sb.from('items').insert(newItem).select('*').single();
+      if(created.error){ notify(created.error.message,false); return; }
+      item=created.data;
     }
 
-  }
+    const unitWeight=Number($('inUnitWeight').value||item.weight_per_unit_kg||0);
+    const enteredTotal=Number($('inTotalWeight').value||0);
+    const totalWeight=enteredTotal || (unitWeight ? qty*unitWeight : 0);
+    const bb=$('inBB').value;
+    let notes=$('inNotes').value.trim();
+    if(bb) notes=(notes ? notes+'\n' : '')+'Best-before: '+bb;
 
+    const {error}=await sb.from('stock_movements').insert({
+      movement_type:'IN',
+      item_id:item.id,
+      quantity:qty,
+      unit_weight_kg:unitWeight||null,
+      total_weight_kg:totalWeight||null,
+      storage_type:$('inStorageType').value||null,
+      user_id:currentUser.id,
+      organisation_id:$('inOrg').value||null,
+      reference:$('inRef').value.trim()||null,
+      batch_ref:$('inBatch').value.trim()||null,
+      notes:notes||null
+    });
+    if(error){ notify(error.message,false); return; }
 
-  const unitWeight=Number($(type==='IN'?'inUnitWeight':'outUnitWeight').value||0);
-  const enteredTotal=Number($(type==='IN'?'inTotalWeight':'outTotalWeight').value||0);
-  const totalWeight=enteredTotal || (unitWeight ? qty*unitWeight : 0);
-  const storageType=$(type==='IN'?'inStorageType':'outStorageType').value || null;
-
-  const {error}=
-    await sb
-      .from('stock_movements')
-      .insert({
-
-        movement_type:type,
-
-        item_id:itemId,
-
-        quantity:qty,
-
-        unit_weight_kg:unitWeight || null,
-
-        total_weight_kg:totalWeight || null,
-
-        storage_type:storageType,
-
-        user_id:currentUser.id,
-
-        organisation_id:org,
-
-        reference:ref,
-
-        batch_ref:batch,
-
-        notes:notes
-
-      });
-
-
-  if(error){
-
-    notify(
-      error.message,
-      false
-    );
-
+    await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_IN',table_name:'stock_movements',details:{item_id:item.id,quantity:qty,reference:$('inRef').value.trim()||null}});
+    form.reset();
+    await refresh();
+    notify('Stock received and added to inventory');
     return;
   }
 
+  const recipient=$('outOrg').value;
+  if(!recipient){ notify('Please select a recipient.',false); return; }
 
-  await sb
-    .from('audit_log')
-    .insert({
+  const picks=[...document.querySelectorAll('.out-pick:checked')];
+  if(!picks.length){ notify('Please pick at least one item to ship.',false); return; }
 
-      user_id:currentUser.id,
+  const rows=[];
+  for(const pick of picks){
+    const id=pick.dataset.itemId;
+    const row=stock.find(x=>String(x.item_id||x.id)===String(id));
+    const qty=Number(document.querySelector('.out-qty[data-item-id="'+CSS.escape(id)+'"]')?.value||0);
+    if(!row || qty<1){ notify('Enter a quantity for every picked item.',false); return; }
+    if(qty>Number(row.current_quantity||0)){ notify('Not enough stock available for '+(row.name||'this item'),false); return; }
+    const item=items.find(i=>String(i.id)===String(row.item_id));
+    const unit=Number(item?.weight_per_unit_kg||0);
+    const batch=document.querySelector('.out-batch[data-item-id="'+CSS.escape(id)+'"]')?.value.trim()||null;
+    rows.push({item_id:row.item_id||id,quantity:qty,unit_weight_kg:unit||null,total_weight_kg:unit?qty*unit:null,storage_type:row.storage_type||row.latest_storage_type||item?.storage_type||null,batch_ref:batch});
+  }
 
-      action:'STOCK_'+type,
-
-      table_name:'stock_movements',
-
-      details:{
-        item_id:itemId,
-        quantity:qty,
-        reference:ref
-      }
-
-    });
-
-
+  const ref=$('outRef').value.trim()||null;
+  const notes=$('outNotes').value.trim()||null;
+  for(const r of rows){
+    const result=await sb.from('stock_movements').insert({movement_type:'OUT',...r,user_id:currentUser.id,organisation_id:recipient,reference:ref,notes});
+    if(result.error){ notify(result.error.message,false); return; }
+  }
+  await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_OUT',table_name:'stock_movements',details:{items:rows.map(r=>({item_id:r.item_id,quantity:r.quantity})),reference:ref,recipient_id:recipient}});
   form.reset();
-
   await refresh();
-
-  notify(
-    'Stock '+
-    type.toLowerCase()+
-    ' recorded'
-  );
-
+  notify(rows.length+' item'+(rows.length===1?'':'s')+' shipped');
 }
+
 
 
 /* NAVIGATION */
@@ -2205,7 +2002,6 @@ function showPage(name){
     stock:'Current Stock',
     in:'Stock In',
     out:'Stock Out',
-    items:'Items',
     organisations:'Donors & Recipients',
     deliveries:'Delivery Notes',
     history:'Audit / Movements',
@@ -2219,190 +2015,20 @@ function showPage(name){
 }
 
 
-/* ITEM EDITOR */
-
-function openItemEditor(){
-
-  if(!canManage()){
-
-    notify(
-      'Manager or Administrator access required',
-      false
-    );
-
-    return;
-  }
-
-
-  $('itemEditor').innerHTML=`
-
-    <form
-      id="itemForm"
-      class="formgrid panel"
-      style="margin:0 0 16px"
-    >
-
-      <div>
-        <label>SKU</label>
-        <input name="sku" id="generatedItemSku" value="Generating..." readonly required>
-        <small class="muted">Automatically generated</small>
-      </div>
-
-      <div>
-        <label>Barcode</label>
-        <input name="barcode">
-      </div>
-
-      <div>
-        <label>Name</label>
-        <input name="name" required>
-      </div>
-
-      <div>
-        <label>Category</label>
-        <select name="category" required>
-          <option value="">Select category...</option>
-          <option value="Food">Food</option>
-          <option value="Non Food">Non Food</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Weight per item (kg)</label>
-        <input name="weight_per_unit_kg" type="number" step="0.001" min="0">
-      </div>
-
-      <div>
-        <label>Stored in</label>
-        <select name="storage_type">
-          <option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Location</label>
-        <input name="location">
-      </div>
-
-      <div class="actions">
-
-        <button
-          type="button"
-          class="btn secondary"
-          onclick="$('itemEditor').innerHTML=''"
-        >
-          Cancel
-        </button>
-
-        <button class="btn primary">
-          Save item
-        </button>
-
-      </div>
-
-    </form>
-  `;
-
-
-  /* Generate the next simple warehouse SKU automatically. */
-  (async()=>{
-    const {data}=await sb
-      .from('items')
-      .select('sku')
-      .like('sku','ITM-%')
-      .order('sku',{ascending:false})
-      .limit(1);
-
-    let next=1;
-    const latest=data&&data[0]&&data[0].sku
-      ? String(data[0].sku).match(/^ITM-(\d+)$/i)
-      : null;
-
-    if(latest) next=Number(latest[1])+1;
-
-    $('generatedItemSku').value=
-      'ITM-'+String(next).padStart(4,'0');
-  })();
-
-
-  $('itemForm').onsubmit=
-    async e=>{
-
-      e.preventDefault();
-
-      let f=
-        new FormData(e.target);
-
-      let obj=
-        Object.fromEntries(f);
-
-      obj.unit='units';
-      obj.reorder_level=0;
-      obj.weight_per_unit_kg=Number(obj.weight_per_unit_kg||0);
-
-
-      const {error}=
-        await sb
-          .from('items')
-          .insert(obj);
-
-
-      if(error){
-
-        notify(
-          error.message,
-          false
-        );
-
-      }else{
-
-        $('itemEditor').innerHTML='';
-
-        await refresh();
-
-        notify(
-          'Item created'
-        );
-
-      }
-
-    };
-
-}
-
-
 /* ORGANISATION EDITOR */
 
-function openOrgEditor(orgId=null){
+function openOrgEditor(){
 
   if(!canWrite()){
 
     notify(
-      'Your role cannot create or edit organisations',
+      'Your role cannot create organisations',
       false
     );
 
     return;
   }
 
-  const existing=orgId
-    ? orgs.find(x=>String(x.id)===String(orgId))
-    : null;
-
-  if(orgId && !existing){
-    notify('Organisation could not be found',false);
-    return;
-  }
-
-  const title=existing
-    ? 'Edit Organisation'
-    : 'New Organisation';
-
-  const submitText=existing
-    ? 'Save changes'
-    : 'Save organisation';
-
-  const val=name=>existing ? esc(existing[name]||'') : '';
 
   $('orgEditor').innerHTML=`
 
@@ -2412,13 +2038,9 @@ function openOrgEditor(orgId=null){
       style="margin:0 0 16px"
     >
 
-      <input type="hidden" name="id" value="${existing?esc(existing.id):''}">
-
-      <h3 class="full" style="margin:0">${title}</h3>
-
       <div>
         <label>Name</label>
-        <input name="name" required value="${val('name')}">
+        <input name="name" required>
       </div>
 
       <div>
@@ -2426,10 +2048,10 @@ function openOrgEditor(orgId=null){
 
         <select name="type">
 
-          <option ${existing?.type==='DONOR'?'selected':''}>DONOR</option>
-          <option ${existing?.type==='RECIPIENT'?'selected':''}>RECIPIENT</option>
-          <option ${existing?.type==='PARTNER'?'selected':''}>PARTNER</option>
-          <option ${existing?.type==='SUPPLIER'?'selected':''}>SUPPLIER</option>
+          <option>DONOR</option>
+          <option>RECIPIENT</option>
+          <option>PARTNER</option>
+          <option>SUPPLIER</option>
 
         </select>
 
@@ -2437,27 +2059,27 @@ function openOrgEditor(orgId=null){
 
       <div>
         <label>Contact</label>
-        <input name="contact_name" value="${val('contact_name')}">
+        <input name="contact_name">
       </div>
 
       <div>
         <label>Phone</label>
-        <input name="phone" value="${val('phone')}">
+        <input name="phone">
       </div>
 
       <div>
         <label>Email</label>
-        <input name="email" value="${val('email')}">
+        <input name="email">
       </div>
 
       <div>
         <label>Postcode</label>
-        <input name="postcode" value="${val('postcode')}">
+        <input name="postcode">
       </div>
 
       <div class="full">
         <label>Address</label>
-        <input name="address" value="${val('address')}">
+        <input name="address">
       </div>
 
       <div class="full">
@@ -2468,7 +2090,7 @@ function openOrgEditor(orgId=null){
 
       <div class="full">
         <label>Notes</label>
-        <textarea name="notes">${val('notes')}</textarea>
+        <textarea name="notes"></textarea>
       </div>
 
       <div class="full actions">
@@ -2482,7 +2104,7 @@ function openOrgEditor(orgId=null){
         </button>
 
         <button class="btn primary">
-          ${submitText}
+          Save organisation
         </button>
 
       </div>
@@ -2496,27 +2118,22 @@ function openOrgEditor(orgId=null){
 
       e.preventDefault();
 
-      const formData=
+      let obj=
         Object.fromEntries(
           new FormData(e.target)
         );
 
-      const id=formData.id;
-      delete formData.id;
 
-      const result=id
-        ? await sb
-            .from('organisations')
-            .update(formData)
-            .eq('id',id)
-        : await sb
-            .from('organisations')
-            .insert(formData);
+      const {error}=
+        await sb
+          .from('organisations')
+          .insert(obj);
 
-      if(result.error){
+
+      if(error){
 
         notify(
-          result.error.message,
+          error.message,
           false
         );
 
@@ -2527,9 +2144,7 @@ function openOrgEditor(orgId=null){
         await refresh();
 
         notify(
-          id
-            ? 'Organisation updated'
-            : 'Organisation created'
+          'Organisation created'
         );
 
       }
@@ -3015,13 +2630,6 @@ $('historyTable').addEventListener('click',function(e){
   viewHistoryDelivery(btn.dataset.viewDelivery);
 });
 
-$('orgsTable').addEventListener('click',function(e){
-  const btn=e.target.closest('[data-edit-org]');
-  if(!btn) return;
-  openOrgEditor(btn.dataset.editOrg);
-});
-
-
 $('loginForm')
   .addEventListener(
     'submit',
@@ -3085,10 +2693,6 @@ $('outForm').onsubmit=
   };
 
 
-$('newItem')
-  .onclick=
-    openItemEditor;
-
 
 $('newOrg')
   .onclick=
@@ -3100,53 +2704,7 @@ $('newDelivery')
     openDeliveryEditor;
 
 
-$('stockSearch').oninput=
-  e=>{
-
-    const q=
-      e.target.value
-        .toLowerCase();
-
-
-    const filtered=
-      stock.filter(
-        x=>
-          [
-            x.sku,
-            x.name,
-            x.category,
-            x.location
-          ]
-          .join(' ')
-          .toLowerCase()
-          .includes(q)
-      );
-
-
-    $('stockTable').innerHTML=
-      table(
-        [
-          'SKU',
-          'Item',
-          'Category',
-          'Location',
-          'Qty',
-          'Reorder'
-        ],
-
-        filtered.map(
-          x=>[
-            esc(x.sku),
-            esc(x.name),
-            esc(x.category),
-            esc(x.location||'—'),
-            money(x.current_quantity),
-            money(x.reorder_level)
-          ]
-        )
-      );
-
-  };
+$('outStockSearch').oninput=renderOutStock;
 
 
 /* START */
