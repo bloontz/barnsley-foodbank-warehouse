@@ -494,6 +494,10 @@ form.formgrid{
         Stock Out
       </button>
 
+      <button data-page="convert">
+        Convert
+      </button>
+
       <button data-page="organisations">
         Donors & Recipients
       </button>
@@ -674,6 +678,60 @@ form.formgrid{
 
       </div>
     </section>
+
+
+    <!-- CONVERT STOCK -->
+    <section id="page-convert" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Convert Stock</h2>
+        <p style="color:#68766e;margin-top:-6px">Convert stock already recorded in the warehouse into different item types. The original stock is removed and the new items are added, with a conversion reference linking the movement together.</p>
+
+        <form id="convertForm">
+          <div class="formgrid">
+            <div>
+              <label>Stock to convert</label>
+              <select id="convertSourceItem" required></select>
+            </div>
+            <div>
+              <label>Quantity to convert</label>
+              <input id="convertSourceQty" type="number" min="1" required>
+            </div>
+            <div>
+              <label>Conversion reference</label>
+              <input id="convertRef" readonly placeholder="Generated automatically">
+            </div>
+            <div>
+              <label>Source batch / reference (optional)</label>
+              <input id="convertSourceBatch" placeholder="e.g. BATCH-12 or pallet reference">
+            </div>
+            <div class="full">
+              <label>New stock created from this conversion</label>
+              <div id="convertLines"></div>
+              <button type="button" id="addConvertLine" class="btn" style="margin-top:10px">+ Add converted item</button>
+            </div>
+            <div class="full">
+              <label>Conversion notes</label>
+              <textarea id="convertNotes" placeholder="Optional notes about how the pallet / stock was broken down"></textarea>
+            </div>
+          </div>
+
+          <div class="panel" style="margin:16px 0 0;background:#f7faf8">
+            <b>Conversion summary</b>
+            <div id="convertSummary" style="margin-top:8px;color:#68766e">Select stock and add the items that will be created.</div>
+          </div>
+
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Convert stock</button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+
+
+    <datalist id="convertItemList"></datalist>
 
 
     <!-- ORGANISATIONS -->
@@ -1195,7 +1253,7 @@ async function loadUser(user){
   await refresh();
 
   const savedPage=localStorage.getItem('warehouseLastPage') || 'dashboard';
-  const validPages=['dashboard','stock','in','out','organisations','deliveries','history','users'];
+  const validPages=['dashboard','stock','in','out','convert','organisations','deliveries','history','users'];
   showPage(validPages.includes(savedPage) ? savedPage : 'dashboard');
 
 }
@@ -1665,9 +1723,9 @@ function renderHistory(profiles=[]){
       const isIn=g.movement_type==='IN';
       return [
         new Date(g.created_at).toLocaleDateString(),
-        badge(isIn?'Received':'Delivered',isIn),
-        esc(isIn ? g.organisation_name : 'Warehouse'),
-        esc(isIn ? 'Warehouse' : g.organisation_name),
+        badge(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? (isIn?'Converted in':'Converted out') : (isIn?'Received':'Delivered'),isIn),
+        esc(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? 'Warehouse conversion' : (isIn ? g.organisation_name : 'Warehouse')),
+        esc(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? 'Warehouse conversion' : (isIn ? 'Warehouse' : g.organisation_name)),
         money(g.lines.length),
         money(g.quantity),
         g.weight ? g.weight.toFixed(3)+' kg' : '-',
@@ -1765,11 +1823,12 @@ function viewHistoryDelivery(key){
   if(!g || !box) return;
 
   const isIn=g.movement_type==='IN';
+  const isConversion=String(g.reference||'').toUpperCase().startsWith('CONV-');
   box.classList.remove('hidden');
   box.innerHTML=
     '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">'+
-      '<div><h3 style="margin:0">'+esc(isIn?'Received delivery':'Delivered delivery')+'</h3>'+
-      '<div style="color:#6a766f;margin-top:4px">'+esc(new Date(g.created_at).toLocaleDateString())+' · '+esc(isIn?g.organisation_name:'Warehouse')+' → '+esc(isIn?'Warehouse':g.organisation_name)+'</div></div>'+
+      '<div><h3 style="margin:0">'+esc(isConversion?(isIn?'Converted stock created':'Stock converted out'):(isIn?'Received delivery':'Delivered delivery'))+'</h3>'+
+      '<div style="color:#6a766f;margin-top:4px">'+esc(new Date(g.created_at).toLocaleDateString())+' · '+esc(isConversion?'Warehouse conversion':(isIn?g.organisation_name:'Warehouse'))+' → '+esc(isConversion?'Warehouse conversion':(isIn?'Warehouse':g.organisation_name))+'</div></div>'+
       '<button type="button" class="btn secondary" id="closeDeliveryDetail">Close</button>'+
     '</div>'+
     '<div class="tablewrap">'+
@@ -1944,6 +2003,18 @@ async function nextStockInNumbers(prefix,count){
     if(match) max=Math.max(max,Number(match[1]));
   });
   return Array.from({length:count},(_,i)=>prefix+'-'+(max+i+1));
+}
+
+async function nextConversionNumber(){
+  const {data}=await sb.from('stock_movements')
+    .select('reference')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const match=String(m.reference||'').match(/^CONV-(\d+)$/i);
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return 'CONV-'+(max+1);
 }
 
 function stockInLineHtml(){
@@ -2173,6 +2244,255 @@ async function addMove(type,form){
 
 
 
+/* CONVERT STOCK */
+
+function convertLineHtml(){
+  return `
+    <div class="convert-line panel" style="margin:0 0 10px;background:#fff;border:1px solid #dce5df">
+      <div class="formgrid">
+        <div>
+          <label>Item / Description</label>
+          <input class="cl-name" list="convertItemList" placeholder="Type item name" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select class="cl-category">
+            <option value="Food">Food</option>
+            <option value="Non Food">Non Food</option>
+          </select>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input class="cl-qty" type="number" min="1" required>
+        </div>
+        <div>
+          <label>Weight per item (kg)</label>
+          <input class="cl-unit" type="number" min="0" step="0.001">
+        </div>
+        <div>
+          <label>Total weight (kg)</label>
+          <input class="cl-total" type="number" readonly>
+        </div>
+        <div>
+          <label>Storage type</label>
+          <select class="cl-storage">
+            <option value="Box">Box</option>
+            <option value="Tray">Tray</option>
+            <option value="Pallet">Pallet</option>
+            <option value="Pallet Cage">Pallet Cage</option>
+            <option value="Bag">Bag</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Warehouse location</label>
+          <input class="cl-location" placeholder="e.g. A-01">
+        </div>
+        <div>
+          <label>Batch reference</label>
+          <input class="cl-batch" readonly placeholder="Generated automatically">
+        </div>
+        <div class="actions" style="align-self:end">
+          <button type="button" class="btn secondary remove-convert-line">Remove</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calculateConvertLineTotal(line){
+  const qty=Number(line.querySelector('.cl-qty')?.value||0);
+  const unit=Number(line.querySelector('.cl-unit')?.value||0);
+  const total=line.querySelector('.cl-total');
+  if(total) total.value=(qty>0 && unit>0)?(qty*unit).toFixed(3):'';
+}
+
+function refreshConvertLineButtons(){
+  const lines=[...document.querySelectorAll('.convert-line')];
+  lines.forEach(line=>{
+    const btn=line.querySelector('.remove-convert-line');
+    if(btn) btn.style.display=lines.length>1?'inline-block':'none';
+  });
+}
+
+function addConvertLine(){
+  const box=$('convertLines');
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend',convertLineHtml());
+  const line=box.lastElementChild;
+  const name=line?.querySelector('.cl-name');
+  if(name){
+    name.addEventListener('change',()=>{
+      const found=items.find(i=>String(i.name||'').trim().toLowerCase()===String(name.value||'').trim().toLowerCase());
+      if(found){
+        const unit=line.querySelector('.cl-unit');
+        const cat=line.querySelector('.cl-category');
+        const storage=line.querySelector('.cl-storage');
+        const loc=line.querySelector('.cl-location');
+        if(unit && !unit.value && found.weight_per_unit_kg) unit.value=found.weight_per_unit_kg;
+        if(cat && found.category) cat.value=found.category;
+        if(storage && found.storage_type) storage.value=found.storage_type;
+        if(loc && found.location) loc.value=found.location;
+        calculateConvertLineTotal(line);
+        renderConvertSummary();
+      }
+    });
+  }
+  refreshConvertLineButtons();
+  assignConvertBatches();
+}
+
+async function assignConvertBatches(){
+  const lines=[...document.querySelectorAll('.convert-line')];
+  const blanks=lines.filter(l=>!l.querySelector('.cl-batch')?.value);
+  if(!blanks.length) return;
+  const nums=await nextStockInNumbers('BATCH',blanks.length);
+  blanks.forEach((line,i)=>{
+    const input=line.querySelector('.cl-batch');
+    if(input && !input.value) input.value=nums[i];
+  });
+}
+
+async function prepareConvertForm(){
+  const select=$('convertSourceItem');
+  if(!select) return;
+  const list=$('convertItemList');
+  if(list) list.innerHTML=items.map(i=>'<option value="'+esc(i.name||'')+'"></option>').join('');
+  const rows=stock.filter(x=>Number(x.current_quantity||0)>0);
+  select.innerHTML='<option value="">Select stock</option>'+rows.map(x=>'<option value="'+esc(x.item_id||x.id)+'">'+esc(x.name||'')+' — '+money(x.current_quantity)+' available'+(x.location?' — '+esc(x.location):'')+'</option>').join('');
+  $('convertRef').value=await nextConversionNumber();
+  const box=$('convertLines');
+  if(box && !box.children.length) addConvertLine();
+  renderConvertSummary();
+}
+
+function renderConvertSummary(){
+  const sourceId=$('convertSourceItem')?.value||'';
+  const source=stock.find(x=>String(x.item_id||x.id)===String(sourceId));
+  const qty=Number($('convertSourceQty')?.value||0);
+  const lines=[...document.querySelectorAll('.convert-line')];
+  const outputs=lines.reduce((n,l)=>n+Number(l.querySelector('.cl-qty')?.value||0),0);
+  const weight=lines.reduce((n,l)=>n+Number(l.querySelector('.cl-total')?.value||0),0);
+  const sourceText=source ? esc(source.name)+' — '+money(qty)+' of '+money(source.current_quantity)+' units' : 'No source stock selected';
+  const outputText=outputs ? money(outputs)+' units created' : 'No converted items entered yet';
+  const weightText=weight ? ' / '+weight.toFixed(3)+' kg' : '';
+  const box=$('convertSummary');
+  if(box) box.innerHTML='<b>From:</b> '+sourceText+'<br><b>To:</b> '+outputText+weightText;
+}
+
+async function convertStock(e){
+  e.preventDefault();
+  if(!canWrite()){ notify('Your role cannot change stock',false); return; }
+  const sourceId=$('convertSourceItem').value;
+  const sourceQty=Number($('convertSourceQty').value||0);
+  const source=stock.find(x=>String(x.item_id||x.id)===String(sourceId));
+  if(!source){ notify('Please select the stock you want to convert.',false); return; }
+  if(sourceQty<1){ notify('Enter the quantity being converted.',false); return; }
+  if(sourceQty>Number(source.current_quantity||0)){ notify('You cannot convert more than the available stock.',false); return; }
+
+  const lines=[...document.querySelectorAll('.convert-line')];
+  if(!lines.length){ notify('Please add at least one converted item.',false); return; }
+
+  const outputRows=[];
+  for(const line of lines){
+    const name=line.querySelector('.cl-name')?.value.trim()||'';
+    const qty=Number(line.querySelector('.cl-qty')?.value||0);
+    const unitEntered=Number(line.querySelector('.cl-unit')?.value||0);
+    if(!name || qty<1){ notify('Please complete every converted item line.',false); return; }
+
+    let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
+    const unit=unitEntered || Number(item?.weight_per_unit_kg||0);
+
+    if(!item){
+      const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
+      const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
+      const next=match ? Number(match[1])+1 : 1;
+      const created=await sb.from('items').insert({
+        sku:'ITM-'+String(next).padStart(4,'0'),
+        name,
+        category:line.querySelector('.cl-category')?.value||'Food',
+        unit:'units',
+        reorder_level:0,
+        weight_per_unit_kg:unit||0,
+        storage_type:line.querySelector('.cl-storage')?.value||null,
+        location:line.querySelector('.cl-location')?.value.trim()||null
+      }).select('*').single();
+      if(created.error){ notify(created.error.message,false); return; }
+      item=created.data;
+    }
+
+    outputRows.push({
+      item,
+      quantity:qty,
+      unit,
+      totalWeight:(unit&&qty)?unit*qty:0,
+      storage:line.querySelector('.cl-storage')?.value||null,
+      location:line.querySelector('.cl-location')?.value.trim()||null,
+      batch:line.querySelector('.cl-batch')?.value.trim()||null
+    });
+  }
+
+  const ref=$('convertRef').value.trim() || await nextConversionNumber();
+  const sourceBatch=$('convertSourceBatch').value.trim();
+  const notesBase=$('convertNotes').value.trim();
+  const sourceNotes='Converted from '+(source.name||'stock')+' quantity '+sourceQty+(sourceBatch?' source batch/reference '+sourceBatch:'')+'. Conversion reference '+ref+'.';
+
+  const sourceMovement={
+    movement_type:'OUT',
+    item_id:source.item_id||source.id,
+    quantity:sourceQty,
+    unit_weight_kg:null,
+    total_weight_kg:null,
+    storage_type:source.storage_type||source.latest_storage_type||null,
+    user_id:currentUser.id,
+    organisation_id:null,
+    reference:ref,
+    batch_ref:sourceBatch||null,
+    notes:(notesBase?notesBase+'\n':'')+sourceNotes
+  };
+
+  const sourceResult=await sb.from('stock_movements').insert(sourceMovement);
+  if(sourceResult.error){ notify(sourceResult.error.message,false); return; }
+
+  for(const row of outputRows){
+    const notes=(notesBase?notesBase+'\n':'')+'Created by conversion '+ref+' from '+(source.name||'stock')+' quantity '+sourceQty+(sourceBatch?' source batch/reference '+sourceBatch:'')+(row.location?'\nWarehouse location: '+row.location:'');
+    const result=await sb.from('stock_movements').insert({
+      movement_type:'IN',
+      item_id:row.item.id,
+      quantity:row.quantity,
+      unit_weight_kg:row.unit||null,
+      total_weight_kg:row.totalWeight||null,
+      storage_type:row.storage,
+      user_id:currentUser.id,
+      organisation_id:null,
+      reference:ref,
+      batch_ref:row.batch||null,
+      notes
+    });
+    if(result.error){ notify(result.error.message,false); return; }
+  }
+
+  await sb.from('audit_log').insert({
+    user_id:currentUser.id,
+    action:'STOCK_CONVERT',
+    table_name:'stock_movements',
+    details:{
+      conversion_reference:ref,
+      source_item_id:source.item_id||source.id,
+      source_item_name:source.name,
+      source_quantity:sourceQty,
+      source_batch_reference:sourceBatch||null,
+      outputs:outputRows.map(row=>({item_id:row.item.id,item_name:row.item.name,quantity:row.quantity,total_weight_kg:row.totalWeight,batch_ref:row.batch}))
+    }
+  });
+
+  $('convertForm').reset();
+  $('convertLines').innerHTML='';
+  await refresh();
+  await prepareConvertForm();
+  notify('Stock converted successfully — '+ref);
+}
+
+
 /* NAVIGATION */
 
 function showPage(name){
@@ -2207,6 +2527,7 @@ function showPage(name){
     stock:'Current Stock',
     in:'Stock In',
     out:'Stock Out',
+    convert:'Convert Stock',
     organisations:'Donors & Recipients',
     deliveries:'Delivery Notes',
     history:'Audit / Movements',
@@ -2216,6 +2537,8 @@ function showPage(name){
 
   $('pageTitle').textContent=
     titles[name]||name;
+
+  if(name==='convert') prepareConvertForm();
 
 }
 
@@ -2910,6 +3233,31 @@ $('outForm').onsubmit=
     );
   };
 
+
+$('convertForm').onsubmit=convertStock;
+$('addConvertLine').onclick=addConvertLine;
+$('convertSourceItem').addEventListener('change',()=>{
+  const source=stock.find(x=>String(x.item_id||x.id)===String($('convertSourceItem').value||''));
+  $('convertSourceQty').max=source?String(Number(source.current_quantity||0)):'';
+  $('convertSourceQty').value='';
+  renderConvertSummary();
+});
+$('convertSourceQty').addEventListener('input',renderConvertSummary);
+$('convertLines').addEventListener('input',e=>{
+  const line=e.target.closest('.convert-line');
+  if(line){ calculateConvertLineTotal(line); renderConvertSummary(); }
+});
+$('convertLines').addEventListener('change',e=>{
+  const line=e.target.closest('.convert-line');
+  if(line){ calculateConvertLineTotal(line); renderConvertSummary(); }
+});
+$('convertLines').addEventListener('click',e=>{
+  const btn=e.target.closest('.remove-convert-line');
+  if(!btn) return;
+  btn.closest('.convert-line')?.remove();
+  refreshConvertLineButtons();
+  renderConvertSummary();
+});
 
 
 $('newOrg')
