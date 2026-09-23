@@ -1587,10 +1587,11 @@ function renderAll(profiles=[]){
 
       const actions = role()==='ADMIN' && p.id!==currentUser.id
         ? '<div style=\"display:flex;gap:6px;flex-wrap:wrap\">'+
+          '<button type=\"button\" class=\"btn secondary\" data-user-edit=\"'+esc(p.id)+'\">Edit</button>'+ 
           '<button type=\"button\" class=\"btn secondary\" data-user-active=\"'+esc(p.id)+'\" data-active=\"'+(p.active?'true':'false')+'\">'+
           (p.active?'Make inactive':'Make active')+
-          '</button>'+
-          '<button type=\"button\" class=\"btn secondary\" data-user-reset=\"'+esc(p.id)+'\">Reset password</button>'+
+          '</button>'+ 
+          '<button type=\"button\" class=\"btn secondary\" data-user-reset=\"'+esc(p.id)+'\">Reset password</button>'+ 
           (p.role!=='ADMIN'
             ? '<button type=\"button\" class=\"btn danger\" data-user-delete=\"'+esc(p.id)+'\">Remove</button>'
             : '')+
@@ -1626,6 +1627,9 @@ function renderAll(profiles=[]){
     );
 
   if(role()==='ADMIN'){
+    document.querySelectorAll('[data-user-edit]').forEach(btn=>{
+      btn.onclick=()=>editUser(btn.dataset.userEdit);
+    });
     document.querySelectorAll('[data-user-active]').forEach(btn=>{
       btn.onclick=()=>adminSetUserActive(btn.dataset.userActive,btn.dataset.active!=='true');
     });
@@ -2769,6 +2773,93 @@ function openOrgEditor(){
 
 /* USER ADMINISTRATION */
 
+
+async function editUser(userId){
+  if(role()!=='ADMIN') return;
+
+  $('userEditor').innerHTML=`
+    <div class="panel" style="margin:16px 0">
+      <h3>Edit User</h3>
+      <div id="editUserMessage" class="error hidden"></div>
+      <form id="editUserForm">
+        <div class="grid2">
+          <div>
+            <label>Full name</label>
+            <input id="editUserFullName" required>
+          </div>
+          <div>
+            <label>Email address</label>
+            <input id="editUserEmail" type="email" required>
+          </div>
+          <div>
+            <label>Role</label>
+            <select id="editUserRole" required>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+              <option value="READ_ONLY">READ_ONLY</option>
+            </select>
+          </div>
+          <div>
+            <label>Account status</label>
+            <select id="editUserActive" required>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button type="button" class="btn secondary" onclick="closeUserEditor()">Cancel</button>
+          <button type="submit" class="btn primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+      body:{action:'get_user',user_id:userId}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to load user');
+    const u=result.user;
+    $('editUserFullName').value=u.full_name||'';
+    $('editUserEmail').value=u.email||'';
+    $('editUserRole').value=u.role||'USER';
+    $('editUserActive').value=u.active?'true':'false';
+  }catch(error){
+    showMessage('editUserMessage',error.message||'Unable to load user');
+    return;
+  }
+
+  $('editUserForm').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;
+    btn.textContent='Saving...';
+    try{
+      const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+        body:{
+          action:'update_user',
+          user_id:userId,
+          full_name:$('editUserFullName').value.trim(),
+          email:$('editUserEmail').value.trim(),
+          role:$('editUserRole').value,
+          active:$('editUserActive').value==='true'
+        }
+      });
+      if(error) throw error;
+      if(!result?.success) throw new Error(result?.error||'Unable to update user');
+      closeUserEditor();
+      await refresh();
+      notify('User details updated');
+    }catch(error){
+      notify(error.message||'Unable to update user',false);
+      btn.disabled=false;
+      btn.textContent='Save changes';
+    }
+  };
+}
+
 function openUserEditor(){
 
   if(role()!=='ADMIN'){
@@ -2860,7 +2951,7 @@ async function adminSetUserActive(userId,active){
   if(!confirm('Are you sure you want to '+actionText+'?')) return;
 
   try{
-    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
       body:{action:'set_active',user_id:userId,active}
     });
     if(error) throw error;
@@ -2890,7 +2981,7 @@ async function adminResetUserPassword(userId){
   }
 
   try{
-    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
       body:{action:'reset_password',user_id:userId,password}
     });
     if(error) throw error;
@@ -2907,7 +2998,7 @@ async function adminRemoveUser(userId){
   if(!confirm('Remove this user permanently? This cannot be undone.')) return;
 
   try{
-    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
       body:{action:'delete',user_id:userId}
     });
     if(error) throw error;
