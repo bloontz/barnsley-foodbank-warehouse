@@ -510,7 +510,7 @@ form.formgrid{
         Audit / Movements
       </button>
 
-      <button data-page="users" id="usersNav">
+      <button data-page="users" id="usersNav" class="hidden">
         Users
       </button>
 
@@ -1585,6 +1585,18 @@ function renderAll(profiles=[]){
             ? 'READ ONLY'
             : 'USER';
 
+      const actions = role()==='ADMIN' && p.id!==currentUser.id
+        ? '<div style=\"display:flex;gap:6px;flex-wrap:wrap\">'+
+          '<button type=\"button\" class=\"btn secondary\" data-user-active=\"'+esc(p.id)+'\" data-active=\"'+(p.active?'true':'false')+'\">'+
+          (p.active?'Make inactive':'Make active')+
+          '</button>'+
+          '<button type=\"button\" class=\"btn secondary\" data-user-reset=\"'+esc(p.id)+'\">Reset password</button>'+
+          (p.role!=='ADMIN'
+            ? '<button type=\"button\" class=\"btn danger\" data-user-delete=\"'+esc(p.id)+'\">Remove</button>'
+            : '')+
+          '</div>'
+        : '-';
+
       return [
 
         esc(p.full_name),
@@ -1595,7 +1607,7 @@ function renderAll(profiles=[]){
           ? 'Active'
           : 'Inactive',
 
-        esc(p.id)
+        actions
 
       ];
 
@@ -1608,15 +1620,31 @@ function renderAll(profiles=[]){
         'Name',
         'Role',
         'Status',
-        'User ID'
+        'Actions'
       ],
       userRows
     );
 
   if(role()==='ADMIN'){
+    document.querySelectorAll('[data-user-active]').forEach(btn=>{
+      btn.onclick=()=>adminSetUserActive(btn.dataset.userActive,btn.dataset.active!=='true');
+    });
+    document.querySelectorAll('[data-user-reset]').forEach(btn=>{
+      btn.onclick=()=>adminResetUserPassword(btn.dataset.userReset);
+    });
+    document.querySelectorAll('[data-user-delete]').forEach(btn=>{
+      btn.onclick=()=>adminRemoveUser(btn.dataset.userDelete);
+    });
+  }
+
+  const usersNav=$('usersNav');
+
+  if(role()==='ADMIN'){
+    usersNav.classList.remove('hidden');
     $('userAdminControls').innerHTML=
       '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
   }else{
+    usersNav.classList.add('hidden');
     $('userAdminControls').innerHTML='';
     $('userEditor').innerHTML='';
   }
@@ -2550,6 +2578,10 @@ async function convertStock(e){
 
 function showPage(name){
 
+  if(name==='users' && role()!=='ADMIN'){
+    name='dashboard';
+  }
+
   localStorage.setItem('warehouseLastPage',name);
 
   document
@@ -2819,6 +2851,72 @@ function openUserEditor(){
 
 function closeUserEditor(){
   $('userEditor').innerHTML='';
+}
+
+async function adminSetUserActive(userId,active){
+  if(role()!=='ADMIN') return;
+
+  const actionText=active?'make this user active':'make this user inactive';
+  if(!confirm('Are you sure you want to '+actionText+'?')) return;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+      body:{action:'set_active',user_id:userId,active}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to update user');
+    await refresh();
+    notify(active?'User made active':'User made inactive');
+  }catch(error){
+    notify(error.message||'Unable to update user',false);
+  }
+}
+
+async function adminResetUserPassword(userId){
+  if(role()!=='ADMIN') return;
+
+  const password=prompt('Enter the new password for this user (minimum 8 characters):');
+  if(password===null) return;
+  if(password.length<8){
+    notify('Password must be at least 8 characters',false);
+    return;
+  }
+
+  const confirmation=prompt('Re-enter the new password to confirm:');
+  if(confirmation===null) return;
+  if(password!==confirmation){
+    notify('The passwords do not match',false);
+    return;
+  }
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+      body:{action:'reset_password',user_id:userId,password}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to reset password');
+    notify('Password reset successfully');
+  }catch(error){
+    notify(error.message||'Unable to reset password',false);
+  }
+}
+
+async function adminRemoveUser(userId){
+  if(role()!=='ADMIN') return;
+
+  if(!confirm('Remove this user permanently? This cannot be undone.')) return;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user',{
+      body:{action:'delete',user_id:userId}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to remove user');
+    await refresh();
+    notify('User removed');
+  }catch(error){
+    notify(error.message||'Unable to remove user',false);
+  }
 }
 
 
