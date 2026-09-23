@@ -651,8 +651,8 @@ form.formgrid{
               <select id="outOrg" required></select>
             </div>
             <div>
-              <label>Reference / Delivery No.</label>
-              <input id="outRef">
+              <label>Reference (optional)</label>
+              <input id="outRef" placeholder="Optional reference">
             </div>
             <div class="full">
               <label>Notes</label>
@@ -763,13 +763,7 @@ form.formgrid{
 
         <h2>Delivery Notes</h2>
 
-        <div class="toolbar">
-          <button id="newDelivery" class="btn primary">
-            + New Delivery Note
-          </button>
-        </div>
-
-        <div id="deliveryEditor"></div>
+        <p style="color:#68766e;margin-top:-6px">Delivery notes are generated automatically when stock is recorded as Stock Out.</p>
 
         <div id="deliveriesTable" class="tablewrap"></div>
 
@@ -1573,10 +1567,7 @@ function renderAll(profiles=[]){
 
           '<button type="button" class="btn secondary" onclick="printDelivery(\''+
           esc(d.id)+
-          '\')">Print</button>'+
-          (d.status==='DRAFT' && canWrite()
-            ? ' <button type="button" class="btn danger" data-cancel-delivery="'+esc(d.id)+'">Cancel Draft</button>'
-            : '')
+          '\')">Print</button>'
 
         ];
 
@@ -2233,16 +2224,75 @@ async function addMove(type,form){
     rows.push({item_id:row.item_id||id,quantity:qty,unit_weight_kg:unit||null,total_weight_kg:unit?qty*unit:null,storage_type:row.storage_type||row.latest_storage_type||item?.storage_type||null,batch_ref:batch});
   }
 
-  const ref=$('outRef').value.trim()||null;
   const notes=$('outNotes').value.trim()||null;
-  for(const r of rows){
-    const result=await sb.from('stock_movements').insert({movement_type:'OUT',...r,user_id:currentUser.id,organisation_id:recipient,reference:ref,notes});
-    if(result.error){ notify(result.error.message,false); return; }
+
+  // Generate the delivery number automatically.
+  const today=new Date().toISOString().slice(0,10);
+  const prefix='DN-'+today.replaceAll('-','')+'-';
+  const {data:existingNotes,error:notesLookupError}=await sb
+    .from('delivery_notes')
+    .select('delivery_number')
+    .like('delivery_number',prefix+'%');
+  if(notesLookupError){ notify(notesLookupError.message,false); return; }
+  let next=1;
+  (existingNotes||[]).forEach(d=>{
+    const m=String(d.delivery_number||'').match(new RegExp('^'+prefix.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\d+)$'));
+    if(m) next=Math.max(next,Number(m[1])+1);
+  });
+  const deliveryNumber=prefix+String(next).padStart(4,'0');
+  const reference=$('outRef').value.trim()||deliveryNumber;
+
+  // Create the delivery note first so every stock-out shipment has one.
+  const {data:delivery,error:deliveryError}=await sb
+    .from('delivery_notes')
+    .insert({
+      delivery_number:deliveryNumber,
+      delivery_date:today,
+      recipient_id:recipient,
+      delivery_method:'Van',
+      reference,
+      notes,
+      created_by:currentUser.id,
+      status:'COMPLETED',
+      dispatched_date:today
+    })
+    .select('id')
+    .single();
+  if(deliveryError || !delivery){
+    notify(deliveryError?.message||'Unable to create delivery note',false);
+    return;
   }
-  await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_OUT',table_name:'stock_movements',details:{items:rows.map(r=>({item_id:r.item_id,quantity:r.quantity})),reference:ref,recipient_id:recipient}});
+
+  for(const r of rows){
+    const result=await sb.from('stock_movements').insert({movement_type:'OUT',...r,user_id:currentUser.id,organisation_id:recipient,reference,notes});
+    if(result.error){
+      await sb.from('delivery_notes').delete().eq('id',delivery.id);
+      notify(result.error.message,false);
+      return;
+    }
+  }
+
+  const lines=rows.map((r,index)=>({
+    delivery_note_id:delivery.id,
+    item_id:r.item_id,
+    quantity:r.quantity,
+    weight_per_item_kg:r.unit_weight_kg,
+    total_weight_kg:r.total_weight_kg,
+    storage_type:r.storage_type,
+    batch_reference:r.batch_ref,
+    line_number:index+1
+  }));
+  const {error:lineError}=await sb.from('delivery_note_items').insert(lines);
+  if(lineError){
+    await sb.from('delivery_notes').delete().eq('id',delivery.id);
+    notify(lineError.message,false);
+    return;
+  }
+
+  await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_OUT',table_name:'stock_movements',details:{delivery_note_id:delivery.id,delivery_number:deliveryNumber,items:rows.map(r=>({item_id:r.item_id,quantity:r.quantity})),reference,recipient_id:recipient}});
   form.reset();
   await refresh();
-  notify(rows.length+' item'+(rows.length===1?'':'s')+' shipped');
+  notify(rows.length+' item'+(rows.length===1?'':'s')+' shipped — delivery note '+deliveryNumber+' created');
 }
 
 
@@ -2772,268 +2822,7 @@ function closeUserEditor(){
 }
 
 
-/* DELIVERY EDITOR */
-
-function openDeliveryEditor(){
-
-  if(!canWrite()){
-
-    notify(
-      'Your role cannot create delivery notes',
-      false
-    );
-
-    return;
-  }
-
-
-  const today=
-    new Date()
-      .toISOString()
-      .slice(0,10);
-
-
-  const number=
-    'DN-'+
-    today.replaceAll('-','')+
-    '-'+
-    String(
-      deliveries.length+1
-    ).padStart(4,'0');
-
-
-  $('deliveryEditor').innerHTML=`
-
-    <form
-      id="deliveryForm"
-      class="formgrid panel"
-      style="margin:0 0 16px"
-    >
-
-      <div>
-        <label>Delivery Note No.</label>
-        <input
-          name="delivery_number"
-          value="${number}"
-          required
-        >
-      </div>
-
-      <div>
-        <label>Date</label>
-        <input
-          name="delivery_date"
-          type="date"
-          value="${today}"
-          required
-        >
-      </div>
-
-      <div>
-        <label>Recipient</label>
-
-        <select name="recipient_id">
-
-          <option value="">
-            None / not recorded
-          </option>
-
-          ${orgs
-            .filter(
-              o=>
-                [
-                  'RECIPIENT',
-                  'PARTNER'
-                ].includes(o.type)
-            )
-            .map(
-              o=>
-                '<option value="'+
-                o.id+
-                '">'+
-                esc(o.name)+
-                '</option>'
-            )
-            .join('')}
-
-        </select>
-
-      </div>
-
-      <div>
-        <label>Method</label>
-
-        <select name="delivery_method">
-
-          <option>Van</option>
-          <option>Collection</option>
-          <option>Other</option>
-
-        </select>
-
-      </div>
-
-      <div>
-        <label>Driver / Collected By</label>
-        <input name="driver_name">
-      </div>
-
-      <div>
-        <label>Reference</label>
-        <input name="reference">
-      </div>
-
-      <div class="full">
-        <label>Notes</label>
-        <textarea name="notes"></textarea>
-      </div>
-
-      <div class="full actions">
-
-        <button
-          type="button"
-          class="btn secondary"
-          onclick="$('deliveryEditor').innerHTML=''"
-        >
-          Cancel
-        </button>
-
-        <button class="btn primary">
-          Create delivery note
-        </button>
-
-      </div>
-
-    </form>
-  `;
-
-
-  $('addDeliveryLine').onclick=addDeliveryLine;
-  addDeliveryLine();
-
-  $('deliveryForm').onsubmit=
-    async e=>{
-
-      e.preventDefault();
-
-      let obj=
-        Object.fromEntries(
-          new FormData(e.target)
-        );
-
-
-      obj.recipient_id=
-        obj.recipient_id||null;
-
-
-      obj.created_by=
-        currentUser.id;
-
-
-      const {data:created,error}=
-        await sb
-          .from('delivery_notes')
-          .insert(obj)
-          .select('id')
-          .single();
-
-      if(!error && created){
-        const lines=[...document.querySelectorAll('#deliveryLines .delivery-line')].map((row,index)=>({
-          delivery_note_id:created.id,
-          item_id:row.querySelector('.dl-item').value,
-          quantity:Number(row.querySelector('.dl-qty').value||0),
-          weight_per_item_kg:Number(row.querySelector('.dl-weight').value||0)||null,
-          total_weight_kg:Number(row.querySelector('.dl-total').value||0)||null,
-          storage_type:row.querySelector('.dl-storage').value||null,
-          batch_reference:row.querySelector('.dl-batch').value.trim()||null,
-          line_number:index+1
-        })).filter(x=>x.item_id && x.quantity>0);
-        if(lines.length){
-          const lineResult=await sb.from('delivery_note_items').insert(lines);
-          if(lineResult.error){ notify(lineResult.error.message,false); return; }
-        }
-      }
-
-      if(error){
-
-        notify(
-          error.message,
-          false
-        );
-
-      }else{
-
-        $('deliveryEditor').innerHTML='';
-
-        await refresh();
-
-        notify(
-          'Delivery note created'
-        );
-
-      }
-
-    };
-
-}
-
-
-function addDeliveryLine(){
-  const wrap=$('deliveryLines');
-  const row=document.createElement('div');
-  row.className='delivery-line';
-  row.style='display:grid;grid-template-columns:2fr .7fr .9fr .9fr 1fr 1.2fr auto;gap:8px;margin:8px 0;align-items:end';
-  row.innerHTML=`
-    <div><label>Item</label><select class="dl-item">${items.map(i=>'<option value="'+esc(i.id)+'">'+esc((i.sku||'')+' — '+i.name)+'</option>').join('')}</select></div>
-    <div><label>Qty</label><input class="dl-qty" type="number" min="1" value="1"></div>
-    <div><label>Weight/item kg</label><input class="dl-weight" type="number" step="0.001" min="0"></div>
-    <div><label>Total kg</label><input class="dl-total" type="number" step="0.001" min="0"></div>
-    <div><label>Stored in</label><select class="dl-storage"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select></div>
-    <div><label>Batch</label><input class="dl-batch"></div>
-    <button type="button" class="btn danger" onclick="this.parentElement.remove()">Remove</button>`;
-  wrap.appendChild(row);
-}
-
-async function cancelDraftDelivery(id){
-
-  const d=deliveries.find(x=>x.id===id);
-
-  if(!d){
-    notify('Delivery note could not be found.',false);
-    return;
-  }
-
-  if(d.status!=='DRAFT'){
-    notify('Only delivery notes still in draft can be cancelled.',false);
-    return;
-  }
-
-  if(!canWrite()){
-    notify('Your role cannot cancel delivery notes.',false);
-    return;
-  }
-
-  const ok=window.confirm(
-    'Cancel delivery note '+(d.delivery_number||'')+'?\n\nThis will permanently remove the draft delivery note. It will not affect stock because it is still a draft.'
-  );
-
-  if(!ok) return;
-
-  const {error}=await sb
-    .from('delivery_notes')
-    .delete()
-    .eq('id',id)
-    .eq('status','DRAFT');
-
-  if(error){
-    notify(error.message||'Unable to cancel the draft delivery note.',false);
-    return;
-  }
-
-  await refresh();
-  notify('Draft delivery note cancelled');
-}
-
+/* DELIVERY NOTES ARE GENERATED AUTOMATICALLY FROM STOCK OUT */
 
 /* PRINT DELIVERY NOTE */
 
@@ -3173,16 +2962,6 @@ $('deliveriesTable')
     }
   );
 
-$('deliveriesTable')
-  .addEventListener(
-    'click',
-    function(e){
-      const btn=e.target.closest('[data-cancel-delivery]');
-      if(!btn) return;
-      cancelDraftDelivery(btn.dataset.cancelDelivery);
-    }
-  );
-
 
 populateHistoryOrganisationFilters();
 
@@ -3319,9 +3098,6 @@ $('newOrg')
     openOrgEditor;
 
 
-$('newDelivery')
-  .onclick=
-    openDeliveryEditor;
 
 
 $('addStockInLine').onclick=addStockInLine;
