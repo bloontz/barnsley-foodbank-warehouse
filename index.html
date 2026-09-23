@@ -1573,7 +1573,10 @@ function renderAll(profiles=[]){
 
           '<button type="button" class="btn secondary" onclick="printDelivery(\''+
           esc(d.id)+
-          '\')">Print</button>'
+          '\')">Print</button>'+
+          (d.status==='DRAFT' && canWrite()
+            ? ' <button type="button" class="btn danger" data-cancel-delivery="'+esc(d.id)+'">Cancel Draft</button>'
+            : '')
 
         ];
 
@@ -2991,6 +2994,47 @@ function addDeliveryLine(){
   wrap.appendChild(row);
 }
 
+async function cancelDraftDelivery(id){
+
+  const d=deliveries.find(x=>x.id===id);
+
+  if(!d){
+    notify('Delivery note could not be found.',false);
+    return;
+  }
+
+  if(d.status!=='DRAFT'){
+    notify('Only delivery notes still in draft can be cancelled.',false);
+    return;
+  }
+
+  if(!canWrite()){
+    notify('Your role cannot cancel delivery notes.',false);
+    return;
+  }
+
+  const ok=window.confirm(
+    'Cancel delivery note '+(d.delivery_number||'')+'?\n\nThis will mark the draft as CANCELLED. It will not affect stock because it is still a draft.'
+  );
+
+  if(!ok) return;
+
+  const {error}=await sb
+    .from('delivery_notes')
+    .update({status:'CANCELLED'})
+    .eq('id',id)
+    .eq('status','DRAFT');
+
+  if(error){
+    notify(error.message||'Unable to cancel the draft delivery note.',false);
+    return;
+  }
+
+  await refresh();
+  notify('Draft delivery note cancelled');
+}
+
+
 /* PRINT DELIVERY NOTE */
 
 function printDelivery(id){
@@ -3126,6 +3170,16 @@ $('deliveriesTable')
       const btn=e.target.closest('[data-print-delivery]');
       if(!btn) return;
       printDelivery(btn.dataset.printDelivery);
+    }
+  );
+
+$('deliveriesTable')
+  .addEventListener(
+    'click',
+    function(e){
+      const btn=e.target.closest('[data-cancel-delivery]');
+      if(!btn) return;
+      cancelDraftDelivery(btn.dataset.cancelDelivery);
     }
   );
 
