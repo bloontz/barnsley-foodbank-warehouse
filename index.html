@@ -3014,14 +3014,14 @@ async function cancelDraftDelivery(id){
   }
 
   const ok=window.confirm(
-    'Cancel delivery note '+(d.delivery_number||'')+'?\n\nThis will mark the draft as CANCELLED. It will not affect stock because it is still a draft.'
+    'Cancel delivery note '+(d.delivery_number||'')+'?\n\nThis will permanently remove the draft delivery note. It will not affect stock because it is still a draft.'
   );
 
   if(!ok) return;
 
   const {error}=await sb
     .from('delivery_notes')
-    .update({status:'CANCELLED'})
+    .delete()
     .eq('id',id)
     .eq('status','DRAFT');
 
