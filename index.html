@@ -347,6 +347,101 @@ form.formgrid{
     grid-template-columns:1fr!important
   }
 }
+
+
+/* Mobile / tablet optimisation — same Supabase data and workflows as desktop */
+@media(max-width:850px){
+  body{font-size:15px}
+  .app{display:block;min-height:100vh}
+  .side{
+    position:sticky;
+    top:0;
+    z-index:50;
+    padding:10px 10px 8px;
+    box-shadow:0 2px 12px #00000018
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px
+  }
+  .brand img{width:135px;padding:4px}
+  .brand small{margin:0;font-size:11px}
+  .nav{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    margin:10px -2px 0;
+    padding:2px 2px 5px;
+    scrollbar-width:thin
+  }
+  .nav button{
+    flex:0 0 auto;
+    width:auto;
+    white-space:nowrap;
+    text-align:center;
+    padding:10px 12px;
+    margin:0;
+    min-height:42px
+  }
+  .userbox{
+    position:static;
+    width:auto;
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    font-size:11px
+  }
+  .userbox br{display:none}
+  .userbox #logout{margin-top:0;margin-left:auto;min-height:40px}
+  main{padding:18px 14px}
+  .top{margin-bottom:16px;align-items:flex-start}
+  .top h1{font-size:23px}
+  .panel{padding:14px;margin-top:12px}
+  .toolbar{gap:7px}
+  .toolbar .btn{min-height:42px}
+  .actions{flex-wrap:wrap;justify-content:stretch}
+  .actions .btn{flex:1 1 140px;min-height:42px}
+  input,select,textarea{font-size:16px;min-height:44px}
+  textarea{min-height:110px}
+  .btn{min-height:42px;padding:10px 13px}
+  .tablewrap{margin:0 -4px;padding:0 4px}
+  table{min-width:680px}
+  th,td{padding:9px 8px}
+}
+
+@media(max-width:550px){
+  .login{padding:14px}
+  .login-card{padding:22px 18px;border-radius:14px}
+  .login-card img{width:220px}
+  .brand img{width:118px}
+  .brand small{font-size:10px}
+  .nav button{padding:9px 11px;font-size:13px}
+  .userbox{font-size:10px}
+  main{padding:12px 10px}
+  .top{gap:8px}
+  .top h1{font-size:21px}
+  .panel{padding:12px}
+  .panel h2{font-size:17px}
+  .stat{padding:14px}
+  .stat b{font-size:24px}
+  form.formgrid{grid-template-columns:1fr!important;gap:0}
+  .actions{display:grid;grid-template-columns:1fr;gap:7px}
+  .actions .btn{width:100%;min-height:44px}
+  .toolbar{display:grid;grid-template-columns:1fr;gap:7px}
+  .toolbar .btn,.toolbar input,.toolbar select{width:100%}
+  label{font-size:12px;margin-top:10px}
+  .empty{padding:20px 10px}
+}
+
+@media(max-width:380px){
+  .brand small{display:none}
+  .brand img{width:110px}
+  .nav button{font-size:12px;padding:9px 10px}
+  .top h1{font-size:19px}
+}
 </style>
 </head>
 
