@@ -1,0 +1,3424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Barnsley Foodbank Partnership — Warehouse</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+:root{
+  --green:#078b40;
+  --dark:#163124;
+  --bg:#f3f6f4;
+  --card:#fff;
+  --muted:#6a766f;
+  --line:#dce5df;
+  --danger:#b42318;
+  --amber:#9a6700
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:#16201a
+}
+
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(135deg,#edf7f0,#f7faf8)
+}
+
+.login-card{
+  width:min(440px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:30px;
+  box-shadow:0 20px 50px #00000012
+}
+
+.login-card img{
+  width:260px;
+  max-width:100%;
+  margin-bottom:15px
+}
+
+.login-card h1{
+  font-size:23px;
+  margin:4px 0
+}
+
+.login-card p{
+  color:var(--muted)
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin:12px 0 6px
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid #cdd8d1;
+  border-radius:8px;
+  padding:10px;
+  background:#fff
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:700
+}
+
+.primary{
+  background:var(--green);
+  color:#fff
+}
+
+.secondary{
+  background:#e9efeb;
+  color:#173c29
+}
+
+.danger{
+  background:#fce8e6;
+  color:var(--danger)
+}
+
+.full{
+  grid-column:1/-1
+}
+
+.error{
+  background:#fff0ef;
+  color:#9d2319;
+  padding:10px;
+  border-radius:8px;
+  margin:12px 0;
+  font-size:13px
+}
+
+.ok{
+  background:#eaf7ee;
+  color:#126d37;
+  padding:10px;
+  border-radius:8px;
+  margin:12px 0;
+  font-size:13px
+}
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:240px 1fr
+}
+
+.side{
+  background:#143d28;
+  color:#fff;
+  padding:20px 14px
+}
+
+.brand img{
+  width:180px;
+  background:#fff;
+  border-radius:5px;
+  padding:5px
+}
+
+.brand small{
+  display:block;
+  margin-top:8px;
+  color:#cfe5d6
+}
+
+.nav{
+  margin-top:28px
+}
+
+.nav button{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:transparent;
+  color:#e8f5eb;
+  border:0;
+  padding:11px 12px;
+  border-radius:8px;
+  margin:3px 0
+}
+
+.nav button.active,
+.nav button:hover{
+  background:#ffffff18
+}
+
+.userbox{
+  position:absolute;
+  bottom:20px;
+  width:210px;
+  font-size:12px;
+  color:#cfe5d6
+}
+
+.userbox button{
+  margin-top:8px
+}
+
+main{
+  padding:25px;
+  min-width:0
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+  margin-bottom:22px
+}
+
+.top h1{
+  margin:0;
+  font-size:26px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px
+}
+
+.stat b{
+  font-size:27px
+}
+
+.stat small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:7px
+}
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin-top:16px
+}
+
+.panel h2{
+  margin:0 0 14px;
+  font-size:18px
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px
+}
+
+.tablewrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px
+}
+
+th,td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid var(--line);
+  font-size:13px
+}
+
+th{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#607067
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:#edf1ee
+}
+
+.badge.green{
+  background:#e7f6ec;
+  color:#13723a
+}
+
+.badge.red{
+  background:#fce8e6;
+  color:#a1261c
+}
+
+.badge.amber{
+  background:#fff4d6;
+  color:#805700
+}
+
+form.formgrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:2px 14px
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:8px
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:25px
+}
+
+@media(max-width:850px){
+  .app{
+    grid-template-columns:1fr
+  }
+
+  .side{
+    position:static
+  }
+
+  .userbox{
+    position:static;
+    width:auto;
+    margin-top:20px
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr)
+  }
+}
+
+@media(max-width:550px){
+  main{
+    padding:14px
+  }
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  .formgrid{
+    grid-template-columns:1fr!important
+  }
+}
+
+
+/* Mobile / tablet optimisation — same Supabase data and workflows as desktop */
+@media(max-width:850px){
+  body{font-size:15px}
+  .app{display:block;min-height:100vh}
+  .side{
+    position:sticky;
+    top:0;
+    z-index:50;
+    padding:10px 10px 8px;
+    box-shadow:0 2px 12px #00000018
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px
+  }
+  .brand img{width:135px;padding:4px}
+  .brand small{margin:0;font-size:11px}
+  .nav{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    margin:10px -2px 0;
+    padding:2px 2px 5px;
+    scrollbar-width:thin
+  }
+  .nav button{
+    flex:0 0 auto;
+    width:auto;
+    white-space:nowrap;
+    text-align:center;
+    padding:10px 12px;
+    margin:0;
+    min-height:42px
+  }
+  .userbox{
+    position:static;
+    width:auto;
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    font-size:11px
+  }
+  .userbox br{display:none}
+  .userbox #logout{margin-top:0;margin-left:auto;min-height:40px}
+  main{padding:18px 14px}
+  .top{margin-bottom:16px;align-items:flex-start}
+  .top h1{font-size:23px}
+  .panel{padding:14px;margin-top:12px}
+  .toolbar{gap:7px}
+  .toolbar .btn{min-height:42px}
+  .actions{flex-wrap:wrap;justify-content:stretch}
+  .actions .btn{flex:1 1 140px;min-height:42px}
+  input,select,textarea{font-size:16px;min-height:44px}
+  textarea{min-height:110px}
+  .btn{min-height:42px;padding:10px 13px}
+  .tablewrap{margin:0 -4px;padding:0 4px}
+  table{min-width:680px}
+  th,td{padding:9px 8px}
+}
+
+@media(max-width:550px){
+  .login{padding:14px}
+  .login-card{padding:22px 18px;border-radius:14px}
+  .login-card img{width:220px}
+  .brand img{width:118px}
+  .brand small{font-size:10px}
+  .nav button{padding:9px 11px;font-size:13px}
+  .userbox{font-size:10px}
+  main{padding:12px 10px}
+  .top{gap:8px}
+  .top h1{font-size:21px}
+  .panel{padding:12px}
+  .panel h2{font-size:17px}
+  .stat{padding:14px}
+  .stat b{font-size:24px}
+  form.formgrid{grid-template-columns:1fr!important;gap:0}
+  .actions{display:grid;grid-template-columns:1fr;gap:7px}
+  .actions .btn{width:100%;min-height:44px}
+  .toolbar{display:grid;grid-template-columns:1fr;gap:7px}
+  .toolbar .btn,.toolbar input,.toolbar select{width:100%}
+  label{font-size:12px;margin-top:10px}
+  .empty{padding:20px 10px}
+}
+
+@media(max-width:380px){
+  .brand small{display:none}
+  .brand img{width:110px}
+  .nav button{font-size:12px;padding:9px 10px}
+  .top h1{font-size:19px}
+}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f5f3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Barnsley Warehouse">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="login">
+  <div class="login-card">
+
+    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+
+    <h1>Warehouse Management System</h1>
+
+    <p>
+      Secure sign-in for Barnsley Foodbank Partnership warehouse staff.
+    </p>
+
+    <div id="loginError" class="error hidden"></div>
+
+    <form id="loginForm">
+
+      <label>Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
+
+      <label>Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:16px"
+      >
+        Sign in
+      </button>
+
+      <button
+        type="button"
+        id="forgotPassword"
+        class="btn secondary"
+        style="width:100%;margin-top:10px"
+      >
+        Forgot password?
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
+
+<!-- PASSWORD RESET -->
+<div id="reset" class="login hidden">
+  <div class="login-card">
+
+    <img src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+
+    <h1>Set a new password</h1>
+
+    <p>
+      Choose a new password for your warehouse account.
+    </p>
+
+    <div id="resetError" class="error hidden"></div>
+    <div id="resetOk" class="ok hidden"></div>
+
+    <form id="resetForm">
+
+      <label>New password</label>
+      <input
+        id="newPassword"
+        type="password"
+        autocomplete="new-password"
+        minlength="8"
+        required
+      >
+
+      <label>Confirm new password</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        autocomplete="new-password"
+        minlength="8"
+        required
+      >
+
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:16px"
+      >
+        Set new password
+      </button>
+
+    </form>
+
+    <button
+      type="button"
+      id="backToLogin"
+      class="btn secondary"
+      style="width:100%;margin-top:10px"
+    >
+      Back to sign in
+    </button>
+
+  </div>
+</div>
+
+
+<!-- APPLICATION -->
+<div id="app" class="app hidden">
+
+  <aside class="side">
+
+    <div class="brand">
+      <img
+        src="barnsley-foodbank-logo.png"
+        alt="Barnsley Foodbank"
+      >
+      <small>Warehouse Management System</small>
+    </div>
+
+    <div class="nav">
+
+      <button data-page="dashboard">
+        Dashboard
+      </button>
+
+      <button data-page="stock">
+        Current Stock
+      </button>
+
+      <button data-page="in">
+        Stock In
+      </button>
+
+      <button data-page="out">
+        Stock Out
+      </button>
+
+      <button data-page="convert">
+        Convert
+      </button>
+
+      <button data-page="organisations">
+        Donors & Recipients
+      </button>
+
+      <button data-page="deliveries">
+        Delivery Notes
+      </button>
+
+      <button data-page="history">
+        Audit / Movements
+      </button>
+
+      <button data-page="users" id="usersNav" class="hidden">
+        Users
+      </button>
+
+    </div>
+
+    <div class="userbox">
+      <b id="userName"></b>
+      <br>
+      <span id="userRole"></span>
+      <br>
+
+      <button id="logout" class="btn secondary">
+        Sign out
+      </button>
+    </div>
+
+  </aside>
+
+
+  <main>
+
+    <div class="top">
+      <h1 id="pageTitle">Dashboard</h1>
+      <span id="status"></span>
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page">
+
+      <div class="grid">
+
+        <div class="stat">
+          <small>Items</small>
+          <b id="statItems">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Units in stock</small>
+          <b id="statUnits">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Low stock</small>
+          <b id="statLow">0</b>
+        </div>
+
+        <div class="stat">
+          <small>Movements</small>
+          <b id="statMoves">0</b>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <h2>Recent stock movements</h2>
+        <div id="recentMoves" class="tablewrap"></div>
+      </div>
+
+    </section>
+
+
+    <!-- CURRENT STOCK -->
+    <section id="page-stock" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Current Stock</h2>
+
+        <div class="toolbar">
+          <input
+            id="stockSearch"
+            placeholder="Search item, SKU, barcode or location"
+          >
+        </div>
+
+        <div id="stockTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- STOCK IN -->
+    <section id="page-in" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Stock In — Receive Goods</h2>
+        <p style="color:#68766e;margin-top:-6px">Record a complete delivery. You can add as many different item types as you need to the same delivery.</p>
+
+        <form id="inForm">
+
+          <div class="formgrid">
+            <div>
+              <label>Donor</label>
+              <select id="inOrg"></select>
+            </div>
+
+            <div>
+              <label>Delivery Reference</label>
+              <input id="inRef" readonly placeholder="Generated automatically">
+            </div>
+
+            <div class="full">
+              <label>Delivery items</label>
+              <div id="stockInLines"></div>
+              <button type="button" id="addStockInLine" class="btn" style="margin-top:10px">+ Add another item</button>
+            </div>
+
+            <div class="full">
+              <label>Delivery notes</label>
+              <textarea id="inNotes"></textarea>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Record delivery</button>
+          </div>
+
+        </form>
+
+      </div>
+    </section>
+
+    <!-- STOCK OUT -->
+    <section id="page-out" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Stock Out — Pick Items for Delivery</h2>
+        <p style="color:#68766e;margin-top:-6px">Choose the items and quantities you want to ship. Only stock currently available in the warehouse is shown.</p>
+
+        <form id="outForm">
+          <div class="formgrid">
+            <div>
+              <label>Recipient</label>
+              <select id="outOrg" required></select>
+            </div>
+            <div>
+              <label>Reference (optional)</label>
+              <input id="outRef" placeholder="Optional reference">
+            </div>
+            <div class="full">
+              <label>Notes</label>
+              <textarea id="outNotes"></textarea>
+            </div>
+          </div>
+
+          <div class="panel" style="margin:16px 0 0;background:#f7faf8">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+              <div>
+                <h3 style="margin:0 0 4px">Available inventory</h3>
+                <small style="color:#68766e">Tick an item, then enter the quantity to ship.</small>
+              </div>
+              <input id="outStockSearch" placeholder="Search available stock" style="max-width:280px">
+            </div>
+            <div id="outStockTable" class="tablewrap" style="margin-top:12px"></div>
+          </div>
+
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Record stock out</button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+
+
+    <!-- CONVERT STOCK -->
+    <section id="page-convert" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Convert Stock</h2>
+        <p style="color:#68766e;margin-top:-6px">Convert stock already recorded in the warehouse into different item types. The original stock is removed and the new items are added, with a conversion reference linking the movement together.</p>
+
+        <form id="convertForm">
+          <div class="formgrid">
+            <div>
+              <label>Stock to convert</label>
+              <select id="convertSourceItem" required></select>
+            </div>
+            <div>
+              <label>Quantity to convert</label>
+              <input id="convertSourceQty" type="number" min="1" required>
+            </div>
+            <div>
+              <label>Conversion reference</label>
+              <input id="convertRef" readonly placeholder="Generated automatically">
+            </div>
+            <div>
+              <label>Source batch / reference (optional)</label>
+              <input id="convertSourceBatch" placeholder="e.g. BATCH-12 or pallet reference">
+            </div>
+            <div class="full">
+              <label>New stock created from this conversion</label>
+              <div id="convertLines"></div>
+              <button type="button" id="addConvertLine" class="btn" style="margin-top:10px">+ Add converted item</button>
+            </div>
+            <div class="full">
+              <label>Conversion notes</label>
+              <textarea id="convertNotes" placeholder="Optional notes about how the pallet / stock was broken down"></textarea>
+            </div>
+          </div>
+
+          <div class="panel" style="margin:16px 0 0;background:#f7faf8">
+            <b>Conversion summary</b>
+            <div id="convertSummary" style="margin-top:8px;color:#68766e">Select stock and add the items that will be created.</div>
+          </div>
+
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary">Convert stock</button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+
+
+    <datalist id="convertItemList"></datalist>
+
+
+    <!-- ORGANISATIONS -->
+    <section id="page-organisations" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Donors & Recipients</h2>
+
+        <div class="toolbar">
+          <button id="newOrg" class="btn primary">
+            + New Organisation
+          </button>
+        </div>
+
+        <div id="orgEditor"></div>
+
+        <div id="orgsTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- DELIVERY NOTES -->
+    <section id="page-deliveries" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Delivery Notes</h2>
+
+        <p style="color:#68766e;margin-top:-6px">Delivery notes are generated automatically when stock is recorded as Stock Out.</p>
+
+        <div id="deliveriesTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HISTORY -->
+    <section id="page-history" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Audit / Movements</h2>
+
+        <div class="panel" style="margin:0 0 16px;background:#f7faf8">
+          <div class="formgrid">
+            <div>
+              <label>Date from</label>
+              <input id="historyDateFrom" type="date">
+            </div>
+            <div>
+              <label>Date to</label>
+              <input id="historyDateTo" type="date">
+            </div>
+            <div>
+              <label>Stock movement</label>
+              <select id="historyType">
+                <option value="ALL">All movements</option>
+                <option value="IN">Received</option>
+                <option value="OUT">Delivered</option>
+              </select>
+            </div>
+            <div>
+              <label>Received from donor (one at a time)</label>
+              <select id="historyDonor">
+                <option value="ALL">All donors</option>
+              </select>
+            </div>
+            <div>
+              <label>Delivered to (one at a time)</label>
+              <select id="historyRecipient">
+                <option value="ALL">All recipients</option>
+              </select>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn primary" id="applyHistoryFilters">Apply filters</button>
+              <button type="button" class="btn secondary" id="clearHistoryFilters">Clear</button>
+              <button type="button" class="btn secondary" id="exportHistoryExcel">Export to Excel</button>
+            </div>
+          </div>
+        </div>
+        <small style="color:#68766e;display:block;margin:-6px 0 14px">Select a single donor or a single recipient. Choosing one automatically clears the other. Export to Excel uses the filters currently shown.</small>
+
+        <div class="formgrid" style="margin-bottom:16px">
+          <div class="panel" style="margin:0">
+            <b>Received</b>
+            <div id="historyReceivedSummary" style="font-size:20px;margin-top:6px">0 units / 0.000 kg</div>
+          </div>
+          <div class="panel" style="margin:0">
+            <b>Delivered</b>
+            <div id="historyDeliveredSummary" style="font-size:20px;margin-top:6px">0 units / 0.000 kg</div>
+          </div>
+        </div>
+
+        <div id="historyTable" class="tablewrap"></div>
+        <div id="deliveryDetail" class="panel hidden" style="margin-top:16px"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- USERS -->
+    <section id="page-users" class="page hidden">
+
+      <div class="panel">
+
+        <h2>Users</h2>
+
+        <p style="color:#68766e">
+          Only administrators can create and manage user accounts.
+        </p>
+
+        <div id="userAdminControls"></div>
+
+        <div id="userEditor"></div>
+
+        <div id="usersTable" class="tablewrap"></div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+/* Supabase client configuration. The publishable key is safe for browser use. */
+const SUPABASE_URL='https://rfqtzwpynnoezlzyakbv.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_-fg6XDkxUmlYzN3aaipKmw_X9S6qzfH';
+
+const {createClient}=supabase;
+
+const sb=createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true
+    }
+  }
+);
+
+
+let currentUser=null;
+let currentProfile=null;
+
+let items=[];
+let orgs=[];
+let stock=[];
+let moves=[];
+let deliveries=[];
+let profilesCache=[];
+
+
+const $=id=>document.getElementById(id);
+
+
+const esc=v=>
+  String(v??'').replace(
+    /[&<>"']/g,
+    c=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[c])
+  );
+
+
+const money=n=>
+  Number(n||0).toLocaleString();
+
+
+function notify(msg,good=true){
+
+  $('status').innerHTML=
+    '<span class="badge '+
+    (good?'green':'red')+
+    '">'+
+    esc(msg)+
+    '</span>';
+
+  setTimeout(()=>{
+    $('status').innerHTML=''
+  },3500);
+
+}
+
+
+function role(){
+  return currentProfile?.role||'READ_ONLY';
+}
+
+
+function canWrite(){
+  return [
+    'ADMIN',
+    'MANAGER',
+    'OPERATIVE'
+  ].includes(role());
+}
+
+
+function canManage(){
+  return [
+    'ADMIN',
+    'MANAGER'
+  ].includes(role());
+}
+
+
+function clearMessage(id){
+
+  $(id).classList.add('hidden');
+  $(id).textContent='';
+
+}
+
+
+function showMessage(id,msg){
+
+  $(id).textContent=msg;
+  $(id).classList.remove('hidden');
+
+}
+
+
+function recoveryRedirect(){
+
+  return window.location.origin+
+         window.location.pathname;
+
+}
+
+
+/* LOGIN */
+
+async function login(e){
+
+  e.preventDefault();
+
+  clearMessage('loginError');
+
+  const email=$('email').value.trim();
+  const password=$('password').value;
+
+  const {error}=await sb.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    showMessage(
+      'loginError',
+      error.message
+    );
+  }
+
+}
+
+
+/* FORGOT PASSWORD */
+
+async function forgotPassword(){
+
+  clearMessage('loginError');
+
+  const email=$('email').value.trim();
+
+  if(!email){
+
+    showMessage(
+      'loginError',
+      'Enter your email address first, then click “Forgot password?”.'
+    );
+
+    return;
+  }
+
+  const {error}=
+    await sb.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:recoveryRedirect()
+      }
+    );
+
+  if(error){
+
+    showMessage(
+      'loginError',
+      error.message
+    );
+
+  }else{
+
+    showMessage(
+      'loginError',
+      'If that email is registered, a password reset email has been sent. Check your inbox and spam folder.'
+    );
+
+  }
+
+}
+
+
+/* PASSWORD RESET */
+
+function showReset(){
+
+  $('login').classList.add('hidden');
+  $('app').classList.add('hidden');
+  $('reset').classList.remove('hidden');
+
+  clearMessage('resetError');
+  clearMessage('resetOk');
+
+}
+
+
+function showLogin(){
+
+  $('reset').classList.add('hidden');
+  $('app').classList.add('hidden');
+  $('login').classList.remove('hidden');
+
+}
+
+
+async function setNewPassword(e){
+
+  e.preventDefault();
+
+  clearMessage('resetError');
+  clearMessage('resetOk');
+
+  const p=$('newPassword').value;
+  const c=$('confirmPassword').value;
+
+  if(p.length<8){
+
+    showMessage(
+      'resetError',
+      'Your new password must be at least 8 characters.'
+    );
+
+    return;
+  }
+
+  if(p!==c){
+
+    showMessage(
+      'resetError',
+      'The passwords do not match.'
+    );
+
+    return;
+  }
+
+  const {error}=
+    await sb.auth.updateUser({
+      password:p
+    });
+
+  if(error){
+
+    showMessage(
+      'resetError',
+      error.message
+    );
+
+    return;
+  }
+
+  $('resetForm').reset();
+
+  showMessage(
+    'resetOk',
+    'Password changed successfully. You can now sign in with your new password.'
+  );
+
+  await sb.auth.signOut();
+
+  setTimeout(
+    ()=>showLogin(),
+    1200
+  );
+
+}
+
+
+let recoveryMode=false;
+
+
+/* START APPLICATION */
+
+async function boot(){
+
+  const isRecovery=
+    location.hash.includes('type=recovery');
+
+  if(isRecovery){
+
+    recoveryMode=true;
+    showReset();
+
+  }
+
+  const {
+    data:{session}
+  }=await sb.auth.getSession();
+
+  if(session && !recoveryMode){
+
+    await loadUser(session.user);
+
+  }
+
+  sb.auth.onAuthStateChange(
+    (event,session)=>{
+
+      if(event==='PASSWORD_RECOVERY'){
+
+        recoveryMode=true;
+        showReset();
+
+        return;
+      }
+
+      if(recoveryMode){
+
+        return;
+      }
+
+      if(session){
+
+        setTimeout(
+          ()=>loadUser(session.user),
+          0
+        );
+
+      }else{
+
+        showLogin();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* LOAD USER */
+
+async function loadUser(user){
+
+  currentUser=user;
+
+  const {
+    data,
+    error
+  }=await sb
+    .from('profiles')
+    .select('*')
+    .eq('id',user.id)
+    .single();
+
+  if(
+    error ||
+    !data ||
+    !data.active
+  ){
+
+    await sb.auth.signOut();
+
+    showLogin();
+
+    showMessage(
+      'loginError',
+      'Your account is not active or has no warehouse profile.'
+    );
+
+    return;
+  }
+
+  currentProfile=data;
+
+  $('login').classList.add('hidden');
+  $('reset').classList.add('hidden');
+  $('app').classList.remove('hidden');
+
+  $('userName').textContent=
+    data.full_name;
+
+  $('userRole').textContent=
+    data.role.replace('_',' ');
+
+  $('usersNav').classList.toggle(
+    'hidden',
+    role()!=='ADMIN'
+  );
+
+  await refresh();
+
+  const savedPage=localStorage.getItem('warehouseLastPage') || 'dashboard';
+  const validPages=['dashboard','stock','in','out','convert','organisations','deliveries','history','users'];
+  showPage(validPages.includes(savedPage) ? savedPage : 'dashboard');
+
+}
+
+
+/* REFRESH DATA */
+
+async function refresh(){
+
+  try{
+
+    const itemsResult=
+      await sb
+        .from('items')
+        .select('*')
+        .eq('active',true)
+        .order('name');
+
+
+    const orgsResult=
+      await sb
+        .from('organisations')
+        .select('*')
+        .eq('active',true)
+        .order('name');
+
+
+    const stockResult=
+      await sb
+        .from('current_stock')
+        .select('*')
+        .order('name');
+
+
+    const movesResult=
+      await sb
+        .from('stock_movements')
+        .select(
+          '*,items(name,sku),organisations(name)'
+        )
+        .order(
+          'created_at',
+          {ascending:false}
+        )
+        .limit(100);
+
+
+    const deliveriesResult=
+      await sb
+        .from('delivery_notes')
+        .select(
+          '*,organisations(name)'
+        )
+        .order(
+          'created_at',
+          {ascending:false}
+        )
+        .limit(100);
+
+
+    const profilesResult=
+      await sb
+        .from('profiles')
+        .select('*')
+        .order('full_name');
+
+
+    if(itemsResult.error)
+      throw itemsResult.error;
+
+    if(orgsResult.error)
+      throw orgsResult.error;
+
+    if(stockResult.error)
+      throw stockResult.error;
+
+    if(movesResult.error)
+      throw movesResult.error;
+
+    if(deliveriesResult.error)
+      throw deliveriesResult.error;
+
+    if(profilesResult.error)
+      throw profilesResult.error;
+
+
+    items=itemsResult.data||[];
+    orgs=orgsResult.data||[];
+    stock=stockResult.data||[];
+    moves=movesResult.data||[];
+    deliveries=deliveriesResult.data||[];
+
+
+    renderAll(
+      profilesResult.data||[]
+    );
+
+
+  }catch(error){
+
+    notify(
+      error.message ||
+      'Unable to load warehouse data',
+      false
+    );
+
+    console.error(
+      'Refresh error:',
+      error
+    );
+
+  }
+
+}
+
+
+/* RENDER */
+
+function renderAll(profiles=[]){
+
+  $('statItems').textContent=
+    items.length;
+
+
+  $('statUnits').textContent=
+    money(
+      stock.reduce(
+        (s,x)=>
+          s+
+          Number(
+            x.current_quantity||0
+          ),
+        0
+      )
+    );
+
+
+  $('statLow').textContent=
+    stock.filter(
+      function(x){
+
+        return Number(
+          x.current_quantity||0
+        )<=Number(
+          x.reorder_level||0
+        );
+
+      }
+    ).length;
+
+
+  $('statMoves').textContent=
+    moves.length;
+
+
+  $('recentMoves').innerHTML=
+    table(
+      [
+        'Date',
+        'Type',
+        'Item',
+        'Qty',
+        'User'
+      ],
+
+      moves
+        .slice(0,10)
+        .map(function(m){
+
+          return [
+
+            new Date(
+              m.created_at
+            ).toLocaleString(),
+
+            badge(
+              m.movement_type,
+              m.movement_type==='IN'
+            ),
+
+            esc(
+              m.items
+                ? m.items.name
+                : '-'
+            ),
+
+            money(m.quantity),
+
+            esc(
+              m.user_id===currentUser.id
+                ? 'You'
+                : m.user_id
+            )
+
+          ];
+
+        })
+    );
+
+
+  $('stockTable').innerHTML=
+    table(
+      [
+        'SKU',
+        'Item',
+        'Category',
+        'Location',
+        'Qty',
+        'Weight',
+        'Stored In',
+        'Reorder'
+      ],
+
+      stock.map(function(x){
+
+        return [
+
+          esc(x.sku),
+
+          esc(x.name),
+
+          esc(x.category),
+
+          esc(x.location||'-'),
+
+          money(
+            x.current_quantity
+          ),
+
+          x.current_weight_kg ? Number(x.current_weight_kg).toFixed(3)+' kg' : '-',
+
+          esc(x.storage_type||x.latest_storage_type||'-'),
+
+          money(
+            x.reorder_level
+          )
+
+        ];
+
+      })
+    );
+
+
+  renderOutStock();
+
+  $('orgsTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Type',
+        'Contact',
+        'Phone',
+        'Postcode'
+      ],
+
+      orgs.map(function(x){
+
+        return [
+
+          esc(x.name),
+
+          esc(x.type),
+
+          esc(
+            x.contact_name||'-'
+          ),
+
+          esc(
+            x.phone||'-'
+          ),
+
+          esc(
+            x.postcode||'-'
+          )
+
+        ];
+
+      })
+    );
+
+
+  renderHistory(profiles);
+
+
+  $('deliveriesTable').innerHTML=
+    table(
+      [
+        'Number',
+        'Date',
+        'Recipient',
+        'Status',
+        'Action'
+      ],
+
+      deliveries.map(function(d){
+
+        return [
+
+          esc(
+            d.delivery_number
+          ),
+
+          esc(
+            d.delivery_date
+          ),
+
+          esc(
+            d.organisations
+              ? d.organisations.name
+              : '-'
+          ),
+
+          badge(
+            d.status,
+            d.status==='COMPLETED'
+          ),
+
+          '<button type="button" class="btn secondary" onclick="printDelivery(\''+
+          esc(d.id)+
+          '\')">Print</button>'
+
+        ];
+
+      })
+    );
+
+
+  const userRows=
+    profiles.map(function(p){
+
+      const displayRole =
+        p.role==='ADMIN'
+          ? 'ADMIN'
+          : p.role==='READ_ONLY'
+            ? 'READ ONLY'
+            : 'USER';
+
+      const actions = role()==='ADMIN' && p.id!==currentUser.id
+        ? '<div style=\"display:flex;gap:6px;flex-wrap:wrap\">'+
+          '<button type=\"button\" class=\"btn secondary\" data-user-edit=\"'+esc(p.id)+'\">Edit</button>'+ 
+          '<button type=\"button\" class=\"btn secondary\" data-user-active=\"'+esc(p.id)+'\" data-active=\"'+(p.active?'true':'false')+'\">'+
+          (p.active?'Make inactive':'Make active')+
+          '</button>'+ 
+          '<button type=\"button\" class=\"btn secondary\" data-user-reset=\"'+esc(p.id)+'\">Reset password</button>'+ 
+          (p.role!=='ADMIN'
+            ? '<button type=\"button\" class=\"btn danger\" data-user-delete=\"'+esc(p.id)+'\">Remove</button>'
+            : '')+
+          '</div>'
+        : '-';
+
+      return [
+
+        esc(p.full_name),
+
+        esc(displayRole),
+
+        p.active
+          ? 'Active'
+          : 'Inactive',
+
+        actions
+
+      ];
+
+    });
+
+
+  $('usersTable').innerHTML=
+    table(
+      [
+        'Name',
+        'Role',
+        'Status',
+        'Actions'
+      ],
+      userRows
+    );
+
+  if(role()==='ADMIN'){
+    document.querySelectorAll('[data-user-edit]').forEach(btn=>{
+      btn.onclick=()=>editUser(btn.dataset.userEdit);
+    });
+    document.querySelectorAll('[data-user-active]').forEach(btn=>{
+      btn.onclick=()=>adminSetUserActive(btn.dataset.userActive,btn.dataset.active!=='true');
+    });
+    document.querySelectorAll('[data-user-reset]').forEach(btn=>{
+      btn.onclick=()=>adminResetUserPassword(btn.dataset.userReset);
+    });
+    document.querySelectorAll('[data-user-delete]').forEach(btn=>{
+      btn.onclick=()=>adminRemoveUser(btn.dataset.userDelete);
+    });
+  }
+
+  const usersNav=$('usersNav');
+
+  if(role()==='ADMIN'){
+    usersNav.classList.remove('hidden');
+    $('userAdminControls').innerHTML=
+      '<button class="btn" onclick="openUserEditor()">+ Add User</button>';
+  }else{
+    usersNav.classList.add('hidden');
+    $('userAdminControls').innerHTML='';
+    $('userEditor').innerHTML='';
+  }
+
+
+  fillSelects();
+
+}
+
+
+function populateHistoryOrganisationFilters(){
+  const donor=$('historyDonor');
+  const recipient=$('historyRecipient');
+  if(!donor || !recipient) return;
+
+  const donorOptions=orgs
+    .filter(o=>['DONOR','SUPPLIER','PARTNER'].includes(o.type))
+    .map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>')
+    .join('');
+
+  const recipientOptions=orgs
+    .filter(o=>['RECIPIENT','PARTNER'].includes(o.type))
+    .map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>')
+    .join('');
+
+  donor.innerHTML='<option value="ALL">All donors</option>'+donorOptions;
+  recipient.innerHTML='<option value="ALL">All recipients</option>'+recipientOptions;
+}
+
+function renderHistory(profiles=[]){
+  const from=$('historyDateFrom')?.value||'';
+  const to=$('historyDateTo')?.value||'';
+  const type=$('historyType')?.value||'ALL';
+  const donor=$('historyDonor')?.value||'ALL';
+  const recipient=$('historyRecipient')?.value||'ALL';
+
+  const filtered=moves.filter(function(m){
+    const day=new Date(m.created_at).toISOString().slice(0,10);
+    if(from && day<from) return false;
+    if(to && day>to) return false;
+    if(type!=='ALL' && m.movement_type!==type) return false;
+    if(donor!=='ALL' && (m.movement_type!=='IN' || String(m.organisation_id||'')!==String(donor))) return false;
+    if(recipient!=='ALL' && (m.movement_type!=='OUT' || String(m.organisation_id||'')!==String(recipient))) return false;
+    return true;
+  });
+
+  const weightFor=function(m){
+    const total=Number(m.total_weight_kg||0);
+    if(total) return total;
+    return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
+  };
+
+  const received=filtered.filter(m=>m.movement_type==='IN');
+  const delivered=filtered.filter(m=>m.movement_type==='OUT');
+  const sumQty=a=>a.reduce((n,m)=>n+Number(m.quantity||0),0);
+  const sumWeight=a=>a.reduce((n,m)=>n+weightFor(m),0);
+
+  if($('historyReceivedSummary'))
+    $('historyReceivedSummary').textContent=money(sumQty(received))+' units / '+sumWeight(received).toFixed(3)+' kg';
+  if($('historyDeliveredSummary'))
+    $('historyDeliveredSummary').textContent=money(sumQty(delivered))+' units / '+sumWeight(delivered).toFixed(3)+' kg';
+
+  // Group movement lines into individual deliveries. If a reference is entered,
+  // all lines sharing the same date, organisation, type and reference form one delivery.
+  // If no reference exists, the individual movement remains its own delivery.
+  const groups=new Map();
+  filtered.forEach(function(m){
+    const day=new Date(m.created_at).toISOString().slice(0,10);
+    const ref=(m.reference||'').trim();
+    const key=ref
+      ? [m.movement_type,day,m.organisation_id||'',ref].join('|')
+      : [m.movement_type,m.id].join('|');
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(m);
+  });
+
+  const grouped=[...groups.entries()].map(function(entry){
+    const lines=entry[1];
+    const first=lines[0];
+    return {
+      id:entry[0],
+      lines,
+      movement_type:first.movement_type,
+      created_at:first.created_at,
+      organisation_id:first.organisation_id,
+      organisation_name:first.organisations?.name||'Not recorded',
+      reference:first.reference||'',
+      batch:first.batch_ref||'',
+      recorded_by:(profiles.find(p=>p.id===first.user_id)?.full_name)||'-',
+      quantity:sumQty(lines),
+      weight:sumWeight(lines)
+    };
+  }).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
+  $('historyTable').innerHTML=table(
+    ['Date','Delivery','From','To','Lines','Qty','Weight','Reference','Recorded By','Action'],
+    grouped.map(function(g){
+      const isIn=g.movement_type==='IN';
+      return [
+        new Date(g.created_at).toLocaleDateString(),
+        badge(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? (isIn?'Converted in':'Converted out') : (isIn?'Received':'Delivered'),isIn),
+        esc(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? 'Warehouse conversion' : (isIn ? g.organisation_name : 'Warehouse')),
+        esc(g.reference && String(g.reference).toUpperCase().startsWith('CONV-') ? 'Warehouse conversion' : (isIn ? 'Warehouse' : g.organisation_name)),
+        money(g.lines.length),
+        money(g.quantity),
+        g.weight ? g.weight.toFixed(3)+' kg' : '-',
+        esc(g.reference||'-'),
+        esc(g.recorded_by),
+        '<button type="button" class="btn secondary" data-view-delivery="'+esc(g.id)+'">View</button>'
+      ];
+    })
+  );
+
+  window.historyDeliveryGroups=grouped;
+}
+
+function exportHistoryExcel(){
+  if(typeof XLSX==='undefined'){
+    notify('Excel export is not available. Please refresh the page and try again.',false);
+    return;
+  }
+
+  const from=$('historyDateFrom')?.value||'';
+  const to=$('historyDateTo')?.value||'';
+  const type=$('historyType')?.value||'ALL';
+  const donorId=$('historyDonor')?.value||'ALL';
+  const recipientId=$('historyRecipient')?.value||'ALL';
+  const groups=window.historyDeliveryGroups||[];
+
+  const donorName=donorId==='ALL' ? 'All donors' : (orgs.find(o=>String(o.id)===String(donorId))?.name||'Selected donor');
+  const recipientName=recipientId==='ALL' ? 'All recipients' : (orgs.find(o=>String(o.id)===String(recipientId))?.name||'Selected recipient');
+
+  const summaryRows=groups.map(g=>({
+    'Date':new Date(g.created_at).toLocaleDateString('en-GB'),
+    'Movement':g.movement_type==='IN'?'Received':'Delivered',
+    'From':g.movement_type==='IN'?g.organisation_name:'Warehouse',
+    'To':g.movement_type==='IN'?'Warehouse':g.organisation_name,
+    'Item lines':g.lines.length,
+    'Quantity (units)':Number(g.quantity||0),
+    'Total weight (kg)':Number(g.weight||0),
+    'Reference':g.reference||'',
+    'Recorded by':g.recorded_by||''
+  }));
+
+  const itemRows=[];
+  groups.forEach(g=>{
+    g.lines.forEach(m=>{
+      itemRows.push({
+        'Date':new Date(m.created_at||g.created_at).toLocaleDateString('en-GB'),
+        'Movement':m.movement_type==='IN'?'Received':'Delivered',
+        'From':m.movement_type==='IN'?(m.organisations?.name||g.organisation_name||'Not recorded'):'Warehouse',
+        'To':m.movement_type==='IN'?'Warehouse':(m.organisations?.name||g.organisation_name||'Not recorded'),
+        'Item':m.items?.name||'-',
+        'SKU':m.items?.sku||'',
+        'Quantity (units)':Number(m.quantity||0),
+        'Weight / item (kg)':Number(m.unit_weight_kg||0),
+        'Total weight (kg)':Number(weightForHistory(m)||0),
+        'Stored in':m.storage_type||'',
+        'Batch reference':m.batch_ref||'',
+        'Delivery reference':m.reference||'',
+        'Recorded by':g.recorded_by||''
+      });
+    });
+  });
+
+  const workbook=XLSX.utils.book_new();
+  const summarySheet=XLSX.utils.json_to_sheet(summaryRows.length?summaryRows:[{'Date':'No records','Movement':'','From':'','To':'','Item lines':'','Quantity (units)':'','Total weight (kg)':'','Reference':'','Recorded by':''}]);
+  const itemSheet=XLSX.utils.json_to_sheet(itemRows.length?itemRows:[{'Date':'No records','Movement':'','From':'','To':'','Item':'','SKU':'','Quantity (units)':'','Weight / item (kg)':'','Total weight (kg)':'','Stored in':'','Batch reference':'','Delivery reference':'','Recorded by':''}]);
+
+  const filterSheet=XLSX.utils.aoa_to_sheet([
+    ['Barnsley Foodbank Partnership — Audit / Movements'],
+    ['Date from',from||'All dates'],
+    ['Date to',to||'All dates'],
+    ['Movement',type==='IN'?'Received':type==='OUT'?'Delivered':'All movements'],
+    ['Received from donor',donorName],
+    ['Delivered to',recipientName],
+    ['Deliveries shown',groups.length],
+    ['Units shown',groups.reduce((n,g)=>n+Number(g.quantity||0),0)],
+    ['Weight shown (kg)',groups.reduce((n,g)=>n+Number(g.weight||0),0)]
+  ]);
+
+  XLSX.utils.book_append_sheet(workbook,summarySheet,'Deliveries');
+  XLSX.utils.book_append_sheet(workbook,itemSheet,'Item Details');
+  XLSX.utils.book_append_sheet(workbook,filterSheet,'Filters');
+
+  summarySheet['!cols']=[{wch:12},{wch:12},{wch:24},{wch:24},{wch:12},{wch:16},{wch:18},{wch:18},{wch:24}];
+  itemSheet['!cols']=[{wch:12},{wch:12},{wch:24},{wch:24},{wch:28},{wch:14},{wch:16},{wch:20},{wch:18},{wch:16},{wch:20},{wch:20},{wch:24}];
+  filterSheet['!cols']=[{wch:28},{wch:45}];
+
+  const stamp=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(workbook,'Barnsley-Foodbank-Audit-Movements-'+stamp+'.xlsx');
+  notify('Excel spreadsheet created');
+}
+
+function viewHistoryDelivery(key){
+  const g=(window.historyDeliveryGroups||[]).find(x=>x.id===key);
+  const box=$('deliveryDetail');
+  if(!g || !box) return;
+
+  const isIn=g.movement_type==='IN';
+  const isConversion=String(g.reference||'').toUpperCase().startsWith('CONV-');
+  box.classList.remove('hidden');
+  box.innerHTML=
+    '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">'+
+      '<div><h3 style="margin:0">'+esc(isConversion?(isIn?'Converted stock created':'Stock converted out'):(isIn?'Received delivery':'Delivered delivery'))+'</h3>'+
+      '<div style="color:#6a766f;margin-top:4px">'+esc(new Date(g.created_at).toLocaleDateString())+' · '+esc(isConversion?'Warehouse conversion':(isIn?g.organisation_name:'Warehouse'))+' → '+esc(isConversion?'Warehouse conversion':(isIn?'Warehouse':g.organisation_name))+'</div></div>'+
+      '<button type="button" class="btn secondary" id="closeDeliveryDetail">Close</button>'+
+    '</div>'+
+    '<div class="tablewrap">'+
+      table(
+        ['Item','Quantity','Weight / Item','Total Weight','Storage','Batch / Reference'],
+        g.lines.map(function(m){
+          const w=weightForHistory(m);
+          return [
+            esc(m.items?.name||'-'),
+            money(m.quantity),
+            m.unit_weight_kg ? Number(m.unit_weight_kg).toFixed(3)+' kg' : '-',
+            w ? w.toFixed(3)+' kg' : '-',
+            esc(m.storage_type||'-'),
+            esc(m.batch_ref||m.reference||'-')
+          ];
+        })
+      )+
+    '</div>'+
+    '<div style="margin-top:12px"><b>Total:</b> '+money(g.quantity)+' units / '+g.weight.toFixed(3)+' kg'+
+    (g.reference?' · <b>Reference:</b> '+esc(g.reference):'')+
+    '</div>';
+
+  $('closeDeliveryDetail').onclick=()=>box.classList.add('hidden');
+}
+
+function weightForHistory(m){
+  const total=Number(m.total_weight_kg||0);
+  if(total) return total;
+  return Number(m.unit_weight_kg||0)*Number(m.quantity||0);
+}
+
+
+
+/* HELPERS */
+
+function badge(t,green){
+
+  return '<span class="badge '+
+    (green?'green':'amber')+
+    '">'+
+    esc(t)+
+    '</span>';
+
+}
+
+
+function table(headers,rows){
+
+  if(!rows.length){
+
+    return '<div class="empty">No records found.</div>';
+
+  }
+
+  return (
+    '<table>'+
+      '<thead>'+
+        '<tr>'+
+          headers
+            .map(
+              h=>'<th>'+h+'</th>'
+            )
+            .join('')+
+        '</tr>'+
+      '</thead>'+
+      '<tbody>'+
+        rows
+          .map(
+            r=>
+              '<tr>'+
+              r
+                .map(
+                  x=>'<td>'+x+'</td>'
+                )
+                .join('')+
+              '</tr>'
+          )
+          .join('')+
+      '</tbody>'+
+    '</table>'
+  );
+
+}
+
+
+/* SELECT BOXES */
+
+function fillSelects(){
+
+  const list=$('inItemList');
+  if(list){
+    list.innerHTML=items
+      .map(i=>'<option value="'+esc(i.name)+'">'+esc(i.sku||'')+'</option>')
+      .join('');
+  }
+
+  const donor=
+    '<option value="">None / not recorded</option>'+
+    orgs
+      .filter(o=>['DONOR','SUPPLIER','PARTNER'].includes(o.type))
+      .map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>')
+      .join('');
+
+  const rec=
+    '<option value="">Select recipient...</option>'+
+    orgs
+      .filter(o=>['RECIPIENT','PARTNER'].includes(o.type))
+      .map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>')
+      .join('');
+
+  $('inOrg').innerHTML=donor;
+  $('outOrg').innerHTML=rec;
+  prepareStockInReferences();
+  renderOutStock();
+}
+
+function renderOutStock(){
+  const box=$('outStockTable');
+  if(!box) return;
+  const q=($('outStockSearch')?.value||'').toLowerCase().trim();
+  const available=stock.filter(x=>Number(x.current_quantity||0)>0 && [x.sku,x.name,x.category,x.location].join(' ').toLowerCase().includes(q));
+  if(!available.length){
+    box.innerHTML='<div class="empty">No available stock matches your search.</div>';
+    return;
+  }
+  box.innerHTML=table(
+    ['Pick','Item','SKU','Available','Weight / Item','Stored In','Location','Quantity to Ship','Batch'],
+    available.map(x=>{
+      const item=items.find(i=>String(i.id)===String(x.item_id));
+      const unit=Number(item?.weight_per_unit_kg||0);
+      const storage=x.storage_type||x.latest_storage_type||item?.storage_type||'-';
+      return [
+        '<input type="checkbox" class="out-pick" data-item-id="'+esc(x.item_id||x.id)+'">',
+        esc(x.name||item?.name||'-'),
+        esc(x.sku||item?.sku||'-'),
+        money(x.current_quantity),
+        unit ? unit.toFixed(3)+' kg' : '-',
+        esc(storage),
+        esc(x.location||item?.location||'-'),
+        '<input class="out-qty" data-item-id="'+esc(x.item_id||x.id)+'" type="number" min="1" max="'+Number(x.current_quantity||0)+'" placeholder="0" style="min-width:90px">',
+        '<input class="out-batch" data-item-id="'+esc(x.item_id||x.id)+'" placeholder="Batch" style="min-width:110px">'
+      ];
+    })
+  );
+}
+
+
+
+/* STOCK MOVEMENTS */
+
+async function nextStockInNumber(prefix){
+  const {data}=await sb.from('stock_movements')
+    .select('reference,batch_ref')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const value=prefix==='REF'?m.reference:m.batch_ref;
+    const match=String(value||'').match(new RegExp('^'+prefix+'-(\\d+)$','i'));
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return prefix+'-'+(max+1);
+}
+
+async function nextStockInNumbers(prefix,count){
+  const {data}=await sb.from('stock_movements')
+    .select('reference,batch_ref')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const value=prefix==='REF'?m.reference:m.batch_ref;
+    const match=String(value||'').match(new RegExp('^'+prefix+'-(\\d+)$','i'));
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return Array.from({length:count},(_,i)=>prefix+'-'+(max+i+1));
+}
+
+async function nextConversionNumber(){
+  const {data}=await sb.from('stock_movements')
+    .select('reference')
+    .limit(5000);
+  let max=0;
+  (data||[]).forEach(m=>{
+    const match=String(m.reference||'').match(/^CONV-(\d+)$/i);
+    if(match) max=Math.max(max,Number(match[1]));
+  });
+  return 'CONV-'+(max+1);
+}
+
+function stockInLineHtml(){
+  const id='sil-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  return `
+    <div class="stock-in-line panel" data-line-id="${id}" style="margin:10px 0 0;background:#f7faf8;border:1px solid #dce7e0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px">
+        <strong>Item</strong>
+        <button type="button" class="btn remove-stock-in-line" data-line-id="${id}" style="display:none">Remove</button>
+      </div>
+      <div class="formgrid">
+        <div>
+          <label>Item / Description</label>
+          <input class="sil-name" list="inItemList" autocomplete="off" placeholder="Type item name or description" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select class="sil-category"><option value="Food">Food</option><option value="Non Food">Non Food</option></select>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input class="sil-qty" type="number" min="1" required>
+        </div>
+        <div>
+          <label>Weight per item (kg)</label>
+          <input class="sil-unit" type="number" step="0.001" min="0" placeholder="e.g. 0.400">
+        </div>
+        <div>
+          <label>Total weight (kg)</label>
+          <input class="sil-total" type="number" step="0.001" min="0" placeholder="Calculated automatically" readonly>
+        </div>
+        <div>
+          <label>Stored in</label>
+          <select class="sil-storage"><option>Box</option><option>Tray</option><option>Pallet</option><option>Pallet cage</option><option>Crate</option><option>Bag</option><option>Loose</option><option>Other</option></select>
+        </div>
+        <div>
+          <label>Warehouse location</label>
+          <input class="sil-location" placeholder="e.g. A1, Rack 3">
+        </div>
+        <div>
+          <label>Batch reference</label>
+          <input class="sil-batch" readonly placeholder="Generated automatically">
+        </div>
+        <div>
+          <label>Best-before</label>
+          <input class="sil-bb" type="date">
+          <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-weight:600">
+            <input class="sil-bb-na" type="checkbox" style="width:auto"> No best-before date (N/A)
+          </label>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calculateStockInLineTotal(line){
+  const qty=Number(line.querySelector('.sil-qty')?.value||0);
+  const unit=Number(line.querySelector('.sil-unit')?.value||0);
+  const total=line.querySelector('.sil-total');
+  if(total) total.value=(qty>0 && unit>0) ? (qty*unit).toFixed(3) : '';
+}
+
+function refreshStockInLineButtons(){
+  const lines=[...document.querySelectorAll('.stock-in-line')];
+  lines.forEach(line=>{
+    const btn=line.querySelector('.remove-stock-in-line');
+    if(btn) btn.style.display=lines.length>1?'inline-block':'none';
+  });
+}
+
+function addStockInLine(){
+  const box=$('stockInLines');
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend',stockInLineHtml());
+  const line=box.lastElementChild;
+  const dateInput=line?.querySelector('.sil-bb');
+  const naInput=line?.querySelector('.sil-bb-na');
+  if(naInput && dateInput){
+    naInput.addEventListener('change',()=>{
+      dateInput.disabled=naInput.checked;
+      if(naInput.checked) dateInput.value='';
+    });
+  }
+  refreshStockInLineButtons();
+  assignStockInBatches();
+}
+
+async function assignStockInBatches(){
+  const lines=[...document.querySelectorAll('.stock-in-line')];
+  const blanks=lines.filter(l=>!l.querySelector('.sil-batch')?.value);
+  if(!blanks.length) return;
+  const nums=await nextStockInNumbers('BATCH',blanks.length);
+  blanks.forEach((line,i)=>{
+    const input=line.querySelector('.sil-batch');
+    if(input && !input.value) input.value=nums[i];
+  });
+}
+
+async function prepareStockInReferences(){
+  const ref=$('inRef');
+  if(ref && !ref.value) ref.value=await nextStockInNumber('REF');
+  assignStockInBatches();
+}
+
+function resetStockInForm(){
+  $('inForm')?.reset();
+  const box=$('stockInLines');
+  if(box){ box.innerHTML=''; addStockInLine(); }
+  prepareStockInReferences();
+}
+
+async function addMove(type,form){
+  if(!canWrite()){ notify('Your role cannot change stock',false); return; }
+
+  if(type==='IN'){
+    const lines=[...document.querySelectorAll('.stock-in-line')];
+    if(!lines.length){ notify('Please add at least one item.',false); return; }
+    const donor=$('inOrg').value||null;
+    const generatedRef=$('inRef').value.trim() || await nextStockInNumber('REF');
+    const deliveryNotes=$('inNotes').value.trim();
+    const lineData=[];
+
+    for(const line of lines){
+      const name=line.querySelector('.sil-name')?.value.trim()||'';
+      const qty=Number(line.querySelector('.sil-qty')?.value||0);
+      const unitEntered=Number(line.querySelector('.sil-unit')?.value||0);
+      const bbNa=!!line.querySelector('.sil-bb-na')?.checked;
+      const bb=bbNa ? 'N/A' : (line.querySelector('.sil-bb')?.value||'').trim();
+      if(!name||qty<1){ notify('Please enter an item and quantity for every line.',false); return; }
+      if(!bb){ notify('Please select a best-before date or tick N/A for every item.',false); return; }
+
+      let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
+      const unit=unitEntered || Number(item?.weight_per_unit_kg||0);
+
+      if(!item){
+        const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
+        const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
+        const next=match ? Number(match[1])+1 : 1;
+        const newItem={
+          sku:'ITM-'+String(next).padStart(4,'0'),
+          name,
+          category:line.querySelector('.sil-category')?.value||'Food',
+          unit:'units',
+          reorder_level:0,
+          weight_per_unit_kg:unit||0,
+          storage_type:line.querySelector('.sil-storage')?.value||null,
+          location:line.querySelector('.sil-location')?.value.trim()||null
+        };
+        const created=await sb.from('items').insert(newItem).select('*').single();
+        if(created.error){ notify(created.error.message,false); return; }
+        item=created.data;
+      }
+
+      const batch=line.querySelector('.sil-batch')?.value.trim()||null;
+      const storage=line.querySelector('.sil-storage')?.value||null;
+      const location=line.querySelector('.sil-location')?.value.trim()||null;
+      const totalWeight=(unit && qty) ? qty*unit : 0;
+      const notes=(deliveryNotes ? deliveryNotes+'\n' : '')+'Best-before: '+bb+(location?'\nWarehouse location: '+location:'');
+      lineData.push({item,qty,unit,batch,storage,totalWeight,notes});
+    }
+
+    const missingBatches=lineData.filter(x=>!x.batch);
+    if(missingBatches.length){
+      const nums=await nextStockInNumbers('BATCH',missingBatches.length);
+      let n=0;
+      lineData.forEach(x=>{ if(!x.batch) x.batch=nums[n++]; });
+    }
+
+    for(const x of lineData){
+      const {error}=await sb.from('stock_movements').insert({
+        movement_type:'IN',
+        item_id:x.item.id,
+        quantity:x.qty,
+        unit_weight_kg:x.unit||null,
+        total_weight_kg:x.totalWeight||null,
+        storage_type:x.storage,
+        user_id:currentUser.id,
+        organisation_id:donor,
+        reference:generatedRef,
+        batch_ref:x.batch,
+        notes:x.notes||null
+      });
+      if(error){ notify(error.message,false); return; }
+    }
+
+    await sb.from('audit_log').insert({
+      user_id:currentUser.id,
+      action:'STOCK_IN',
+      table_name:'stock_movements',
+      details:{items:lineData.map(x=>({item_id:x.item.id,quantity:x.qty,batch_ref:x.batch})),reference:generatedRef,donor_id:donor}
+    });
+    resetStockInForm();
+    await refresh();
+    notify(lineData.length+' item'+(lineData.length===1?'':'s')+' received in delivery '+generatedRef);
+    return;
+  }
+
+  const recipient=$('outOrg').value;
+  if(!recipient){ notify('Please select a recipient.',false); return; }
+
+  const picks=[...document.querySelectorAll('.out-pick:checked')];
+  if(!picks.length){ notify('Please pick at least one item to ship.',false); return; }
+
+  const rows=[];
+  for(const pick of picks){
+    const id=pick.dataset.itemId;
+    const row=stock.find(x=>String(x.item_id||x.id)===String(id));
+    const qty=Number(document.querySelector('.out-qty[data-item-id="'+CSS.escape(id)+'"]')?.value||0);
+    if(!row || qty<1){ notify('Enter a quantity for every picked item.',false); return; }
+    if(qty>Number(row.current_quantity||0)){ notify('Not enough stock available for '+(row.name||'this item'),false); return; }
+    const item=items.find(i=>String(i.id)===String(row.item_id));
+    const unit=Number(item?.weight_per_unit_kg||0);
+    const batch=document.querySelector('.out-batch[data-item-id="'+CSS.escape(id)+'"]')?.value.trim()||null;
+    rows.push({item_id:row.item_id||id,quantity:qty,unit_weight_kg:unit||null,total_weight_kg:unit?qty*unit:null,storage_type:row.storage_type||row.latest_storage_type||item?.storage_type||null,batch_ref:batch});
+  }
+
+  const notes=$('outNotes').value.trim()||null;
+
+  // Generate the delivery number automatically.
+  const today=new Date().toISOString().slice(0,10);
+  const prefix='DN-'+today.replaceAll('-','')+'-';
+  const {data:existingNotes,error:notesLookupError}=await sb
+    .from('delivery_notes')
+    .select('delivery_number')
+    .like('delivery_number',prefix+'%');
+  if(notesLookupError){ notify(notesLookupError.message,false); return; }
+  let next=1;
+  (existingNotes||[]).forEach(d=>{
+    const m=String(d.delivery_number||'').match(new RegExp('^'+prefix.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\d+)$'));
+    if(m) next=Math.max(next,Number(m[1])+1);
+  });
+  const deliveryNumber=prefix+String(next).padStart(4,'0');
+  const reference=$('outRef').value.trim()||deliveryNumber;
+
+  // Create the delivery note first so every stock-out shipment has one.
+  const {data:delivery,error:deliveryError}=await sb
+    .from('delivery_notes')
+    .insert({
+      delivery_number:deliveryNumber,
+      delivery_date:today,
+      recipient_id:recipient,
+      delivery_method:'Van',
+      reference,
+      notes,
+      created_by:currentUser.id,
+      status:'COMPLETED',
+      dispatched_date:today
+    })
+    .select('id')
+    .single();
+  if(deliveryError || !delivery){
+    notify(deliveryError?.message||'Unable to create delivery note',false);
+    return;
+  }
+
+  for(const r of rows){
+    const result=await sb.from('stock_movements').insert({movement_type:'OUT',...r,user_id:currentUser.id,organisation_id:recipient,reference,notes});
+    if(result.error){
+      await sb.from('delivery_notes').delete().eq('id',delivery.id);
+      notify(result.error.message,false);
+      return;
+    }
+  }
+
+  const lines=rows.map((r,index)=>({
+    delivery_note_id:delivery.id,
+    item_id:r.item_id,
+    quantity:r.quantity,
+    weight_per_item_kg:r.unit_weight_kg,
+    total_weight_kg:r.total_weight_kg,
+    storage_type:r.storage_type,
+    batch_reference:r.batch_ref,
+    line_number:index+1
+  }));
+  const {error:lineError}=await sb.from('delivery_note_items').insert(lines);
+  if(lineError){
+    await sb.from('delivery_notes').delete().eq('id',delivery.id);
+    notify(lineError.message,false);
+    return;
+  }
+
+  await sb.from('audit_log').insert({user_id:currentUser.id,action:'STOCK_OUT',table_name:'stock_movements',details:{delivery_note_id:delivery.id,delivery_number:deliveryNumber,items:rows.map(r=>({item_id:r.item_id,quantity:r.quantity})),reference,recipient_id:recipient}});
+  form.reset();
+  await refresh();
+  notify(rows.length+' item'+(rows.length===1?'':'s')+' shipped — delivery note '+deliveryNumber+' created');
+}
+
+
+
+/* CONVERT STOCK */
+
+function convertLineHtml(){
+  return `
+    <div class="convert-line panel" style="margin:0 0 10px;background:#fff;border:1px solid #dce5df">
+      <div class="formgrid">
+        <div>
+          <label>Item / Description</label>
+          <input class="cl-name" list="convertItemList" placeholder="Type item name" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select class="cl-category">
+            <option value="Food">Food</option>
+            <option value="Non Food">Non Food</option>
+          </select>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input class="cl-qty" type="number" min="1" required>
+        </div>
+        <div>
+          <label>Weight per item (kg)</label>
+          <input class="cl-unit" type="number" min="0" step="0.001">
+        </div>
+        <div>
+          <label>Total weight (kg)</label>
+          <input class="cl-total" type="number" readonly>
+        </div>
+        <div>
+          <label>Storage type</label>
+          <select class="cl-storage">
+            <option value="Box">Box</option>
+            <option value="Tray">Tray</option>
+            <option value="Pallet">Pallet</option>
+            <option value="Pallet Cage">Pallet Cage</option>
+            <option value="Bag">Bag</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Warehouse location</label>
+          <input class="cl-location" placeholder="e.g. A-01">
+        </div>
+        <div>
+          <label>Batch reference</label>
+          <input class="cl-batch" readonly placeholder="Generated automatically">
+        </div>
+        <div class="actions" style="align-self:end">
+          <button type="button" class="btn secondary remove-convert-line">Remove</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calculateConvertLineTotal(line){
+  const qty=Number(line.querySelector('.cl-qty')?.value||0);
+  const unit=Number(line.querySelector('.cl-unit')?.value||0);
+  const total=line.querySelector('.cl-total');
+  if(total) total.value=(qty>0 && unit>0)?(qty*unit).toFixed(3):'';
+}
+
+function refreshConvertLineButtons(){
+  const lines=[...document.querySelectorAll('.convert-line')];
+  lines.forEach(line=>{
+    const btn=line.querySelector('.remove-convert-line');
+    if(btn) btn.style.display=lines.length>1?'inline-block':'none';
+  });
+}
+
+function addConvertLine(){
+  const box=$('convertLines');
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend',convertLineHtml());
+  const line=box.lastElementChild;
+  const name=line?.querySelector('.cl-name');
+  if(name){
+    name.addEventListener('change',()=>{
+      const found=items.find(i=>String(i.name||'').trim().toLowerCase()===String(name.value||'').trim().toLowerCase());
+      if(found){
+        const unit=line.querySelector('.cl-unit');
+        const cat=line.querySelector('.cl-category');
+        const storage=line.querySelector('.cl-storage');
+        const loc=line.querySelector('.cl-location');
+        if(unit && !unit.value && found.weight_per_unit_kg) unit.value=found.weight_per_unit_kg;
+        if(cat && found.category) cat.value=found.category;
+        if(storage && found.storage_type) storage.value=found.storage_type;
+        if(loc && found.location) loc.value=found.location;
+        calculateConvertLineTotal(line);
+        renderConvertSummary();
+      }
+    });
+  }
+  refreshConvertLineButtons();
+  assignConvertBatches();
+}
+
+async function assignConvertBatches(){
+  const lines=[...document.querySelectorAll('.convert-line')];
+  const blanks=lines.filter(l=>!l.querySelector('.cl-batch')?.value);
+  if(!blanks.length) return;
+  const nums=await nextStockInNumbers('BATCH',blanks.length);
+  blanks.forEach((line,i)=>{
+    const input=line.querySelector('.cl-batch');
+    if(input && !input.value) input.value=nums[i];
+  });
+}
+
+async function prepareConvertForm(){
+  const select=$('convertSourceItem');
+  if(!select) return;
+  const list=$('convertItemList');
+  if(list) list.innerHTML=items.map(i=>'<option value="'+esc(i.name||'')+'"></option>').join('');
+  const rows=stock.filter(x=>Number(x.current_quantity||0)>0);
+  select.innerHTML='<option value="">Select stock</option>'+rows.map(x=>'<option value="'+esc(x.item_id||x.id)+'">'+esc(x.name||'')+' — '+money(x.current_quantity)+' available'+(x.location?' — '+esc(x.location):'')+'</option>').join('');
+  $('convertRef').value=await nextConversionNumber();
+  const box=$('convertLines');
+  if(box && !box.children.length) addConvertLine();
+  renderConvertSummary();
+}
+
+function renderConvertSummary(){
+  const sourceId=$('convertSourceItem')?.value||'';
+  const source=stock.find(x=>String(x.item_id||x.id)===String(sourceId));
+  const qty=Number($('convertSourceQty')?.value||0);
+  const lines=[...document.querySelectorAll('.convert-line')];
+  const outputs=lines.reduce((n,l)=>n+Number(l.querySelector('.cl-qty')?.value||0),0);
+  const weight=lines.reduce((n,l)=>n+Number(l.querySelector('.cl-total')?.value||0),0);
+  const sourceText=source ? esc(source.name)+' — '+money(qty)+' of '+money(source.current_quantity)+' units' : 'No source stock selected';
+  const outputText=outputs ? money(outputs)+' units created' : 'No converted items entered yet';
+  const weightText=weight ? ' / '+weight.toFixed(3)+' kg' : '';
+  const box=$('convertSummary');
+  if(box) box.innerHTML='<b>From:</b> '+sourceText+'<br><b>To:</b> '+outputText+weightText;
+}
+
+async function convertStock(e){
+  e.preventDefault();
+  if(!canWrite()){ notify('Your role cannot change stock',false); return; }
+  const sourceId=$('convertSourceItem').value;
+  const sourceQty=Number($('convertSourceQty').value||0);
+  const source=stock.find(x=>String(x.item_id||x.id)===String(sourceId));
+  if(!source){ notify('Please select the stock you want to convert.',false); return; }
+  if(sourceQty<1){ notify('Enter the quantity being converted.',false); return; }
+  if(sourceQty>Number(source.current_quantity||0)){ notify('You cannot convert more than the available stock.',false); return; }
+
+  const lines=[...document.querySelectorAll('.convert-line')];
+  if(!lines.length){ notify('Please add at least one converted item.',false); return; }
+
+  const outputRows=[];
+  for(const line of lines){
+    const name=line.querySelector('.cl-name')?.value.trim()||'';
+    const qty=Number(line.querySelector('.cl-qty')?.value||0);
+    const unitEntered=Number(line.querySelector('.cl-unit')?.value||0);
+    if(!name || qty<1){ notify('Please complete every converted item line.',false); return; }
+
+    let item=items.find(i=>String(i.name||'').trim().toLowerCase()===name.toLowerCase());
+    const unit=unitEntered || Number(item?.weight_per_unit_kg||0);
+
+    if(!item){
+      const {data:latest}=await sb.from('items').select('sku').like('sku','ITM-%').order('sku',{ascending:false}).limit(1);
+      const match=latest?.[0]?.sku ? String(latest[0].sku).match(/^ITM-(\d+)$/i) : null;
+      const next=match ? Number(match[1])+1 : 1;
+      const created=await sb.from('items').insert({
+        sku:'ITM-'+String(next).padStart(4,'0'),
+        name,
+        category:line.querySelector('.cl-category')?.value||'Food',
+        unit:'units',
+        reorder_level:0,
+        weight_per_unit_kg:unit||0,
+        storage_type:line.querySelector('.cl-storage')?.value||null,
+        location:line.querySelector('.cl-location')?.value.trim()||null
+      }).select('*').single();
+      if(created.error){ notify(created.error.message,false); return; }
+      item=created.data;
+    }
+
+    outputRows.push({
+      item,
+      quantity:qty,
+      unit,
+      totalWeight:(unit&&qty)?unit*qty:0,
+      storage:line.querySelector('.cl-storage')?.value||null,
+      location:line.querySelector('.cl-location')?.value.trim()||null,
+      batch:line.querySelector('.cl-batch')?.value.trim()||null
+    });
+  }
+
+  const ref=$('convertRef').value.trim() || await nextConversionNumber();
+  const sourceBatch=$('convertSourceBatch').value.trim();
+  const notesBase=$('convertNotes').value.trim();
+  const sourceNotes='Converted from '+(source.name||'stock')+' quantity '+sourceQty+(sourceBatch?' source batch/reference '+sourceBatch:'')+'. Conversion reference '+ref+'.';
+
+  const sourceMovement={
+    movement_type:'OUT',
+    item_id:source.item_id||source.id,
+    quantity:sourceQty,
+    unit_weight_kg:null,
+    total_weight_kg:null,
+    storage_type:source.storage_type||source.latest_storage_type||null,
+    user_id:currentUser.id,
+    organisation_id:null,
+    reference:ref,
+    batch_ref:sourceBatch||null,
+    notes:(notesBase?notesBase+'\n':'')+sourceNotes
+  };
+
+  const sourceResult=await sb.from('stock_movements').insert(sourceMovement);
+  if(sourceResult.error){ notify(sourceResult.error.message,false); return; }
+
+  for(const row of outputRows){
+    const notes=(notesBase?notesBase+'\n':'')+'Created by conversion '+ref+' from '+(source.name||'stock')+' quantity '+sourceQty+(sourceBatch?' source batch/reference '+sourceBatch:'')+(row.location?'\nWarehouse location: '+row.location:'');
+    const result=await sb.from('stock_movements').insert({
+      movement_type:'IN',
+      item_id:row.item.id,
+      quantity:row.quantity,
+      unit_weight_kg:row.unit||null,
+      total_weight_kg:row.totalWeight||null,
+      storage_type:row.storage,
+      user_id:currentUser.id,
+      organisation_id:null,
+      reference:ref,
+      batch_ref:row.batch||null,
+      notes
+    });
+    if(result.error){ notify(result.error.message,false); return; }
+  }
+
+  await sb.from('audit_log').insert({
+    user_id:currentUser.id,
+    action:'STOCK_CONVERT',
+    table_name:'stock_movements',
+    details:{
+      conversion_reference:ref,
+      source_item_id:source.item_id||source.id,
+      source_item_name:source.name,
+      source_quantity:sourceQty,
+      source_batch_reference:sourceBatch||null,
+      outputs:outputRows.map(row=>({item_id:row.item.id,item_name:row.item.name,quantity:row.quantity,total_weight_kg:row.totalWeight,batch_ref:row.batch}))
+    }
+  });
+
+  $('convertForm').reset();
+  $('convertLines').innerHTML='';
+  await refresh();
+  await prepareConvertForm();
+  notify('Stock converted successfully — '+ref);
+}
+
+
+/* NAVIGATION */
+
+function showPage(name){
+
+  if(name==='users' && role()!=='ADMIN'){
+    name='dashboard';
+  }
+
+  localStorage.setItem('warehouseLastPage',name);
+
+  document
+    .querySelectorAll('.page')
+    .forEach(
+      x=>
+        x.classList.add('hidden')
+    );
+
+
+  $('page-'+name)
+    .classList.remove('hidden');
+
+
+  document
+    .querySelectorAll('.nav button')
+    .forEach(
+      x=>
+        x.classList.toggle(
+          'active',
+          x.dataset.page===name
+        )
+    );
+
+
+  const titles={
+    dashboard:'Dashboard',
+    stock:'Current Stock',
+    in:'Stock In',
+    out:'Stock Out',
+    convert:'Convert Stock',
+    organisations:'Donors & Recipients',
+    deliveries:'Delivery Notes',
+    history:'Audit / Movements',
+    users:'Users'
+  };
+
+
+  $('pageTitle').textContent=
+    titles[name]||name;
+
+  if(name==='convert') prepareConvertForm();
+
+}
+
+
+/* ORGANISATION EDITOR */
+
+function openOrgEditor(){
+
+  if(!canWrite()){
+
+    notify(
+      'Your role cannot create organisations',
+      false
+    );
+
+    return;
+  }
+
+
+  $('orgEditor').innerHTML=`
+
+    <form
+      id="orgForm"
+      class="formgrid panel"
+      style="margin:0 0 16px"
+    >
+
+      <div>
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+
+      <div>
+        <label>Type</label>
+
+        <select name="type">
+
+          <option>DONOR</option>
+          <option>RECIPIENT</option>
+          <option>PARTNER</option>
+          <option>SUPPLIER</option>
+
+        </select>
+
+      </div>
+
+      <div>
+        <label>Contact</label>
+        <input name="contact_name">
+      </div>
+
+      <div>
+        <label>Phone</label>
+        <input name="phone">
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input name="email">
+      </div>
+
+      <div>
+        <label>Postcode</label>
+        <input name="postcode">
+      </div>
+
+      <div class="full">
+        <label>Address</label>
+        <input name="address">
+      </div>
+
+      <div class="full">
+        <label>Delivery items</label>
+        <div id="deliveryLines"></div>
+        <button type="button" class="btn secondary" id="addDeliveryLine">+ Add item</button>
+      </div>
+
+      <div class="full">
+        <label>Notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+
+      <div class="full actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="$('orgEditor').innerHTML=''"
+        >
+          Cancel
+        </button>
+
+        <button class="btn primary">
+          Save organisation
+        </button>
+
+      </div>
+
+    </form>
+  `;
+
+
+  $('orgForm').onsubmit=
+    async e=>{
+
+      e.preventDefault();
+
+      let obj=
+        Object.fromEntries(
+          new FormData(e.target)
+        );
+
+
+      const {error}=
+        await sb
+          .from('organisations')
+          .insert(obj);
+
+
+      if(error){
+
+        notify(
+          error.message,
+          false
+        );
+
+      }else{
+
+        $('orgEditor').innerHTML='';
+
+        await refresh();
+
+        notify(
+          'Organisation created'
+        );
+
+      }
+
+    };
+
+}
+
+
+/* USER ADMINISTRATION */
+
+
+async function editUser(userId){
+  if(role()!=='ADMIN') return;
+
+  $('userEditor').innerHTML=`
+    <div class="panel" style="margin:16px 0">
+      <h3>Edit User</h3>
+      <div id="editUserMessage" class="error hidden"></div>
+      <form id="editUserForm">
+        <div class="grid2">
+          <div>
+            <label>Full name</label>
+            <input id="editUserFullName" required>
+          </div>
+          <div>
+            <label>Email address</label>
+            <input id="editUserEmail" type="email" required>
+          </div>
+          <div>
+            <label>Role</label>
+            <select id="editUserRole" required>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+              <option value="READ_ONLY">READ_ONLY</option>
+            </select>
+          </div>
+          <div>
+            <label>Account status</label>
+            <select id="editUserActive" required>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button type="button" class="btn secondary" onclick="closeUserEditor()">Cancel</button>
+          <button type="submit" class="btn primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+      body:{action:'get_user',user_id:userId}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to load user');
+    const u=result.user;
+    $('editUserFullName').value=u.full_name||'';
+    $('editUserEmail').value=u.email||'';
+    $('editUserRole').value=u.role||'USER';
+    $('editUserActive').value=u.active?'true':'false';
+  }catch(error){
+    showMessage('editUserMessage',error.message||'Unable to load user');
+    return;
+  }
+
+  $('editUserForm').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;
+    btn.textContent='Saving...';
+    try{
+      const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+        body:{
+          action:'update_user',
+          user_id:userId,
+          full_name:$('editUserFullName').value.trim(),
+          email:$('editUserEmail').value.trim(),
+          role:$('editUserRole').value,
+          active:$('editUserActive').value==='true'
+        }
+      });
+      if(error) throw error;
+      if(!result?.success) throw new Error(result?.error||'Unable to update user');
+      closeUserEditor();
+      await refresh();
+      notify('User details updated');
+    }catch(error){
+      notify(error.message||'Unable to update user',false);
+      btn.disabled=false;
+      btn.textContent='Save changes';
+    }
+  };
+}
+
+function openUserEditor(){
+
+  if(role()!=='ADMIN'){
+    notify('Only administrators can create users',false);
+    return;
+  }
+
+  $('userEditor').innerHTML=`
+    <div class="panel" style="margin:16px 0">
+      <h3>Add User</h3>
+      <form id="userForm">
+        <div class="grid2">
+          <div>
+            <label>Full name</label>
+            <input name="full_name" required>
+          </div>
+          <div>
+            <label>Email address</label>
+            <input name="email" type="email" required>
+          </div>
+          <div>
+            <label>Temporary password</label>
+            <input name="password" type="password" minlength="8" required>
+          </div>
+          <div>
+            <label>Role</label>
+            <select name="role" required>
+              <option value="">Select role...</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+              <option value="READ_ONLY">READ ONLY</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button type="button" class="btn secondary" onclick="closeUserEditor()">Cancel</button>
+          <button type="submit" class="btn">Create User</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  $('userForm').onsubmit=async e=>{
+    e.preventDefault();
+
+    if(role()!=='ADMIN'){
+      notify('Only administrators can create users',false);
+      return;
+    }
+
+    const data=Object.fromEntries(new FormData(e.target));
+    const btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;
+    btn.textContent='Creating...';
+
+    try{
+      const {data:result,error}=await sb.functions.invoke('admin-create-user',{
+        body:{
+          full_name:data.full_name,
+          email:data.email,
+          password:data.password,
+          role:data.role
+        }
+      });
+
+      if(error) throw error;
+      if(!result?.success) throw new Error(result?.error||'Unable to create user');
+
+      closeUserEditor();
+      await refresh();
+      notify('User created successfully');
+
+    }catch(error){
+      notify(error.message||'Unable to create user',false);
+      btn.disabled=false;
+      btn.textContent='Create User';
+    }
+  };
+}
+
+function closeUserEditor(){
+  $('userEditor').innerHTML='';
+}
+
+async function adminSetUserActive(userId,active){
+  if(role()!=='ADMIN') return;
+
+  const actionText=active?'make this user active':'make this user inactive';
+  if(!confirm('Are you sure you want to '+actionText+'?')) return;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+      body:{action:'set_active',user_id:userId,active}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to update user');
+    await refresh();
+    notify(active?'User made active':'User made inactive');
+  }catch(error){
+    notify(error.message||'Unable to update user',false);
+  }
+}
+
+async function adminResetUserPassword(userId){
+  if(role()!=='ADMIN') return;
+
+  const password=prompt('Enter the new password for this user (minimum 8 characters):');
+  if(password===null) return;
+  if(password.length<8){
+    notify('Password must be at least 8 characters',false);
+    return;
+  }
+
+  const confirmation=prompt('Re-enter the new password to confirm:');
+  if(confirmation===null) return;
+  if(password!==confirmation){
+    notify('The passwords do not match',false);
+    return;
+  }
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+      body:{action:'reset_password',user_id:userId,password}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to reset password');
+    notify('Password reset successfully');
+  }catch(error){
+    notify(error.message||'Unable to reset password',false);
+  }
+}
+
+async function adminRemoveUser(userId){
+  if(role()!=='ADMIN') return;
+
+  if(!confirm('Remove this user permanently? This cannot be undone.')) return;
+
+  try{
+    const {data:result,error}=await sb.functions.invoke('admin-manage-user-v3',{
+      body:{action:'delete',user_id:userId}
+    });
+    if(error) throw error;
+    if(!result?.success) throw new Error(result?.error||'Unable to remove user');
+    await refresh();
+    notify('User removed');
+  }catch(error){
+    notify(error.message||'Unable to remove user',false);
+  }
+}
+
+
+/* DELIVERY NOTES ARE GENERATED AUTOMATICALLY FROM STOCK OUT */
+
+/* PRINT DELIVERY NOTE */
+
+function printDelivery(id){
+  const d=deliveries.find(x=>x.id===id);
+
+  if(!d){
+    notify('Delivery note could not be found.',false);
+    return;
+  }
+
+  const recipient=d.organisations?.name || '-';
+  const deliveryNumber=d.delivery_number || '-';
+  const deliveryDate=d.delivery_date || '-';
+  const method=d.delivery_method || '-';
+  const driver=d.driver_name || '-';
+  const reference=d.reference || '-';
+
+  const existing=document.getElementById('printArea');
+  if(existing) existing.remove();
+
+  const area=document.createElement('div');
+  area.id='printArea';
+
+  area.innerHTML=`
+    <style>
+      #printArea{display:none}
+      @page{size:A4 landscape;margin:10mm}
+      @media print{
+        body > *:not(#printArea){display:none!important}
+        body{margin:0!important;padding:0!important;background:#fff!important}
+        #printArea{
+          display:block!important;
+          width:100%!important;
+          color:#111!important;
+          background:#fff!important;
+          font-family:Arial,sans-serif!important;
+        }
+      }
+      .print-page{width:100%;max-width:277mm;margin:0 auto}
+      .head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #078b40;padding-bottom:12px}
+      .logo{width:220px;height:auto}
+      .addr{text-align:right;font-size:12px;line-height:1.45}
+      h1{margin:18px 0 12px;color:#078b40;font-size:24px}
+      .box{border:1px solid #aaa;padding:12px;margin:12px 0}
+      .details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 24px;font-size:12px;line-height:1.5}
+      .items{width:100%;border-collapse:collapse;margin:12px 0}
+      .items th,.items td{border:1px solid #aaa;padding:7px;font-size:11px;text-align:left}
+      .items th{background:#f0f3f1}
+      .empty{text-align:center;padding:20px!important}
+      .sign{display:grid;grid-template-columns:1fr 1fr 1fr;gap:25px;margin-top:25px;font-size:11px}
+      .line{border-bottom:1px solid #333;height:28px;margin-bottom:5px}
+      footer{text-align:center;margin-top:25px;font-size:10px}
+    </style>
+
+    <div class="print-page">
+      <div class="head">
+        <img class="logo" src="barnsley-foodbank-logo.png" alt="Barnsley Foodbank">
+        <div class="addr">
+          <b>Barnsley Foodbank Partnership</b><br>
+          Unit 19, Grange Lane Industrial Estate<br>
+          Carrwood Road, Stairfoot<br>
+          Barnsley, South Yorkshire, S71 5AS
+        </div>
+      </div>
+
+      <h1>DELIVERY NOTE</h1>
+
+      <div class="box">
+        <div class="details">
+          <div><b>Note Number:</b><br>${esc(deliveryNumber)}</div>
+          <div><b>Date:</b><br>${esc(deliveryDate)}</div>
+          <div><b>Recipient:</b><br>${esc(recipient)}</div>
+          <div><b>Delivery Method:</b><br>${esc(method)}</div>
+          <div><b>Driver / Collected By:</b><br>${esc(driver)}</div>
+          <div><b>Reference:</b><br>${esc(reference)}</div>
+        </div>
+      </div>
+
+      <div class="box">
+        <table class="items">
+          <thead>
+            <tr>
+              <th>Item / Description</th>
+              <th>Quantity</th>
+              <th>Weight / Item</th>
+              <th>Total Weight</th>
+              <th>Stored In</th>
+              <th>Batch / Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="6" class="empty">No delivery items recorded.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sign">
+        <div><b>Received By</b><div class="line"></div>Name</div>
+        <div><b>Signature</b><div class="line"></div>Signature</div>
+        <div><b>Date Received</b><div class="line"></div>Date</div>
+      </div>
+
+      <footer>
+        Barnsley Foodbank Partnership — Delivery Note ${esc(deliveryNumber)}
+      </footer>
+    </div>
+  `;
+
+  document.body.appendChild(area);
+  document.title='Delivery Note '+deliveryNumber;
+
+  const cleanup=()=>{
+    const printArea=document.getElementById('printArea');
+    if(printArea) printArea.remove();
+    document.title='Barnsley Foodbank Partnership — Warehouse';
+    window.removeEventListener('afterprint',cleanup);
+  };
+
+  window.addEventListener('afterprint',cleanup);
+
+  // Directly invoke the browser printer while the click is active.
+  window.print();
+}
+
+/* EVENT HANDLERS */
+
+$('deliveriesTable')
+  .addEventListener(
+    'click',
+    function(e){
+      const btn=e.target.closest('[data-print-delivery]');
+      if(!btn) return;
+      printDelivery(btn.dataset.printDelivery);
+    }
+  );
+
+
+populateHistoryOrganisationFilters();
+
+$('applyHistoryFilters')
+  .onclick=()=>renderHistory(profilesCache);
+
+$('clearHistoryFilters')
+  .onclick=()=>{
+    $('historyDateFrom').value='';
+    $('historyDateTo').value='';
+    $('historyType').value='ALL';
+    $('historyDonor').value='ALL';
+    $('historyRecipient').value='ALL';
+    $('deliveryDetail').classList.add('hidden');
+    renderHistory(profilesCache);
+  };
+
+$('historyDateFrom').onchange=()=>renderHistory(profilesCache);
+$('historyDateTo').onchange=()=>renderHistory(profilesCache);
+$('historyType').onchange=()=>renderHistory(profilesCache);
+$('historyDonor').onchange=()=>{
+  if($('historyDonor').value!=='ALL'){
+    $('historyRecipient').value='ALL';
+    $('historyType').value='IN';
+  }
+  renderHistory(profilesCache);
+};
+$('historyRecipient').onchange=()=>{
+  if($('historyRecipient').value!=='ALL'){
+    $('historyDonor').value='ALL';
+    $('historyType').value='OUT';
+  }
+  renderHistory(profilesCache);
+};
+$('exportHistoryExcel').onclick=exportHistoryExcel;
+
+$('historyTable').addEventListener('click',function(e){
+  const btn=e.target.closest('[data-view-delivery]');
+  if(!btn) return;
+  viewHistoryDelivery(btn.dataset.viewDelivery);
+});
+
+$('loginForm')
+  .addEventListener(
+    'submit',
+    login
+  );
+
+
+$('forgotPassword')
+  .onclick=
+    forgotPassword;
+
+
+$('resetForm')
+  .addEventListener(
+    'submit',
+    setNewPassword
+  );
+
+
+$('backToLogin')
+  .onclick=
+    async()=>{
+      await sb.auth.signOut();
+      showLogin();
+    };
+
+
+$('logout')
+  .onclick=
+    ()=>sb.auth.signOut();
+
+
+document
+  .querySelectorAll('.nav button')
+  .forEach(
+    b=>
+      b.onclick=
+        ()=>showPage(
+          b.dataset.page
+        )
+  );
+
+
+$('inForm').onsubmit=
+  e=>{
+    e.preventDefault();
+    addMove(
+      'IN',
+      e.target
+    );
+  };
+
+
+$('outForm').onsubmit=
+  e=>{
+    e.preventDefault();
+    addMove(
+      'OUT',
+      e.target
+    );
+  };
+
+
+$('convertForm').onsubmit=convertStock;
+$('addConvertLine').onclick=addConvertLine;
+$('convertSourceItem').addEventListener('change',()=>{
+  const source=stock.find(x=>String(x.item_id||x.id)===String($('convertSourceItem').value||''));
+  $('convertSourceQty').max=source?String(Number(source.current_quantity||0)):'';
+  $('convertSourceQty').value='';
+  renderConvertSummary();
+});
+$('convertSourceQty').addEventListener('input',renderConvertSummary);
+$('convertLines').addEventListener('input',e=>{
+  const line=e.target.closest('.convert-line');
+  if(line){ calculateConvertLineTotal(line); renderConvertSummary(); }
+});
+$('convertLines').addEventListener('change',e=>{
+  const line=e.target.closest('.convert-line');
+  if(line){ calculateConvertLineTotal(line); renderConvertSummary(); }
+});
+$('convertLines').addEventListener('click',e=>{
+  const btn=e.target.closest('.remove-convert-line');
+  if(!btn) return;
+  btn.closest('.convert-line')?.remove();
+  refreshConvertLineButtons();
+  renderConvertSummary();
+});
+
+
+$('newOrg')
+  .onclick=
+    openOrgEditor;
+
+
+
+
+$('addStockInLine').onclick=addStockInLine;
+$('stockInLines').addEventListener('input',e=>{
+  const line=e.target.closest('.stock-in-line');
+  if(line && (e.target.classList.contains('sil-qty')||e.target.classList.contains('sil-unit'))) calculateStockInLineTotal(line);
+});
+$('stockInLines').addEventListener('click',e=>{
+  const btn=e.target.closest('.remove-stock-in-line');
+  if(!btn) return;
+  const line=document.querySelector('.stock-in-line[data-line-id="'+CSS.escape(btn.dataset.lineId)+'"]');
+  if(line) line.remove();
+  refreshStockInLineButtons();
+});
+$('outStockSearch').oninput=renderOutStock;
+
+
+/* START */
+
+addStockInLine();
+prepareStockInReferences();
+boot();
+
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>

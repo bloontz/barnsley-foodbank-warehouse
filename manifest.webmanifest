@@ -1,21 +1,25 @@
 {
-  "name": "Barnsley Foodbank Warehouse",
+  "name": "Barnsley Foodbank Partnership \u2014 Warehouse",
   "short_name": "Barnsley Warehouse",
-  "start_url": "./",
+  "description": "Barnsley Foodbank Partnership warehouse management system.",
+  "start_url": "./app.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#ffffff",
-  "theme_color": "#1f6f43",
-  "description": "Barnsley Foodbank Partnership Warehouse Management System",
+  "theme_color": "#1f5f3a",
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
